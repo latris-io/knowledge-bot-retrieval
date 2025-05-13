@@ -260,3 +260,52 @@
 2025-05-13 18:00:13,898 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
 2025-05-13 18:00:18,981 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 2025-05-13 18:00:18,983 — INFO — bot — [RETRIEVAL] Sources: ['How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'Modified_Schedule_2_3_2025_11_33_49_AM_0efcb30c5f.pdf', 'Modified_Schedule_2_3_2025_11_33_49_AM_0efcb30c5f.pdf', 'Modified_Schedule_2_3_2025_11_33_49_AM_0efcb30c5f.pdf', 'Modified_Schedule_2_3_2025_11_33_49_AM_0efcb30c5f.pdf', 'Modified_Schedule_2_3_2025_11_33_49_AM_0efcb30c5f.pdf'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+2025-05-13 18:20:06,914 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-05-13 18:20:27,877 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-13 18:20:28,670 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-13 18:20:28,684 — INFO — bot — [CLASSIFIER] Question: what kind of composite do i use when bonding attachements?, Mode: qa
+2025-05-13 18:20:28,684 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-13 18:20:28,701 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-05-13 18:20:29,097 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-05-13 18:20:29,347 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-05-13 18:20:29,462 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-05-13 18:20:29,655 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-05-13 18:20:29,790 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-05-13 18:20:29,791 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-05-13 18:20:29,791 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-13 18:20:29,912 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/get "HTTP/1.1 200 OK"
+2025-05-13 18:20:29,917 — INFO — retriever — [RETRIEVER] Initialized BM25 with 35 documents
+2025-05-13 18:20:29,917 — INFO — retriever — [RETRIEVER DEBUG] EmbeddingsFilter threshold set to 0.2
+2025-05-13 18:20:29,917 — INFO — retriever — [RETRIEVER] Hybrid retriever ready — k=20, threshold=0.2
+2025-05-13 18:20:29,918 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "file_name": "How to Bond Attachments.pdf",
+  "bot_id": 1,
+  "ocr_used": false,
+  "file_document_id": "hp6zawg0gx74en0uttdj774n",
+  "company_id": 1,
+  "source_type": "manual_upload",
+  "page_count": 2,
+  "chunk_id": "ee91e1c6-b2d3-4a64-b61a-8c6db5e4186c",
+  "page_number": 1,
+  "storage_key": "7efdb25edb07b6e11d84b98680170061b81124b8e68c355f8f16aee864abdfe6.pdf",
+  "section_title": "Section 0",
+  "chunk_index": 0,
+  "creation_date": "D:20250505171151+00'00'",
+  "mime": "application/pdf",
+  "author": "python-docx",
+  "event_id": 154
+}
+2025-05-13 18:20:29,918 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-13 18:20:29,938 — INFO — bot — [MEMORY] Created new history for session web-session
+2025-05-13 18:20:30,842 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-13 18:20:30,844 — INFO — langchain.retrievers.multi_query — Generated queries: ['What type of composite material is best for bonding attachments?  ', 'Which composite should I choose for attaching different components?  ', 'What are the recommended composites for securely bonding attachments?']
+2025-05-13 18:20:31,919 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-13 18:20:32,026 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/query "HTTP/1.1 200 OK"
+2025-05-13 18:20:32,382 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-13 18:20:32,472 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/query "HTTP/1.1 200 OK"
+2025-05-13 18:20:33,067 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-13 18:20:33,216 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/query "HTTP/1.1 200 OK"
+2025-05-13 18:20:34,299 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-13 18:20:34,915 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-13 18:20:36,554 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-13 18:20:36,556 — INFO — bot — [RETRIEVAL] Sources: ['How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'How to Bond Attachments.pdf'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
