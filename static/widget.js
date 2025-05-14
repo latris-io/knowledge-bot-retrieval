@@ -3,106 +3,104 @@
     const API_URL = "https://knowledge-bot-retrieval.onrender.com";
   
     const STYLE = `
-  .kb-btn {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    width: 56px;
-    height: 56px;
-    background: #2563eb;
-    border-radius: 9999px;
-    color: #fff;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 9999;
-  }
-
-  .kb-modal {
-    position: fixed;
-    bottom: 90px;
-    right: 24px;
-    width: 360px;
-    max-height: 80vh;
-    background: #fff;
-    border-radius: 16px;
-    padding: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    font-family: sans-serif;
-    z-index: 9999;
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  .kb-modal *, .kb-modal *::before, .kb-modal *::after {
-    box-sizing: border-box;
-  }
-
-  .kb-close {
-    position: absolute;
-    top: 8px;
-    right: 12px;
-    font-size: 18px;
-    color: #666;
-    cursor: pointer;
-  }
-
-  .kb-modal textarea {
-    resize: none;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    width: 100%;
-    margin-top: 16px;
-    box-sizing: border-box;
-    font-family: inherit;
-    font-size: 14px;
-  }
-
-  .kb-modal button {
-    margin-top: 8px;
-    background: #2563eb;
-    color: #fff;
-    padding: 10px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-
-  .kb-answer {
-    margin-top: 12px;
-    background: #f9fafb;
-    padding: 10px;
-    border-radius: 8px;
-    font-size: 14px;
-    white-space: pre-wrap;
-    max-height: 200px;
-    overflow-y: auto;
-  }
-
-  @media (max-width: 480px) {
-    .kb-modal {
-      right: 12px;
-      left: 12px;
-      width: auto;
-      bottom: 80px;
-      border-radius: 12px;
-      padding: 12px;
-    }
-    .kb-btn {
-      bottom: 16px;
-      right: 16px;
-      width: 48px;
-      height: 48px;
-      font-size: 20px;
-    }
-  }
-`;
-
+      .kb-btn {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 56px;
+        height: 56px;
+        background: #2563eb;
+        border-radius: 9999px;
+        color: #fff;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 9999;
+      }
+  
+      .kb-modal {
+        position: fixed;
+        bottom: 90px;
+        right: 24px;
+        width: 360px;
+        max-height: 80vh;
+        background: #fff;
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        font-family: sans-serif;
+        z-index: 9999;
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+      }
+  
+      .kb-modal *, .kb-modal *::before, .kb-modal *::after {
+        box-sizing: border-box;
+      }
+  
+      .kb-close {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        font-size: 18px;
+        color: #666;
+        cursor: pointer;
+      }
+  
+      .kb-modal textarea {
+        resize: none;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        width: 100%;
+        margin-top: 16px;
+        box-sizing: border-box;
+        font-family: inherit;
+        font-size: 14px;
+      }
+  
+      .kb-modal button {
+        margin-top: 8px;
+        background: #2563eb;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+  
+      .kb-answer {
+        margin-top: 12px;
+        background: #f9fafb;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 14px;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+  
+      @media (max-width: 480px) {
+        .kb-modal {
+          right: 12px;
+          left: 12px;
+          width: auto;
+          bottom: 80px;
+          border-radius: 12px;
+          padding: 12px;
+        }
+        .kb-btn {
+          bottom: 16px;
+          right: 16px;
+          width: 48px;
+          height: 48px;
+          font-size: 20px;
+        }
+      }
+    `;
   
     const style = document.createElement("style");
     style.innerText = STYLE;
@@ -130,19 +128,20 @@
   
     btn.onclick = () => {
       modal.style.display = modal.style.display === "flex" ? "none" : "flex";
+      modal.style.flexDirection = "column";
     };
   
     closeBtn.onclick = () => {
       modal.style.display = "none";
       textarea.value = "";
-      answerBox.textContent = "";
+      answerBox.innerHTML = "";
     };
   
     askBtn.onclick = async () => {
       const question = textarea.value.trim();
       if (!question) return;
   
-      answerBox.textContent = "Thinking...";
+      answerBox.innerHTML = `<em>Thinking...</em>`;
       askBtn.disabled = true;
   
       try {
@@ -155,13 +154,17 @@
           body: JSON.stringify({ question })
         });
         const data = await res.json();
-        answerBox.textContent = data.answer || data.error || "No response.";
+  
+        const raw = data.answer || data.error || "No response.";
+        const markdown = marked.parse(raw);
+        answerBox.innerHTML = window.DOMPurify
+          ? DOMPurify.sanitize(markdown)
+          : markdown;
       } catch (err) {
         answerBox.textContent = `Error: ${err.message}`;
       } finally {
         askBtn.disabled = false;
         textarea.value = "";
-  
       }
     };
   })();
