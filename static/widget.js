@@ -19,6 +19,7 @@
     cursor: pointer;
     z-index: 9999;
   }
+
   .kb-modal {
     position: fixed;
     bottom: 90px;
@@ -33,10 +34,13 @@
     z-index: 9999;
     display: none;
     flex-direction: column;
+    overflow: hidden;
   }
+
   .kb-modal *, .kb-modal *::before, .kb-modal *::after {
     box-sizing: border-box;
   }
+
   .kb-close {
     position: absolute;
     top: 8px;
@@ -45,6 +49,7 @@
     color: #666;
     cursor: pointer;
   }
+
   .kb-modal textarea {
     resize: none;
     padding: 10px;
@@ -53,7 +58,10 @@
     width: 100%;
     margin-top: 16px;
     box-sizing: border-box;
+    font-family: inherit;
+    font-size: 14px;
   }
+
   .kb-modal button {
     margin-top: 8px;
     background: #2563eb;
@@ -62,7 +70,9 @@
     border: none;
     border-radius: 8px;
     cursor: pointer;
+    font-size: 14px;
   }
+
   .kb-answer {
     margin-top: 12px;
     background: #f9fafb;
@@ -70,8 +80,29 @@
     border-radius: 8px;
     font-size: 14px;
     white-space: pre-wrap;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  @media (max-width: 480px) {
+    .kb-modal {
+      right: 12px;
+      left: 12px;
+      width: auto;
+      bottom: 80px;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .kb-btn {
+      bottom: 16px;
+      right: 16px;
+      width: 48px;
+      height: 48px;
+      font-size: 20px;
+    }
   }
 `;
+
   
     const style = document.createElement("style");
     style.innerText = STYLE;
