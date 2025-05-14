@@ -744,3 +744,52 @@
 2025-05-13 18:40:13,674 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
 2025-05-13 18:40:14,761 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 2025-05-13 18:40:14,763 — INFO — bot — [RETRIEVAL] Sources: ['How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'How to Bond Attachments.pdf'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+2025-05-14 07:02:26,708 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-05-14 07:03:29,444 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 07:03:30,184 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 07:03:30,209 — INFO — bot — [CLASSIFIER] Question: how do i bond attachments?, Mode: qa
+2025-05-14 07:03:30,210 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 07:03:30,225 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-05-14 07:03:30,655 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-05-14 07:03:30,857 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-05-14 07:03:30,963 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-05-14 07:03:31,039 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-05-14 07:03:31,125 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-05-14 07:03:31,127 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-05-14 07:03:31,127 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 07:03:31,266 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/get "HTTP/1.1 200 OK"
+2025-05-14 07:03:31,271 — INFO — retriever — [RETRIEVER] Initialized BM25 with 35 documents
+2025-05-14 07:03:31,272 — INFO — retriever — [RETRIEVER DEBUG] EmbeddingsFilter threshold set to 0.2
+2025-05-14 07:03:31,272 — INFO — retriever — [RETRIEVER] Hybrid retriever ready — k=20, threshold=0.2
+2025-05-14 07:03:31,272 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "file_name": "How to Bond Attachments.pdf",
+  "page_number": 1,
+  "mime": "application/pdf",
+  "creation_date": "D:20250505171151+00'00'",
+  "chunk_index": 0,
+  "event_id": 154,
+  "file_document_id": "hp6zawg0gx74en0uttdj774n",
+  "storage_key": "7efdb25edb07b6e11d84b98680170061b81124b8e68c355f8f16aee864abdfe6.pdf",
+  "bot_id": 1,
+  "chunk_id": "ee91e1c6-b2d3-4a64-b61a-8c6db5e4186c",
+  "source_type": "manual_upload",
+  "section_title": "Section 0",
+  "company_id": 1,
+  "ocr_used": false,
+  "page_count": 2,
+  "author": "python-docx"
+}
+2025-05-14 07:03:31,272 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 07:03:31,290 — INFO — bot — [MEMORY] Created new history for session web-028ed72b-33a6-4073-9afe-e19b1290d21a
+2025-05-14 07:03:33,020 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 07:03:33,022 — INFO — langchain.retrievers.multi_query — Generated queries: ['What are effective methods for strengthening emotional attachments?  ', 'How can I create deeper connections with my attachments?  ', 'What strategies can I use to enhance the bonding process with my attachments?']
+2025-05-14 07:03:37,244 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-14 07:03:37,569 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/query "HTTP/1.1 200 OK"
+2025-05-14 07:03:38,136 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-14 07:03:38,281 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/query "HTTP/1.1 200 OK"
+2025-05-14 07:03:38,513 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-14 07:03:38,651 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/query "HTTP/1.1 200 OK"
+2025-05-14 07:03:39,140 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-14 07:03:39,982 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-14 07:03:46,503 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 07:03:46,506 — INFO — bot — [RETRIEVAL] Sources: ['How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'Modified_Schedule_2_3_2025_11_33_49_AM_0efcb30c5f.pdf', 'Modified_Schedule_2_3_2025_11_33_49_AM_0efcb30c5f.pdf', 'Modified_Schedule_2_3_2025_11_33_49_AM_0efcb30c5f.pdf', 'Modified_Schedule_2_3_2025_11_33_49_AM_0efcb30c5f.pdf', 'Modified_Schedule_2_3_2025_11_33_49_AM_0efcb30c5f.pdf'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
