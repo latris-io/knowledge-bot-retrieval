@@ -58,7 +58,7 @@
         width: 100%;
         margin-top: 16px;
         font-family: inherit;
-        font-size: 14px;
+        font-size: 16px;
       }
   
       .kb-modal button {
@@ -69,7 +69,7 @@
         border: none;
         border-radius: 8px;
         cursor: pointer;
-        font-size: 14px;
+        font-size: 16px;
       }
   
       .kb-answer {
