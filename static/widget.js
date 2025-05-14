@@ -98,6 +98,19 @@
         100% { transform: rotate(360deg); }
       }
   
+      details.kb-sources {
+        margin-top: 12px;
+        background: #eef2ff;
+        padding: 8px;
+        border-radius: 6px;
+        font-size: 13px;
+      }
+  
+      summary {
+        cursor: pointer;
+        font-weight: bold;
+      }
+  
       @media (max-width: 480px) {
         .kb-modal {
           right: 12px;
@@ -142,13 +155,12 @@
     const closeBtn = modal.querySelector(".kb-close");
   
     btn.onclick = () => {
-        const isOpen = modal.style.display === "flex";
-        modal.style.display = isOpen ? "none" : "flex";
-        if (!isOpen) {
-          setTimeout(() => textarea.focus(), 50); // slight delay ensures element is visible before focusing
-        }
+      const isOpen = modal.style.display === "flex";
+      modal.style.display = isOpen ? "none" : "flex";
+      if (!isOpen) {
+        setTimeout(() => textarea.focus(), 50);
+      }
     };
-      
   
     closeBtn.onclick = () => {
       modal.style.display = "none";
@@ -157,41 +169,51 @@
     };
   
     askBtn.onclick = async () => {
-        const question = textarea.value.trim();
-        if (!question) return;
-      
-        // Clear previous content and show spinner
-        answerBox.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <div class="kb-spinner"></div>
-            <span>Thinking...</span>
-          </div>
-        `;
-        askBtn.disabled = true;
-      
-        try {
-          const res = await fetch(`${API_URL}/ask`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ question })
-          });
-      
-          const data = await res.json();
-          const raw = data.answer || data.error || "No response.";
-          const markdown = marked.parse(raw);
-          answerBox.innerHTML = window.DOMPurify
-            ? DOMPurify.sanitize(markdown)
-            : markdown;
-        } catch (err) {
-          answerBox.innerHTML = `<strong>Error:</strong> ${err.message}`;
-        } finally {
-          askBtn.disabled = false;
-          textarea.value = "";
-        }
-      };
-      
+      const question = textarea.value.trim();
+      if (!question) return;
+  
+      answerBox.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="kb-spinner"></div>
+          <span>Thinking...</span>
+        </div>
+      `;
+      askBtn.disabled = true;
+  
+      try {
+        const res = await fetch(`${API_URL}/ask`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({ question })
+        });
+  
+        const data = await res.json();
+        let raw = data.answer || data.error || "No response.";
+  
+        // Extract sources
+        const sourceMatches = [...raw.matchAll(/\[source: (.+?)\]/g)];
+        const sources = sourceMatches.map(match => match[1]);
+  
+        // Remove [source: ...] from main text
+        raw = raw.replace(/\[source: .+?\]/g, "").trim();
+  
+        const mainHtml = marked.parse(raw);
+        const sourcesHtml = sources.length
+          ? `<details class="kb-sources"><summary>Show Sources (${sources.length})</summary><ul>${sources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
+          : "";
+  
+        answerBox.innerHTML = window.DOMPurify
+          ? DOMPurify.sanitize(mainHtml + sourcesHtml)
+          : (mainHtml + sourcesHtml);
+      } catch (err) {
+        answerBox.innerHTML = `<strong>Error:</strong> ${err.message}`;
+      } finally {
+        askBtn.disabled = false;
+        textarea.value = "";
+      }
+    };
   })();
   
