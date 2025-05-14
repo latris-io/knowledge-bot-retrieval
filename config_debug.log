@@ -793,3 +793,5 @@
 2025-05-14 07:03:39,982 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
 2025-05-14 07:03:46,503 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 2025-05-14 07:03:46,506 — INFO — bot — [RETRIEVAL] Sources: ['How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'How to Bond Attachments.pdf', 'Modified_Schedule_2_3_2025_11_33_49_AM_0efcb30c5f.pdf', 'Modified_Schedule_2_3_2025_11_33_49_AM_0efcb30c5f.pdf', 'Modified_Schedule_2_3_2025_11_33_49_AM_0efcb30c5f.pdf', 'Modified_Schedule_2_3_2025_11_33_49_AM_0efcb30c5f.pdf', 'Modified_Schedule_2_3_2025_11_33_49_AM_0efcb30c5f.pdf'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+2025-05-14 07:09:41,513 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-05-14 07:11:23,361 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
