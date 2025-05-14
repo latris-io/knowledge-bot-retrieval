@@ -57,7 +57,6 @@
         border-radius: 8px;
         width: 100%;
         margin-top: 16px;
-        box-sizing: border-box;
         font-family: inherit;
         font-size: 14px;
       }
@@ -81,6 +80,22 @@
         font-size: 14px;
         max-height: 200px;
         overflow-y: auto;
+      }
+  
+      .kb-spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #2563eb;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        animation: kb-spin 0.8s linear infinite;
+        display: inline-block;
+        vertical-align: middle;
+      }
+  
+      @keyframes kb-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
       }
   
       @media (max-width: 480px) {
@@ -138,34 +153,41 @@
     };
   
     askBtn.onclick = async () => {
-      const question = textarea.value.trim();
-      if (!question) return;
-  
-      answerBox.innerHTML = `<em>Thinking...</em>`;
-      askBtn.disabled = true;
-  
-      try {
-        const res = await fetch(`${API_URL}/ask`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
-          body: JSON.stringify({ question })
-        });
-        const data = await res.json();
-  
-        const raw = data.answer || data.error || "No response.";
-        const markdown = marked.parse(raw);
-        answerBox.innerHTML = window.DOMPurify
-          ? DOMPurify.sanitize(markdown)
-          : markdown;
-      } catch (err) {
-        answerBox.textContent = `Error: ${err.message}`;
-      } finally {
-        askBtn.disabled = false;
-        textarea.value = "";
-      }
-    };
+        const question = textarea.value.trim();
+        if (!question) return;
+      
+        // Clear previous content and show spinner
+        answerBox.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="kb-spinner"></div>
+            <span>Thinking...</span>
+          </div>
+        `;
+        askBtn.disabled = true;
+      
+        try {
+          const res = await fetch(`${API_URL}/ask`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ question })
+          });
+      
+          const data = await res.json();
+          const raw = data.answer || data.error || "No response.";
+          const markdown = marked.parse(raw);
+          answerBox.innerHTML = window.DOMPurify
+            ? DOMPurify.sanitize(markdown)
+            : markdown;
+        } catch (err) {
+          answerBox.innerHTML = `<strong>Error:</strong> ${err.message}`;
+        } finally {
+          askBtn.disabled = false;
+          textarea.value = "";
+        }
+      };
+      
   })();
   
