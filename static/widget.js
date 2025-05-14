@@ -142,9 +142,13 @@
     const closeBtn = modal.querySelector(".kb-close");
   
     btn.onclick = () => {
-      modal.style.display = modal.style.display === "flex" ? "none" : "flex";
-      modal.style.flexDirection = "column";
+        const isOpen = modal.style.display === "flex";
+        modal.style.display = isOpen ? "none" : "flex";
+        if (!isOpen) {
+          setTimeout(() => textarea.focus(), 50); // slight delay ensures element is visible before focusing
+        }
     };
+      
   
     closeBtn.onclick = () => {
       modal.style.display = "none";
