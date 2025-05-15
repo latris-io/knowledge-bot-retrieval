@@ -27,7 +27,7 @@ DEFAULT_SIMILARITY_THRESHOLD = float(os.getenv("RETRIEVER_SIMILARITY_THRESHOLD",
 class RetrieverService:
     def __init__(self):
         self.embedding_function = OpenAIEmbeddings(
-            model="text-embedding-3-small",
+            model="text-embedding-3-large",
             openai_api_key=get_openai_api_key()
         )
         logger.info("[RETRIEVER] Initialized RetrieverService")

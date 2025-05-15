@@ -809,3 +809,535 @@
 2025-05-14 09:51:38,109 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
 2025-05-14 12:01:01,202 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
 2025-05-14 12:03:07,212 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-05-14 12:35:11,182 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-05-14 17:12:01,875 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-05-14 17:13:19,653 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-05-14 19:24:50,720 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 19:24:51,785 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 19:24:51,796 — INFO — bot — [CLASSIFIER] Question: what time does the brentwood office opeN?, Mode: qa
+2025-05-14 19:24:51,796 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 19:24:51,821 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-05-14 19:24:52,475 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-05-14 19:24:52,654 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-05-14 19:24:52,740 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-05-14 19:24:52,837 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-05-14 19:24:52,933 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-05-14 19:24:52,935 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-05-14 19:24:52,935 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 19:24:53,043 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/get "HTTP/1.1 200 OK"
+2025-05-14 19:24:53,046 — INFO — retriever — [RETRIEVER] Initialized BM25 with 9 documents
+2025-05-14 19:24:53,046 — INFO — retriever — [RETRIEVER DEBUG] EmbeddingsFilter threshold set to 0.2
+2025-05-14 19:24:53,047 — INFO — retriever — [RETRIEVER] Hybrid retriever ready — k=20, threshold=0.2
+2025-05-14 19:24:53,047 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "storage_key": "Lucas_Offices_826788fe89.pdf",
+  "bot_id": 1,
+  "section_title": "Section 0",
+  "ocr_used": false,
+  "mime": "application/pdf",
+  "chunk_index": 0,
+  "source_type": "manual_upload",
+  "event_id": 190,
+  "author": "Marty Bremer",
+  "company_id": 3,
+  "file_name": "Lucas Offices.pdf",
+  "creation_date": "D:20250514213157+00'00'",
+  "page_number": 1,
+  "file_document_id": "f328fro1fernr7k0ekxr6jqe",
+  "page_count": 3,
+  "chunk_id": "5bf169f8-4280-4866-b369-3565a5978349"
+}
+2025-05-14 19:24:53,047 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 19:24:53,074 — INFO — bot — [MEMORY] Created new history for session web-0ff5cc6c-5f81-4589-9a01-54953af23929
+2025-05-14 19:24:54,034 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 19:24:54,036 — INFO — langchain.retrievers.multi_query — Generated queries: ['What are the opening hours for the Brentwood office?  ', 'When does the Brentwood office start its operations for the day?  ', 'Can you tell me the opening time of the Brentwood office?']
+2025-05-14 19:24:56,902 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-14 19:24:57,008 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/query "HTTP/1.1 200 OK"
+2025-05-14 19:24:57,515 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-14 19:24:57,708 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/query "HTTP/1.1 200 OK"
+2025-05-14 19:24:57,992 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-14 19:24:58,147 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/query "HTTP/1.1 200 OK"
+2025-05-14 19:24:59,036 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 19:24:59,038 — INFO — bot — [RETRIEVAL] Sources: ['Lucas Offices.pdf', 'Lucas Offices.pdf', 'Lucas Offices.pdf', 'Lucas Offices.pdf', 'Lucas Offices.pdf', 'Lucas Offices.pdf', 'Lucas Offices.pdf', 'Lucas Offices.pdf', 'Lucas Offices.pdf'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+2025-05-14 19:25:33,901 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 19:25:34,555 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 19:25:34,559 — INFO — bot — [CLASSIFIER] Question: what time does the brentwood office opeN?, Mode: qa
+2025-05-14 19:25:34,559 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 19:25:34,582 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-05-14 19:25:34,739 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-05-14 19:25:34,904 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-05-14 19:25:34,996 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-05-14 19:25:35,104 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-05-14 19:25:35,237 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-05-14 19:25:35,238 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-05-14 19:25:35,238 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 19:25:35,362 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/get "HTTP/1.1 200 OK"
+2025-05-14 19:25:35,362 — INFO — retriever — [RETRIEVER] Initialized BM25 with 9 documents
+2025-05-14 19:25:35,362 — INFO — retriever — [RETRIEVER DEBUG] EmbeddingsFilter threshold set to 0.2
+2025-05-14 19:25:35,363 — INFO — retriever — [RETRIEVER] Hybrid retriever ready — k=20, threshold=0.2
+2025-05-14 19:25:35,363 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "page_count": 3,
+  "storage_key": "Lucas_Offices_826788fe89.pdf",
+  "company_id": 3,
+  "chunk_index": 0,
+  "creation_date": "D:20250514213157+00'00'",
+  "page_number": 1,
+  "event_id": 190,
+  "file_document_id": "f328fro1fernr7k0ekxr6jqe",
+  "source_type": "manual_upload",
+  "bot_id": 1,
+  "section_title": "Section 0",
+  "mime": "application/pdf",
+  "ocr_used": false,
+  "file_name": "Lucas Offices.pdf",
+  "chunk_id": "5bf169f8-4280-4866-b369-3565a5978349",
+  "author": "Marty Bremer"
+}
+2025-05-14 19:25:35,363 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 19:25:35,385 — INFO — bot — [MEMORY] Created new history for session web-7648e299-ba77-4b56-8fc7-8450afa3f31e
+2025-05-14 19:25:36,320 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 19:25:36,322 — INFO — langchain.retrievers.multi_query — Generated queries: ['What are the opening hours for the Brentwood office?  ', 'When does the Brentwood office start its operations for the day?  ', 'Can you tell me the opening time of the Brentwood office?']
+2025-05-14 19:25:37,400 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-14 19:25:37,521 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/query "HTTP/1.1 200 OK"
+2025-05-14 19:25:38,171 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-14 19:25:38,276 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/query "HTTP/1.1 200 OK"
+2025-05-14 19:25:38,536 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-14 19:25:38,643 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/query "HTTP/1.1 200 OK"
+2025-05-14 19:25:39,227 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 19:25:39,228 — INFO — bot — [RETRIEVAL] Sources: ['Lucas Offices.pdf', 'Lucas Offices.pdf', 'Lucas Offices.pdf', 'Lucas Offices.pdf', 'Lucas Offices.pdf', 'Lucas Offices.pdf', 'Lucas Offices.pdf', 'Lucas Offices.pdf', 'Lucas Offices.pdf'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+2025-05-14 19:27:21,853 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-05-14 19:27:29,690 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 19:27:31,265 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 19:27:31,275 — INFO — bot — [CLASSIFIER] Question: what time does the brentwood office opeN?, Mode: qa
+2025-05-14 19:27:31,275 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 19:27:31,298 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-05-14 19:27:31,555 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-05-14 19:27:31,738 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-05-14 19:27:31,834 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-05-14 19:27:31,931 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-05-14 19:27:32,026 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-05-14 19:27:32,027 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-05-14 19:27:32,027 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 19:27:32,115 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/get "HTTP/1.1 200 OK"
+2025-05-14 19:27:32,117 — INFO — retriever — [RETRIEVER] Initialized BM25 with 9 documents
+2025-05-14 19:27:32,117 — INFO — retriever — [RETRIEVER DEBUG] EmbeddingsFilter threshold set to 0.2
+2025-05-14 19:27:32,118 — INFO — retriever — [RETRIEVER] Hybrid retriever ready — k=20, threshold=0.2
+2025-05-14 19:27:32,118 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "storage_key": "Lucas_Offices_826788fe89.pdf",
+  "section_title": "Section 0",
+  "source_type": "manual_upload",
+  "file_name": "Lucas Offices.pdf",
+  "file_document_id": "f328fro1fernr7k0ekxr6jqe",
+  "mime": "application/pdf",
+  "page_number": 1,
+  "event_id": 190,
+  "chunk_id": "5bf169f8-4280-4866-b369-3565a5978349",
+  "author": "Marty Bremer",
+  "bot_id": 1,
+  "creation_date": "D:20250514213157+00'00'",
+  "chunk_index": 0,
+  "ocr_used": false,
+  "company_id": 3,
+  "page_count": 3
+}
+2025-05-14 19:27:32,118 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 19:27:32,145 — INFO — bot — [MEMORY] Created new history for session web-821a284f-27db-4c16-9a28-bde3d38d17c6
+2025-05-14 19:27:33,126 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 19:27:33,128 — INFO — langchain.retrievers.multi_query — Generated queries: ['What are the opening hours for the Brentwood office?  ', 'Can you tell me when the Brentwood office starts operating?  ', 'At what time does the Brentwood office begin its services?']
+2025-05-14 19:27:33,812 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-14 19:27:34,022 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/query "HTTP/1.1 400 Bad Request"
+2025-05-14 19:27:34,049 — ERROR — bot — [BOT] Error processing question: Collection expecting embedding with dimension of 1536, got 3072
+Traceback (most recent call last):
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/bot.py", line 190, in ask_question
+    result = await asyncio.to_thread(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/usr/local/Cellar/python@3.13/3.13.3/Frameworks/Python.framework/Versions/3.13/lib/python3.13/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.13/3.13.3/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/base.py", line 5416, in invoke
+    return self.bound.invoke(
+           ~~~~~~~~~~~~~~~~~^
+        input,
+        ^^^^^^
+        self._merge_configs(config),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **{**self.kwargs, **kwargs},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/base.py", line 5416, in invoke
+    return self.bound.invoke(
+           ~~~~~~~~~~~~~~~~~^
+        input,
+        ^^^^^^
+        self._merge_configs(config),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **{**self.kwargs, **kwargs},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/base.py", line 3034, in invoke
+    input = context.run(step.invoke, input, config)
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/base.py", line 5416, in invoke
+    return self.bound.invoke(
+           ~~~~~~~~~~~~~~~~~^
+        input,
+        ^^^^^^
+        self._merge_configs(config),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **{**self.kwargs, **kwargs},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/base.py", line 4757, in invoke
+    return self._call_with_config(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        self._invoke,
+        ^^^^^^^^^^^^^
+    ...<2 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/base.py", line 1930, in _call_with_config
+    context.run(
+    ~~~~~~~~~~~^
+        call_func_with_variable_args,  # type: ignore[arg-type]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    ),
+    ^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/config.py", line 428, in call_func_with_variable_args
+    return func(input, **kwargs)  # type: ignore[call-arg]
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/base.py", line 4626, in _invoke
+    output = output.invoke(
+        input,
+    ...<4 lines>...
+        ),
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/base.py", line 5416, in invoke
+    return self.bound.invoke(
+           ~~~~~~~~~~~~~~~~~^
+        input,
+        ^^^^^^
+        self._merge_configs(config),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **{**self.kwargs, **kwargs},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/chains/base.py", line 167, in invoke
+    raise e
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/chains/base.py", line 157, in invoke
+    self._call(inputs, run_manager=run_manager)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/chains/conversational_retrieval/base.py", line 159, in _call
+    docs = self._get_docs(new_question, inputs, run_manager=_run_manager)
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/chains/conversational_retrieval/base.py", line 396, in _get_docs
+    docs = self.retriever.invoke(
+        question, config={"callbacks": run_manager.get_child()}
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/retrievers.py", line 258, in invoke
+    result = self._get_relevant_documents(
+        input, run_manager=run_manager, **_kwargs
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/retrievers/contextual_compression.py", line 44, in _get_relevant_documents
+    docs = self.base_retriever.invoke(
+        query, config={"callbacks": run_manager.get_child()}, **kwargs
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/retrievers/ensemble.py", line 114, in invoke
+    raise e
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/retrievers/ensemble.py", line 111, in invoke
+    result = self.rank_fusion(input, run_manager=run_manager, config=config)
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/retrievers/ensemble.py", line 219, in rank_fusion
+    retriever.invoke(
+    ~~~~~~~~~~~~~~~~^
+        query,
+        ^^^^^^
+    ...<2 lines>...
+        ),
+        ^^
+    )
+    ^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/retrievers.py", line 258, in invoke
+    result = self._get_relevant_documents(
+        input, run_manager=run_manager, **_kwargs
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/retrievers/multi_query.py", line 172, in _get_relevant_documents
+    documents = self.retrieve_documents(queries, run_manager)
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/retrievers/multi_query.py", line 210, in retrieve_documents
+    docs = self.retriever.invoke(
+        query, config={"callbacks": run_manager.get_child()}
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/retrievers.py", line 258, in invoke
+    result = self._get_relevant_documents(
+        input, run_manager=run_manager, **_kwargs
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/vectorstores/base.py", line 1079, in _get_relevant_documents
+    docs = self.vectorstore.similarity_search(query, **_kwargs)
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_community/vectorstores/chroma.py", line 350, in similarity_search
+    docs_and_scores = self.similarity_search_with_score(
+        query, k, filter=filter, **kwargs
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_community/vectorstores/chroma.py", line 440, in similarity_search_with_score
+    results = self.__query_collection(
+        query_embeddings=[query_embedding],
+    ...<3 lines>...
+        **kwargs,
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/utils/utils.py", line 54, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_community/vectorstores/chroma.py", line 157, in __query_collection
+    return self._collection.query(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        query_texts=query_texts,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/chromadb/api/models/Collection.py", line 221, in query
+    query_results = self._client._query(
+        collection_id=self.id,
+    ...<7 lines>...
+        database=self.database,
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/chromadb/telemetry/opentelemetry/__init__.py", line 150, in wrapper
+    return f(*args, **kwargs)
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/chromadb/api/fastapi.py", line 603, in _query
+    resp_json = self._make_request(
+        "post",
+    ...<10 lines>...
+        },
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/chromadb/api/fastapi.py", line 106, in _make_request
+    BaseHTTPClient._raise_chroma_error(response)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/chromadb/api/base_http_client.py", line 96, in _raise_chroma_error
+    raise chroma_error
+chromadb.errors.InvalidArgumentError: Collection expecting embedding with dimension of 1536, got 3072
+2025-05-14 19:27:45,989 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 19:27:46,313 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 19:27:46,315 — INFO — bot — [CLASSIFIER] Question: what time does the brentwood office opeN?, Mode: qa
+2025-05-14 19:27:46,315 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 19:27:46,337 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-05-14 19:27:46,628 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-05-14 19:27:46,856 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-05-14 19:27:46,939 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-05-14 19:27:47,041 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-05-14 19:27:47,136 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-05-14 19:27:47,137 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-05-14 19:27:47,137 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 19:27:47,233 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/get "HTTP/1.1 200 OK"
+2025-05-14 19:27:47,234 — INFO — retriever — [RETRIEVER] Initialized BM25 with 9 documents
+2025-05-14 19:27:47,235 — INFO — retriever — [RETRIEVER DEBUG] EmbeddingsFilter threshold set to 0.2
+2025-05-14 19:27:47,235 — INFO — retriever — [RETRIEVER] Hybrid retriever ready — k=20, threshold=0.2
+2025-05-14 19:27:47,235 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "creation_date": "D:20250514213157+00'00'",
+  "company_id": 3,
+  "file_document_id": "f328fro1fernr7k0ekxr6jqe",
+  "bot_id": 1,
+  "page_number": 1,
+  "mime": "application/pdf",
+  "event_id": 190,
+  "storage_key": "Lucas_Offices_826788fe89.pdf",
+  "author": "Marty Bremer",
+  "ocr_used": false,
+  "section_title": "Section 0",
+  "chunk_index": 0,
+  "source_type": "manual_upload",
+  "file_name": "Lucas Offices.pdf",
+  "page_count": 3,
+  "chunk_id": "5bf169f8-4280-4866-b369-3565a5978349"
+}
+2025-05-14 19:27:47,235 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-05-14 19:27:47,259 — INFO — bot — [MEMORY] Created new history for session web-3fe6ac9a-30bb-496d-b63c-0fd645f8d085
+2025-05-14 19:27:48,560 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 19:27:48,561 — INFO — langchain.retrievers.multi_query — Generated queries: ['What are the opening hours for the Brentwood office?  ', 'When does the Brentwood office start its operations for the day?  ', 'Can you tell me the opening time of the Brentwood office?']
+2025-05-14 19:27:49,268 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-14 19:27:49,448 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/2445246f-639c-4de6-81ef-0ecaf8dcbc9b/query "HTTP/1.1 400 Bad Request"
+2025-05-14 19:27:49,463 — ERROR — bot — [BOT] Error processing question: Collection expecting embedding with dimension of 1536, got 3072
+Traceback (most recent call last):
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/bot.py", line 190, in ask_question
+    result = await asyncio.to_thread(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/usr/local/Cellar/python@3.13/3.13.3/Frameworks/Python.framework/Versions/3.13/lib/python3.13/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.13/3.13.3/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/base.py", line 5416, in invoke
+    return self.bound.invoke(
+           ~~~~~~~~~~~~~~~~~^
+        input,
+        ^^^^^^
+        self._merge_configs(config),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **{**self.kwargs, **kwargs},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/base.py", line 5416, in invoke
+    return self.bound.invoke(
+           ~~~~~~~~~~~~~~~~~^
+        input,
+        ^^^^^^
+        self._merge_configs(config),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **{**self.kwargs, **kwargs},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/base.py", line 3034, in invoke
+    input = context.run(step.invoke, input, config)
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/base.py", line 5416, in invoke
+    return self.bound.invoke(
+           ~~~~~~~~~~~~~~~~~^
+        input,
+        ^^^^^^
+        self._merge_configs(config),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **{**self.kwargs, **kwargs},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/base.py", line 4757, in invoke
+    return self._call_with_config(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        self._invoke,
+        ^^^^^^^^^^^^^
+    ...<2 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/base.py", line 1930, in _call_with_config
+    context.run(
+    ~~~~~~~~~~~^
+        call_func_with_variable_args,  # type: ignore[arg-type]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    ),
+    ^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/config.py", line 428, in call_func_with_variable_args
+    return func(input, **kwargs)  # type: ignore[call-arg]
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/base.py", line 4626, in _invoke
+    output = output.invoke(
+        input,
+    ...<4 lines>...
+        ),
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/runnables/base.py", line 5416, in invoke
+    return self.bound.invoke(
+           ~~~~~~~~~~~~~~~~~^
+        input,
+        ^^^^^^
+        self._merge_configs(config),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **{**self.kwargs, **kwargs},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/chains/base.py", line 167, in invoke
+    raise e
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/chains/base.py", line 157, in invoke
+    self._call(inputs, run_manager=run_manager)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/chains/conversational_retrieval/base.py", line 159, in _call
+    docs = self._get_docs(new_question, inputs, run_manager=_run_manager)
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/chains/conversational_retrieval/base.py", line 396, in _get_docs
+    docs = self.retriever.invoke(
+        question, config={"callbacks": run_manager.get_child()}
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/retrievers.py", line 258, in invoke
+    result = self._get_relevant_documents(
+        input, run_manager=run_manager, **_kwargs
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/retrievers/contextual_compression.py", line 44, in _get_relevant_documents
+    docs = self.base_retriever.invoke(
+        query, config={"callbacks": run_manager.get_child()}, **kwargs
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/retrievers/ensemble.py", line 114, in invoke
+    raise e
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/retrievers/ensemble.py", line 111, in invoke
+    result = self.rank_fusion(input, run_manager=run_manager, config=config)
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/retrievers/ensemble.py", line 219, in rank_fusion
+    retriever.invoke(
+    ~~~~~~~~~~~~~~~~^
+        query,
+        ^^^^^^
+    ...<2 lines>...
+        ),
+        ^^
+    )
+    ^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/retrievers.py", line 258, in invoke
+    result = self._get_relevant_documents(
+        input, run_manager=run_manager, **_kwargs
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/retrievers/multi_query.py", line 172, in _get_relevant_documents
+    documents = self.retrieve_documents(queries, run_manager)
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain/retrievers/multi_query.py", line 210, in retrieve_documents
+    docs = self.retriever.invoke(
+        query, config={"callbacks": run_manager.get_child()}
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/retrievers.py", line 258, in invoke
+    result = self._get_relevant_documents(
+        input, run_manager=run_manager, **_kwargs
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/vectorstores/base.py", line 1079, in _get_relevant_documents
+    docs = self.vectorstore.similarity_search(query, **_kwargs)
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_community/vectorstores/chroma.py", line 350, in similarity_search
+    docs_and_scores = self.similarity_search_with_score(
+        query, k, filter=filter, **kwargs
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_community/vectorstores/chroma.py", line 440, in similarity_search_with_score
+    results = self.__query_collection(
+        query_embeddings=[query_embedding],
+    ...<3 lines>...
+        **kwargs,
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_core/utils/utils.py", line 54, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/langchain_community/vectorstores/chroma.py", line 157, in __query_collection
+    return self._collection.query(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        query_texts=query_texts,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/chromadb/api/models/Collection.py", line 221, in query
+    query_results = self._client._query(
+        collection_id=self.id,
+    ...<7 lines>...
+        database=self.database,
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/chromadb/telemetry/opentelemetry/__init__.py", line 150, in wrapper
+    return f(*args, **kwargs)
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/chromadb/api/fastapi.py", line 603, in _query
+    resp_json = self._make_request(
+        "post",
+    ...<10 lines>...
+        },
+    )
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/chromadb/api/fastapi.py", line 106, in _make_request
+    BaseHTTPClient._raise_chroma_error(response)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/venv/lib/python3.13/site-packages/chromadb/api/base_http_client.py", line 96, in _raise_chroma_error
+    raise chroma_error
+chromadb.errors.InvalidArgumentError: Collection expecting embedding with dimension of 1536, got 3072
