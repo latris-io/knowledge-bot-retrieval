@@ -21,7 +21,7 @@ from ratelimit import limits, sleep_and_retry
 logger = logging.getLogger(__name__)
 
 DEFAULT_K = int(os.getenv("RETRIEVER_K", 20))
-DEFAULT_SIMILARITY_THRESHOLD = float(os.getenv("RETRIEVER_SIMILARITY_THRESHOLD", 0.2))
+DEFAULT_SIMILARITY_THRESHOLD = float(os.getenv("RETRIEVER_SIMILARITY_THRESHOLD", 0.1))
 
 
 class RetrieverService:
