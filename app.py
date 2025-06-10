@@ -45,6 +45,47 @@ logger = logging.getLogger(__name__)
 
 session_histories = {}
 
+def should_use_multi_query(question: str) -> bool:
+    """
+    Intelligently determine if a question would benefit from MultiQueryRetriever.
+    Uses MultiQuery for complex/broad queries, Direct for simple/specific ones.
+    """
+    question_lower = question.lower().strip()
+    
+    # Patterns that benefit from multiple query perspectives
+    broad_patterns = [
+        # List/enumeration requests
+        'list', 'what are', 'show me', 'tell me about', 'describe',
+        # Comparison/analysis
+        'compare', 'difference', 'versus', 'vs', 'better', 'best',
+        # Broad exploration
+        'overview', 'summary', 'explain', 'how does', 'why',
+        # Multiple aspects
+        'projects', 'experience', 'background', 'history', 'achievements',
+        'services', 'offerings', 'capabilities', 'expertise'
+    ]
+    
+    # Patterns that work well with direct retrieval
+    specific_patterns = [
+        # Direct factual questions
+        'who is', 'what is', 'when is', 'where is',
+        # Specific details
+        'phone', 'email', 'address', 'contact', 'hours', 'schedule',
+        # Simple yes/no or factual
+        'is', 'does', 'can', 'will', 'has'
+    ]
+    
+    # Check for broad patterns (use MultiQuery)
+    if any(pattern in question_lower for pattern in broad_patterns):
+        return True
+    
+    # Check for specific patterns (use Direct)
+    if any(pattern in question_lower for pattern in specific_patterns):
+        return False
+    
+    # Default: use Direct for speed (most queries are specific)
+    return False
+
 def get_session_history(session_id: str) -> InMemoryChatMessageHistory:
     if session_id not in session_histories:
         session_histories[session_id] = InMemoryChatMessageHistory()
@@ -110,6 +151,7 @@ async def ask_question(
     stream_handler: Optional[EventStreamHandler] = None,
     k: Optional[int] = None,
     similarity_threshold: Optional[float] = None,
+    use_multi_query: bool = False,
     verbose: bool = False
 ):
     try:
@@ -121,12 +163,19 @@ async def ask_question(
         if verbose:
             logger.info(f"[BOT] Using mode: {mode}")
 
+        # Intelligent auto-detection: use MultiQuery for complex/broad queries
+        auto_multi_query = should_use_multi_query(question)
+        if verbose:
+            strategy = "MultiQuery (enhanced coverage)" if auto_multi_query else "Direct (maximum speed)"
+            logger.info(f"[BOT] Auto-selected retrieval strategy: {strategy}")
+
         retriever_service = RetrieverService()
         retriever = retriever_service.build_retriever(
             company_id=company_id,
             bot_id=bot_id,
             k=k,
-            similarity_threshold=similarity_threshold
+            similarity_threshold=similarity_threshold,
+            use_multi_query=auto_multi_query
         )
 
         prompt = get_prompt_template(mode)
@@ -230,6 +279,7 @@ async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_cl
                         stream_handler=stream_handler,
                         k=request.k,
                         similarity_threshold=request.similarity_threshold,
+                        use_multi_query=False,  # Auto-detection handles this internally
                         verbose=True
                     )
                     # Get the actual coroutine result

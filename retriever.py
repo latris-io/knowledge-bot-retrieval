@@ -4,7 +4,8 @@ import json
 import urllib.parse
 from typing import Dict, Optional
 
-from langchain_openai import OpenAIEmbeddings
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain.retrievers.multi_query import MultiQueryRetriever
 from langchain.retrievers.ensemble import EnsembleRetriever
 from langchain_community.retrievers import BM25Retriever
 from langchain.retrievers import ContextualCompressionRetriever
@@ -60,7 +61,8 @@ class RetrieverService:
         bot_id: int,
         filters: Optional[Dict] = None,
         k: Optional[int] = None,
-        similarity_threshold: Optional[float] = None
+        similarity_threshold: Optional[float] = None,
+        use_multi_query: bool = False
     ):
         try:
             collection_name = "global"
@@ -84,7 +86,22 @@ class RetrieverService:
                 search_kwargs={"k": k, "filter": base_filter}
             )
 
-            # Use direct vector retriever for maximum speed (skip multi-query overhead)
+            # Conditionally use MultiQueryRetriever for enhanced coverage vs speed
+            if use_multi_query:
+                logger.info(f"[RETRIEVER] Using MultiQueryRetriever for enhanced coverage")
+                multi_query = MultiQueryRetriever.from_llm(
+                    retriever=vector_retriever,
+                    llm=ChatOpenAI(
+                        model="gpt-4o-mini",  # Fast model for query generation
+                        temperature=0,
+                        openai_api_key=get_openai_api_key()
+                    )
+                )
+                vector_component = multi_query
+            else:
+                logger.info(f"[RETRIEVER] Using direct vector retriever for maximum speed")
+                vector_component = vector_retriever
+
             docs = vectorstore.get(include=["documents", "metadatas"], where=base_filter)
             texts = docs["documents"]
             metadatas = docs["metadatas"]
@@ -94,7 +111,7 @@ class RetrieverService:
             logger.info(f"[RETRIEVER] Initialized BM25 with {len(texts)} documents")
 
             hybrid = EnsembleRetriever(
-                retrievers=[vector_retriever, bm25],
+                retrievers=[vector_component, bm25],
                 weights=[0.8, 0.2]
             )
 
