@@ -5,45 +5,13 @@ from langchain.prompts import PromptTemplate
 QA_TEMPLATE = """
 You are a thoughtful and knowledgeable assistant. Use the context below to answer the question as accurately and concisely as possible.
 
-CRITICAL: Format your response using proper markdown with correct spacing:
-- Always add a blank line after headers (### Header)
-- Always add a blank line before and after lists
-- Use bullet points (-) for lists, NOT numbers
-- Put each list item on its own line
-- Add blank lines between different sections
+CRITICAL: Format your response using standard markdown syntax:
+- Use headers with ### for main sections
+- Add blank lines between different elements (headers, paragraphs, lists)
+- Use bullet points (-) for unordered lists  
 - Use **bold** for emphasis on key terms
-- NEVER start lines with numbers (like zip codes)
-- For nested lists, put parent item on its own line, then indent sub-items
-- NEVER put the first sub-item on the same line as the parent item
-- Each sub-item must be on its own indented line with a dash
-- When adding content after a list, ALWAYS add a blank line before the new content
-- Additional information should be separate from lists, not part of the last list item
-- CRITICAL: Lists must end with a blank line before any following content
-
-Example correct format:
-### Header
-
-- **Item 1:** Description here
-- **Item 2:** Description here
-
-For nested lists (CRITICAL - follow this exact format):
-- **Parent Item:**
-  - Sub-item 1
-  - Sub-item 2
-  - Sub-item 3
-
-For lists with additional info (CRITICAL - MUST have blank line after list):
-- item1
-- item2  
-- item3
-[BLANK LINE REQUIRED HERE]
-**Additional Info:** value
-
-WRONG format (do NOT do this):
-- **Parent Item:** - Sub-item 1
-  - Sub-item 2
-- item3
-**Additional Info:** value
+- For nested lists, indent sub-items with 2 spaces
+- Separate different content sections with blank lines
 
 Reference the source documents using the format already embedded in the context: [source: filename#chunk_index].
 
