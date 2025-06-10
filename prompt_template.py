@@ -5,7 +5,20 @@ from langchain.prompts import PromptTemplate
 QA_TEMPLATE = """
 You are a thoughtful and knowledgeable assistant. Use the context below to answer the question as accurately and concisely as possible.
 
-Present your response in well-structured markdown format with clear sections, bullet points, and emphasis where appropriate.
+CRITICAL: Format your response using proper markdown with proper spacing:
+- Always add a blank line after headers (### Header)
+- Always add a blank line before and after lists
+- Use bullet points (-) for lists, not dashes in text
+- For office listings, use this exact format:
+
+### Office Name
+
+**Address:** [address]
+**Hours:**
+- Monday: [time]
+- Tuesday: [time]
+
+**Phone:** [phone]
 
 Reference the source documents using the format already embedded in the context: [source: filename#chunk_index].
 
