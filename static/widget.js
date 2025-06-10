@@ -29,153 +29,65 @@
     }
 
     const sessionManager = new SessionManager();
+    
+    // Initialize marked.js library
+    loadMarkedLibrary();
   
-    // Simple markdown to HTML converter
+    // Load marked.js library for proper markdown parsing
+    function loadMarkedLibrary() {
+        return new Promise((resolve) => {
+            if (window.marked) {
+                resolve();
+                return;
+            }
+            
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+            script.onload = () => {
+                // Configure marked.js for LLM output
+                marked.setOptions({
+                    breaks: true,        // Convert \n to <br>
+                    gfm: true,           // GitHub Flavored Markdown
+                    sanitize: false,     // We'll handle sanitization elsewhere
+                    smartypants: false   // Keep simple quotes
+                });
+                resolve();
+            };
+            document.head.appendChild(script);
+        });
+    }
+
+    // Standard markdown parsing using marked.js with LLM preprocessing
     function parseMarkdown(text) {
         if (!text) return '';
         
-        // Fix missing line breaks between markdown structural elements (special characters only)
-        let html = text
-            // Fix header to header: "### Header#### Sub" -> "### Header\n#### Sub"
+        // Pre-process common LLM markdown issues (structural characters only)
+        let processed = text
+            // Fix headers running into subheaders: "### Header#### Sub" -> "### Header\n#### Sub"
             .replace(/(#{1,6}\s+[^#\n]*?)(#{1,6}\s+)/gm, '$1\n$2')
-            // Fix header to numbered list: "### Header1. Item" -> "### Header\n1. Item"
+            // Fix headers running into numbered lists: "### Header1. Item" -> "### Header\n1. Item"
             .replace(/(#{1,6}\s+[^#\n]*?)(\d+\.\s+)/gm, '$1\n$2')
-            // Fix numbered lists: "1. Item2. Next" -> "1. Item\n2. Next"  
+            // Fix numbered lists running together: "1. Item2. Next" -> "1. Item\n2. Next"
             .replace(/(\d+\.\s+[^\n]*?)(\d+\.\s+)/gm, '$1\n$2')
-            // Fix bullet points: "- Item- Next" -> "- Item\n- Next"
-            .replace(/(-\s+[^\n]*?)(-\s+)/gm, '$1\n$2')
-            // Normalize paragraph breaks
-            .replace(/\n\n+/g, '\n\n');
-        
-        // Split into lines for processing
-        const lines = html.split('\n');
-        const processedLines = [];
-        let inList = false;
-        let listType = null;
-        
-        for (const line of lines) {
-            let processedLine = line;
-            
-            // Handle headers (must be processed per line to avoid conflicts)
-            if (processedLine.match(/^### (.+)$/)) {
-                if (inList) {
-                    processedLines.push(listType === 'ol' ? '</ol>' : '</ul>');
-                    inList = false;
-                    listType = null;
-                }
-                const headerContent = processedLine.replace(/^### (.+)$/, '$1')
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(/`([^`]+)`/g, '<code>$1</code>')
-                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-                processedLine = `<h3>${headerContent}</h3>`;
-            } else if (processedLine.match(/^## (.+)$/)) {
-                if (inList) {
-                    processedLines.push(listType === 'ol' ? '</ol>' : '</ul>');
-                    inList = false;
-                    listType = null;
-                }
-                const headerContent = processedLine.replace(/^## (.+)$/, '$1')
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(/`([^`]+)`/g, '<code>$1</code>')
-                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-                processedLine = `<h2>${headerContent}</h2>`;
-            } else if (processedLine.match(/^# (.+)$/)) {
-                if (inList) {
-                    processedLines.push(listType === 'ol' ? '</ol>' : '</ul>');
-                    inList = false;
-                    listType = null;
-                }
-                const headerContent = processedLine.replace(/^# (.+)$/, '$1')
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(/`([^`]+)`/g, '<code>$1</code>')
-                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-                processedLine = `<h1>${headerContent}</h1>`;
-            } else if (processedLine.match(/^[\s]*[-*+]\s+/)) {
-                // Handle bullet points
-                if (!inList || listType !== 'ul') {
-                    if (inList) {
-                        processedLines.push(listType === 'ol' ? '</ol>' : '</ul>');
-                    }
-                    processedLines.push('<ul>');
-                    inList = true;
-                    listType = 'ul';
-                }
-                const content = processedLine.replace(/^[\s]*[-*+]\s+/, '');
-                // Apply inline formatting to list content
-                const formattedContent = content
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(/`([^`]+)`/g, '<code>$1</code>')
-                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-                processedLine = `<li>${formattedContent}</li>`;
-            } else if (processedLine.match(/^\d+\.\s+/)) {
-                // Handle numbered lists
-                if (!inList || listType !== 'ol') {
-                    if (inList) {
-                        processedLines.push(listType === 'ol' ? '</ol>' : '</ul>');
-                    }
-                    processedLines.push('<ol>');
-                    inList = true;
-                    listType = 'ol';
-                }
-                const content = processedLine.replace(/^\d+\.\s+/, '');
-                // Apply inline formatting to list content
-                const formattedContent = content
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(/`([^`]+)`/g, '<code>$1</code>')
-                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-                processedLine = `<li>${formattedContent}</li>`;
-            } else {
-                // Regular content
-                if (inList) {
-                    processedLines.push(listType === 'ol' ? '</ol>' : '</ul>');
-                    inList = false;
-                    listType = null;
-                }
-                // Only add non-empty lines or preserve intentional empty lines
-                if (processedLine.trim() || processedLines.length > 0) {
-                    // Apply inline formatting
-                    processedLine = processedLine
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Bold
-                        .replace(/\*(.*?)\*/g, '<em>$1</em>')              // Italic
-                        .replace(/`([^`]+)`/g, '<code>$1</code>')          // Code
-                        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>'); // Links
-                }
-            }
-            
-            // Add the processed line
-            if (processedLine.trim() || processedLines.length > 0) {
-                processedLines.push(processedLine);
+            // Fix bullet points running together: "- Item- Next" -> "- Item\n- Next"
+            .replace(/(-\s+[^\n]*?)(-\s+)/gm, '$1\n$2');
+
+        // Use marked.js if available, fallback to simple parsing
+        if (window.marked) {
+            try {
+                return marked.parse(processed);
+            } catch (error) {
+                console.warn('Marked.js parsing failed, using fallback:', error);
             }
         }
         
-        // Close any open list
-        if (inList) {
-            processedLines.push(listType === 'ol' ? '</ol>' : '</ul>');
-        }
-        
-        // Join lines and handle paragraph breaks
-        html = processedLines.join('\n');
-        
-        // Convert double newlines to paragraph breaks, single newlines to line breaks
-        html = html.replace(/\n\n+/g, '</p><p>');
-        html = html.replace(/\n/g, '<br>');
-        
-        // Wrap in paragraph tags if there's content that needs it
-        if (html && !html.match(/^<(h[1-6]|ul|ol|li)/)) {
-            html = '<p>' + html + '</p>';
-        }
-        
-        // Clean up empty paragraphs and extra breaks
-        html = html.replace(/<p><\/p>/g, '');
-        html = html.replace(/<p><br><\/p>/g, '');
-        html = html.replace(/(<br>){3,}/g, '<br><br>');
-        
-        return html.trim();
+        // Fallback: basic inline formatting only
+        return processed
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/`([^`]+)`/g, '<code>$1</code>')
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+            .replace(/\n/g, '<br>');
     }
   
     const STYLE = `
