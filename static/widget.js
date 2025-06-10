@@ -34,58 +34,136 @@
     function parseMarkdown(text) {
         if (!text) return '';
         
-        let html = text;
+        // First, handle line breaks to separate content properly
+        let html = text.replace(/\n\n+/g, '\n\n'); // Normalize paragraph breaks
         
-        // Headers
-        html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-        html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-        html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-        
-        // Bold
-        html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        
-        // Italic
-        html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-        
-        // Code
-        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-        
-        // Links
-        html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-        
-        // Lists
+        // Split into lines for processing
         const lines = html.split('\n');
-        let inList = false;
         const processedLines = [];
+        let inList = false;
+        let listType = null;
         
         for (const line of lines) {
-            if (line.match(/^[\s]*[-*+]\s+/)) {
-                if (!inList) {
+            let processedLine = line;
+            
+            // Handle headers (must be processed per line to avoid conflicts)
+            if (processedLine.match(/^### (.+)$/)) {
+                if (inList) {
+                    processedLines.push(listType === 'ol' ? '</ol>' : '</ul>');
+                    inList = false;
+                    listType = null;
+                }
+                const headerContent = processedLine.replace(/^### (.+)$/, '$1')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/`([^`]+)`/g, '<code>$1</code>')
+                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+                processedLine = `<h3>${headerContent}</h3>`;
+            } else if (processedLine.match(/^## (.+)$/)) {
+                if (inList) {
+                    processedLines.push(listType === 'ol' ? '</ol>' : '</ul>');
+                    inList = false;
+                    listType = null;
+                }
+                const headerContent = processedLine.replace(/^## (.+)$/, '$1')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/`([^`]+)`/g, '<code>$1</code>')
+                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+                processedLine = `<h2>${headerContent}</h2>`;
+            } else if (processedLine.match(/^# (.+)$/)) {
+                if (inList) {
+                    processedLines.push(listType === 'ol' ? '</ol>' : '</ul>');
+                    inList = false;
+                    listType = null;
+                }
+                const headerContent = processedLine.replace(/^# (.+)$/, '$1')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/`([^`]+)`/g, '<code>$1</code>')
+                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+                processedLine = `<h1>${headerContent}</h1>`;
+            } else if (processedLine.match(/^[\s]*[-*+]\s+/)) {
+                // Handle bullet points
+                if (!inList || listType !== 'ul') {
+                    if (inList) {
+                        processedLines.push(listType === 'ol' ? '</ol>' : '</ul>');
+                    }
                     processedLines.push('<ul>');
                     inList = true;
+                    listType = 'ul';
                 }
-                const content = line.replace(/^[\s]*[-*+]\s+/, '');
-                processedLines.push(`<li>${content}</li>`);
+                const content = processedLine.replace(/^[\s]*[-*+]\s+/, '');
+                // Apply inline formatting to list content
+                const formattedContent = content
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/`([^`]+)`/g, '<code>$1</code>')
+                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+                processedLine = `<li>${formattedContent}</li>`;
+            } else if (processedLine.match(/^\d+\.\s+/)) {
+                // Handle numbered lists
+                if (!inList || listType !== 'ol') {
+                    if (inList) {
+                        processedLines.push(listType === 'ol' ? '</ol>' : '</ul>');
+                    }
+                    processedLines.push('<ol>');
+                    inList = true;
+                    listType = 'ol';
+                }
+                const content = processedLine.replace(/^\d+\.\s+/, '');
+                // Apply inline formatting to list content
+                const formattedContent = content
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/`([^`]+)`/g, '<code>$1</code>')
+                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+                processedLine = `<li>${formattedContent}</li>`;
             } else {
+                // Regular content
                 if (inList) {
-                    processedLines.push('</ul>');
+                    processedLines.push(listType === 'ol' ? '</ol>' : '</ul>');
                     inList = false;
+                    listType = null;
                 }
-                if (line.trim()) {
-                    processedLines.push(line);
+                // Only add non-empty lines or preserve intentional empty lines
+                if (processedLine.trim() || processedLines.length > 0) {
+                    // Apply inline formatting
+                    processedLine = processedLine
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Bold
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')              // Italic
+                        .replace(/`([^`]+)`/g, '<code>$1</code>')          // Code
+                        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>'); // Links
                 }
+            }
+            
+            // Add the processed line
+            if (processedLine.trim() || processedLines.length > 0) {
+                processedLines.push(processedLine);
             }
         }
         
+        // Close any open list
         if (inList) {
-            processedLines.push('</ul>');
+            processedLines.push(listType === 'ol' ? '</ol>' : '</ul>');
         }
         
+        // Join lines and handle paragraph breaks
         html = processedLines.join('\n');
         
-        // Line breaks
-        html = html.replace(/\n\n+/g, '<br><br>');
+        // Convert double newlines to paragraph breaks, single newlines to line breaks
+        html = html.replace(/\n\n+/g, '</p><p>');
         html = html.replace(/\n/g, '<br>');
+        
+        // Wrap in paragraph tags if there's content that needs it
+        if (html && !html.match(/^<(h[1-6]|ul|ol|li)/)) {
+            html = '<p>' + html + '</p>';
+        }
+        
+        // Clean up empty paragraphs and extra breaks
+        html = html.replace(/<p><\/p>/g, '');
+        html = html.replace(/<p><br><\/p>/g, '');
+        html = html.replace(/(<br>){3,}/g, '<br><br>');
         
         return html.trim();
     }
@@ -208,6 +286,12 @@
         margin: 8px 0;
         padding-left: 20px;
         list-style-type: disc;
+      }
+
+      .kb-answer ol {
+        margin: 8px 0;
+        padding-left: 20px;
+        list-style-type: decimal;
       }
 
       .kb-answer li {
