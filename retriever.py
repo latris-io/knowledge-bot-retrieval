@@ -4,8 +4,7 @@ import json
 import urllib.parse
 from typing import Dict, Optional
 
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain.retrievers.multi_query import MultiQueryRetriever
+from langchain_openai import OpenAIEmbeddings
 from langchain.retrievers.ensemble import EnsembleRetriever
 from langchain_community.retrievers import BM25Retriever
 from langchain.retrievers import ContextualCompressionRetriever
@@ -85,15 +84,7 @@ class RetrieverService:
                 search_kwargs={"k": k, "filter": base_filter}
             )
 
-            multi_query = MultiQueryRetriever.from_llm(
-                retriever=vector_retriever,
-                llm=ChatOpenAI(
-                    model="gpt-4o-mini",
-                    temperature=0,
-                    openai_api_key=get_openai_api_key()
-                )
-            )
-
+            # Use direct vector retriever for maximum speed (skip multi-query overhead)
             docs = vectorstore.get(include=["documents", "metadatas"], where=base_filter)
             texts = docs["documents"]
             metadatas = docs["metadatas"]
@@ -103,7 +94,7 @@ class RetrieverService:
             logger.info(f"[RETRIEVER] Initialized BM25 with {len(texts)} documents")
 
             hybrid = EnsembleRetriever(
-                retrievers=[multi_query, bm25],
+                retrievers=[vector_retriever, bm25],
                 weights=[0.8, 0.2]
             )
 
