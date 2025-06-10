@@ -49,67 +49,79 @@ def get_session_history(session_id: str) -> InMemoryChatMessageHistory:
         logger.info(f"[MEMORY] Created new history for session {session_id}")
     return session_histories[session_id]
 
-def format_chat_history(chat_history: InMemoryChatMessageHistory, is_simple_query: bool = False) -> str:
-    """Format chat history for inclusion in prompt"""
+def format_chat_history(chat_history: InMemoryChatMessageHistory, complexity: str = 'simple') -> str:
+    """Format chat history for inclusion in prompt based on query complexity"""
     if not chat_history.messages:
         return ""
     
-    # For simple queries, use minimal context (1 Q&A pair); for complex, use more (3 Q&A pairs)
-    context_limit = 2 if is_simple_query else 6  # 1 vs 3 Q&A pairs
+    # Optimize context based on complexity: simple=1 pair, medium=2 pairs, complex=3 pairs  
+    context_limits = {'simple': 2, 'medium': 4, 'complex': 6}  # Q&A pairs * 2
+    context_limit = context_limits.get(complexity, 2)
+    
+    # Optimize truncation based on complexity
+    truncate_limits = {'simple': 150, 'medium': 250, 'complex': 400}
+    truncate_limit = truncate_limits.get(complexity, 200)
     
     formatted = []
     for message in chat_history.messages[-context_limit:]:
         if isinstance(message, HumanMessage):
             formatted.append(f"Human: {message.content}")
         elif isinstance(message, AIMessage):
-            # Truncate long AI responses for context efficiency
-            content = message.content[:200] + "..." if len(message.content) > 200 else message.content
+            # Truncate AI responses based on complexity needs
+            content = message.content[:truncate_limit] + "..." if len(message.content) > truncate_limit else message.content
             formatted.append(f"Assistant: {content}")
     
     if formatted:
         return "Previous conversation:\n" + "\n".join(formatted) + "\n\n"
     return ""
 
-def should_use_multi_query(question: str) -> bool:
+def get_query_complexity(question: str) -> str:
     """
-    Intelligently determine if a question would benefit from MultiQueryRetriever.
-    Uses MultiQuery for complex/broad queries, Direct for simple/specific ones.
+    Determine query complexity level for optimal processing strategy.
+    Returns: 'simple', 'medium', or 'complex'
     """
     question_lower = question.lower().strip()
     
-    # Patterns that benefit from multiple query perspectives
-    broad_patterns = [
-        # List/enumeration requests
-        'list', 'what are', 'show me', 'tell me about', 'describe',
-        # Comparison/analysis
-        'compare', 'difference', 'versus', 'vs', 'better', 'best',
-        # Broad exploration
-        'overview', 'summary', 'explain', 'how does', 'why',
-        # Multiple aspects
-        'projects', 'experience', 'background', 'history', 'achievements',
-        'services', 'offerings', 'capabilities', 'expertise'
+    # High complexity: Multiple aspects, comprehensive analysis
+    complex_patterns = [
+        'tell me about', 'describe', 'overview', 'summary', 'explain',
+        'projects and experience', 'background and', 'history and',
+        'achievements and', 'capabilities and', 'services and',
+        'compare', 'difference', 'versus', 'vs', 'better', 'best'
     ]
     
-    # Patterns that work well with direct retrieval
-    specific_patterns = [
-        # Direct factual questions
+    # Medium complexity: Lists, single broad topics
+    medium_patterns = [
+        'list', 'what are', 'show me', 'projects', 'experience', 
+        'background', 'history', 'achievements', 'services', 
+        'offerings', 'capabilities', 'expertise', 'how does', 'why'
+    ]
+    
+    # Simple: Direct factual questions
+    simple_patterns = [
         'who is', 'what is', 'when is', 'where is',
-        # Specific details
         'phone', 'email', 'address', 'contact', 'hours', 'schedule',
-        # Simple yes/no or factual
         'is', 'does', 'can', 'will', 'has'
     ]
     
-    # Check for broad patterns (use MultiQuery)
-    if any(pattern in question_lower for pattern in broad_patterns):
-        return True
+    # Check for complex patterns first (most comprehensive)
+    if any(pattern in question_lower for pattern in complex_patterns):
+        return 'complex'
     
-    # Check for specific patterns (use Direct)
-    if any(pattern in question_lower for pattern in specific_patterns):
-        return False
+    # Check for medium patterns (moderate coverage)
+    if any(pattern in question_lower for pattern in medium_patterns):
+        return 'medium'
     
-    # Default: use Direct for speed (most queries are specific)
-    return False
+    # Check for simple patterns (direct retrieval)
+    if any(pattern in question_lower for pattern in simple_patterns):
+        return 'simple'
+    
+    # Default: simple for speed (most queries are specific)
+    return 'simple'
+
+def should_use_multi_query(question: str) -> bool:
+    """Determine if MultiQueryRetriever should be used (complex queries only)"""
+    return get_query_complexity(question) == 'complex'
 
 # CORS configuration
 app.add_middleware(
@@ -184,19 +196,25 @@ async def ask_question(
         if verbose:
             logger.info(f"[BOT] Using mode: {mode}")
 
-        # Intelligent auto-detection: use MultiQuery for complex/broad queries
-        auto_multi_query = should_use_multi_query(question)
-        is_simple_query = not auto_multi_query  # Simple query = Direct mode
+        # Three-tier intelligent complexity detection
+        complexity = get_query_complexity(question)
+        auto_multi_query = should_use_multi_query(question)  # Only for complex
+        is_simple_query = complexity == 'simple'
         
         if verbose:
-            strategy = "MultiQuery (enhanced coverage)" if auto_multi_query else "Direct (maximum speed)"
-            logger.info(f"[BOT] Auto-selected retrieval strategy: {strategy}")
+            strategies = {
+                'simple': "Direct (maximum speed)",
+                'medium': "Enhanced Direct (balanced speed+quality)", 
+                'complex': "MultiQuery (comprehensive coverage)"
+            }
+            logger.info(f"[BOT] Auto-detected complexity: {complexity} → {strategies[complexity]}")
 
-        # Optimize k value for performance: fewer documents for simple queries
+        # Optimize k value based on complexity tier
         if k is None:
-            k = 8 if auto_multi_query else 2  # Complex: 8 docs, Simple: 2 docs for maximum speed
+            k_values = {'simple': 2, 'medium': 4, 'complex': 6}  # Graduated approach
+            k = k_values[complexity]
             if verbose:
-                logger.info(f"[BOT] Optimized k={k} for {'complex' if auto_multi_query else 'simple'} query")
+                logger.info(f"[BOT] Optimized k={k} for {complexity} query")
 
         retriever_service = RetrieverService()
         retriever = retriever_service.build_retriever(
@@ -207,8 +225,8 @@ async def ask_question(
             use_multi_query=auto_multi_query
         )
 
-        # Optimize prompt for performance: use concise prompt for simple queries
-        if is_simple_query:
+        # Optimize prompt based on complexity level
+        if complexity == 'simple':
             # Concise prompt for maximum speed on simple factual queries
             concise_template = """Answer the question using the context below. Be accurate and concise.
 
@@ -220,6 +238,18 @@ Question:
 
 Answer:"""
             prompt = PromptTemplate(input_variables=["context", "question"], template=concise_template)
+        elif complexity == 'medium':
+            # Balanced prompt for medium complexity
+            medium_template = """Use the context below to answer the question accurately. Provide helpful details while being concise.
+
+Context:
+{context}
+
+Question:
+{question}
+
+Answer:"""
+            prompt = PromptTemplate(input_variables=["context", "question"], template=medium_template)
         else:
             # Full detailed prompt for complex queries
             prompt = get_prompt_template(mode)
@@ -228,10 +258,15 @@ Answer:"""
             "{page_content}\n[source: {file_name}#{chunk_index}]"
         )
 
-        # Use faster model for simple queries, higher quality for complex ones
-        model = "gpt-3.5-turbo" if is_simple_query else "gpt-4o-mini"
-        if verbose and is_simple_query:
-            logger.info(f"[BOT] Using {model} for maximum speed on simple query")
+        # Optimize model selection based on complexity
+        model_map = {
+            'simple': 'gpt-3.5-turbo',      # Fastest for factual queries
+            'medium': 'gpt-3.5-turbo',      # Fast but good quality for moderate complexity  
+            'complex': 'gpt-4o-mini'        # Best quality for comprehensive analysis
+        }
+        model = model_map[complexity]
+        if verbose:
+            logger.info(f"[BOT] Using {model} for {complexity} query optimization")
             
         llm = ChatOpenAI(
             model=model,
@@ -241,18 +276,20 @@ Answer:"""
             openai_api_key=get_openai_api_key()
         )
 
-        # Get conversation history for this session - skip for simple queries if no history
+        # Get conversation history for this session - optimize based on complexity
         chat_history = get_session_history(session_id)
-        if is_simple_query and not chat_history.messages:
+        if complexity == 'simple' and not chat_history.messages:
             # Skip conversation context entirely for simple queries with no history
             conversation_context = ""
         else:
-            conversation_context = format_chat_history(chat_history, is_simple_query)
+            conversation_context = format_chat_history(chat_history, complexity)
         
         # Enhanced prompt with conversation context - optimized for performance
-        if is_simple_query and len(conversation_context) > 500:
-            # Truncate conversation context for simple queries to reduce processing time
-            conversation_context = conversation_context[:500] + "...\n\n"
+        context_limits = {'simple': 400, 'medium': 800, 'complex': 1200}
+        max_context = context_limits.get(complexity, 500)
+        if len(conversation_context) > max_context:
+            # Truncate conversation context based on complexity to optimize processing time
+            conversation_context = conversation_context[:max_context] + "...\n\n"
         
         enhanced_prompt_template = conversation_context + prompt.template
         enhanced_prompt = PromptTemplate(

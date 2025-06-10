@@ -88,14 +88,26 @@ class RetrieverService:
 
             # Conditionally use MultiQueryRetriever for enhanced coverage vs speed
             if use_multi_query:
-                logger.info(f"[RETRIEVER] Using MultiQueryRetriever for enhanced coverage")
+                logger.info(f"[RETRIEVER] Using optimized MultiQueryRetriever for enhanced coverage")
+                # Custom prompt for faster query generation
+                from langchain.prompts import PromptTemplate
+                
+                query_prompt = PromptTemplate(
+                    input_variables=["question"],
+                    template="""Generate 2 alternative search queries for the following question to improve retrieval coverage.
+Focus on different aspects and phrasings.
+Question: {question}
+Alternative queries:"""
+                )
+                
                 multi_query = MultiQueryRetriever.from_llm(
                     retriever=vector_retriever,
                     llm=ChatOpenAI(
-                        model="gpt-4o-mini",  # Fast model for query generation
+                        model="gpt-3.5-turbo",  # Faster model for query generation
                         temperature=0,
                         openai_api_key=get_openai_api_key()
-                    )
+                    ),
+                    prompt=query_prompt  # Custom prompt for 2 queries instead of 3
                 )
                 vector_component = multi_query
             else:
@@ -118,11 +130,13 @@ class RetrieverService:
                     weights=[0.8, 0.2]
                 )
 
-                logger.info(f"[RETRIEVER DEBUG] EmbeddingsFilter threshold set to {similarity_threshold}")
+                # Use relaxed threshold for complex queries to speed up filtering
+                complex_threshold = max(similarity_threshold * 0.7, 0.05)  # More permissive filtering
+                logger.info(f"[RETRIEVER DEBUG] EmbeddingsFilter threshold set to {complex_threshold} (relaxed for complex queries)")
                 compressor = DocumentCompressorPipeline(transformers=[
                     EmbeddingsFilter(
                         embeddings=self.embedding_function,
-                        similarity_threshold=similarity_threshold
+                        similarity_threshold=complex_threshold
                     )
                 ])
 
