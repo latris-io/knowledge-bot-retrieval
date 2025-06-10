@@ -34,8 +34,14 @@
     function parseMarkdown(text) {
         if (!text) return '';
         
-        // First, handle line breaks to separate content properly
-        let html = text.replace(/\n\n+/g, '\n\n'); // Normalize paragraph breaks
+        // First, fix missing line breaks after headers and numbered lists
+        let html = text
+            // Add line break after headers if missing
+            .replace(/^(#{1,3}\s+[^#\n]+)([^#\n])/gm, '$1\n$2')
+            // Add line break after numbered items if missing  
+            .replace(/^(\d+\.\s+[^0-9\n]+)([0-9])/gm, '$1\n$2')
+            // Normalize paragraph breaks
+            .replace(/\n\n+/g, '\n\n');
         
         // Split into lines for processing
         const lines = html.split('\n');
