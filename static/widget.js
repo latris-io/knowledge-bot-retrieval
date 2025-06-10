@@ -115,14 +115,19 @@
         margin: 12px 0 8px 0;
         color: #1f2937;
         font-weight: 600;
+        line-height: 1.3;
       }
 
       .kb-answer h1 {
         font-size: 18px;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 4px;
       }
 
       .kb-answer h2 {
         font-size: 16px;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 2px;
       }
 
       .kb-answer h3 {
@@ -136,23 +141,45 @@
 
       .kb-answer em {
         font-style: italic;
+        color: #4b5563;
       }
 
       .kb-answer ul {
         margin: 8px 0;
         padding-left: 20px;
+        list-style-type: disc;
       }
 
       .kb-answer li {
         margin: 4px 0;
+        line-height: 1.4;
       }
 
       .kb-answer code {
         background: #e5e7eb;
         padding: 2px 4px;
         border-radius: 3px;
-        font-family: monospace;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
         font-size: 13px;
+        color: #1f2937;
+      }
+
+      .kb-answer a {
+        color: #2563eb;
+        text-decoration: underline;
+      }
+
+      .kb-answer a:hover {
+        color: #1d4ed8;
+      }
+
+      .kb-answer br {
+        line-height: 1.5;
+      }
+
+      .kb-answer p {
+        margin: 8px 0;
+        line-height: 1.5;
       }
   
       .kb-spinner {
