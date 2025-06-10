@@ -49,17 +49,22 @@ def get_session_history(session_id: str) -> InMemoryChatMessageHistory:
         logger.info(f"[MEMORY] Created new history for session {session_id}")
     return session_histories[session_id]
 
-def format_chat_history(chat_history: InMemoryChatMessageHistory) -> str:
+def format_chat_history(chat_history: InMemoryChatMessageHistory, is_simple_query: bool = False) -> str:
     """Format chat history for inclusion in prompt"""
     if not chat_history.messages:
         return ""
     
+    # For simple queries, use minimal context (1 Q&A pair); for complex, use more (3 Q&A pairs)
+    context_limit = 2 if is_simple_query else 6  # 1 vs 3 Q&A pairs
+    
     formatted = []
-    for message in chat_history.messages[-6:]:  # Last 3 Q&A pairs
+    for message in chat_history.messages[-context_limit:]:
         if isinstance(message, HumanMessage):
             formatted.append(f"Human: {message.content}")
         elif isinstance(message, AIMessage):
-            formatted.append(f"Assistant: {message.content}")
+            # Truncate long AI responses for context efficiency
+            content = message.content[:200] + "..." if len(message.content) > 200 else message.content
+            formatted.append(f"Assistant: {content}")
     
     if formatted:
         return "Previous conversation:\n" + "\n".join(formatted) + "\n\n"
@@ -181,9 +186,17 @@ async def ask_question(
 
         # Intelligent auto-detection: use MultiQuery for complex/broad queries
         auto_multi_query = should_use_multi_query(question)
+        is_simple_query = not auto_multi_query  # Simple query = Direct mode
+        
         if verbose:
             strategy = "MultiQuery (enhanced coverage)" if auto_multi_query else "Direct (maximum speed)"
             logger.info(f"[BOT] Auto-selected retrieval strategy: {strategy}")
+
+        # Optimize k value for performance: fewer documents for simple queries
+        if k is None:
+            k = 8 if auto_multi_query else 2  # Complex: 8 docs, Simple: 2 docs for maximum speed
+            if verbose:
+                logger.info(f"[BOT] Optimized k={k} for {'complex' if auto_multi_query else 'simple'} query")
 
         retriever_service = RetrieverService()
         retriever = retriever_service.build_retriever(
@@ -194,25 +207,53 @@ async def ask_question(
             use_multi_query=auto_multi_query
         )
 
-        prompt = get_prompt_template(mode)
+        # Optimize prompt for performance: use concise prompt for simple queries
+        if is_simple_query:
+            # Concise prompt for maximum speed on simple factual queries
+            concise_template = """Answer the question using the context below. Be accurate and concise.
+
+Context:
+{context}
+
+Question:
+{question}
+
+Answer:"""
+            prompt = PromptTemplate(input_variables=["context", "question"], template=concise_template)
+        else:
+            # Full detailed prompt for complex queries
+            prompt = get_prompt_template(mode)
 
         document_prompt = PromptTemplate.from_template(
             "{page_content}\n[source: {file_name}#{chunk_index}]"
         )
 
+        # Use faster model for simple queries, higher quality for complex ones
+        model = "gpt-3.5-turbo" if is_simple_query else "gpt-4o-mini"
+        if verbose and is_simple_query:
+            logger.info(f"[BOT] Using {model} for maximum speed on simple query")
+            
         llm = ChatOpenAI(
-            model="gpt-4o-mini",
+            model=model,
             temperature=0,
             streaming=streaming,
             callbacks=[stream_handler] if streaming else None,
             openai_api_key=get_openai_api_key()
         )
 
-        # Get conversation history for this session
+        # Get conversation history for this session - skip for simple queries if no history
         chat_history = get_session_history(session_id)
-        conversation_context = format_chat_history(chat_history)
+        if is_simple_query and not chat_history.messages:
+            # Skip conversation context entirely for simple queries with no history
+            conversation_context = ""
+        else:
+            conversation_context = format_chat_history(chat_history, is_simple_query)
         
-        # Enhanced prompt with conversation context
+        # Enhanced prompt with conversation context - optimized for performance
+        if is_simple_query and len(conversation_context) > 500:
+            # Truncate conversation context for simple queries to reduce processing time
+            conversation_context = conversation_context[:500] + "...\n\n"
+        
         enhanced_prompt_template = conversation_context + prompt.template
         enhanced_prompt = PromptTemplate(
             template=enhanced_prompt_template,
