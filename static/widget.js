@@ -34,11 +34,13 @@
     function parseMarkdown(text) {
         if (!text) return '';
         
-        // First, fix missing line breaks after headers and numbered lists
+        // First, fix missing line breaks between markdown structural elements
         let html = text
-            // Fix header immediately followed by capital letter (start of new sentence): "### HeaderSentence" -> "### Header\nSentence"
-            .replace(/^(#{1,3}\s+\w+(?:\s+\w+)*?)([A-Z]\w+)/gm, '$1\n$2')
-            // Fix numbered lists: "1. ItemNext item" -> "1. Item\nNext item"  
+            // Fix header immediately followed by subheader: "### Header#### Subheader" -> "### Header\n#### Subheader"
+            .replace(/^(#{1,3}\s+.*?)(#{1,6}\s+)/gm, '$1\n$2')
+            // Fix header immediately followed by numbered list: "### Header1. Item" -> "### Header\n1. Item"
+            .replace(/^(#{1,6}\s+.*?)(\d+\.\s+)/gm, '$1\n$2')
+            // Fix numbered lists: "1. Item2. Next item" -> "1. Item\n2. Next item"  
             .replace(/^(\d+\.\s+.*?)(\d+\.)/gm, '$1\n$2')
             // Normalize paragraph breaks
             .replace(/\n\n+/g, '\n\n');
