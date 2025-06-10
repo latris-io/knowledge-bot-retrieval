@@ -13,6 +13,7 @@ def process_markdown_to_html(markdown_text: str) -> str:
     - Italic (*text*) → <em> tags
     - Lists and bullet points → <ul>/<li> tags
     - Proper HTML structure
+    - Cleans up PDF extraction artifacts
     
     Args:
         markdown_text: Raw markdown text from LLM
@@ -24,6 +25,9 @@ def process_markdown_to_html(markdown_text: str) -> str:
         return ""
     
     html_text = markdown_text.strip()
+    
+    # Clean up PDF extraction artifacts first
+    html_text = _clean_pdf_artifacts(html_text)
     
     # Convert headers to HTML (only process complete headers at line start)
     html_text = re.sub(r'^### (.+)$', r'<h3>\1</h3>', html_text, flags=re.MULTILINE)
@@ -105,6 +109,9 @@ def process_markdown_to_clean_text(markdown_text: str) -> str:
     
     processed_text = markdown_text.strip()
     
+    # Clean up PDF extraction artifacts first
+    processed_text = _clean_pdf_artifacts(processed_text)
+    
     # Convert headers to clean section titles
     # ### Section Name → Section Name:
     processed_text = re.sub(r'^### (.+)$', r'\1:', processed_text, flags=re.MULTILINE)
@@ -147,6 +154,45 @@ def process_markdown_to_clean_text(markdown_text: str) -> str:
     processed_text = processed_text.strip()
     
     return processed_text
+
+
+def _clean_pdf_artifacts(text: str) -> str:
+    """
+    Clean up common PDF extraction artifacts that cause formatting issues.
+    
+    Args:
+        text: Text potentially containing PDF extraction artifacts
+        
+    Returns:
+        Cleaned text with artifacts removed
+    """
+    if not text:
+        return text
+    
+    cleaned = text
+    
+    # Fix orphaned markdown symbols (common PDF extraction artifact)
+    # Remove single asterisks that aren't part of proper markdown
+    cleaned = re.sub(r'(\w)\*\*(?!\w)', r'\1', cleaned)  # Remove trailing **
+    cleaned = re.sub(r'(?<!\w)\*\*(\w)', r'\1', cleaned)  # Remove leading **
+    
+    # Fix malformed bold where ** appears in the middle of words/phrases
+    # Pattern: word** word → word word
+    cleaned = re.sub(r'(\w)\*\*\s+(\w)', r'\1 \2', cleaned)
+    
+    # Clean up other common PDF artifacts
+    cleaned = re.sub(r'\s+\*\*\s+', ' ', cleaned)  # Remove isolated **
+    cleaned = re.sub(r'\*\*$', '', cleaned, flags=re.MULTILINE)  # Remove ** at end of lines
+    cleaned = re.sub(r'^\*\*', '', cleaned, flags=re.MULTILINE)  # Remove ** at start of lines
+    
+    # Fix spacing issues from PDF extraction
+    cleaned = re.sub(r'\s{2,}', ' ', cleaned)  # Multiple spaces to single space
+    cleaned = re.sub(r'([a-z])([A-Z])', r'\1 \2', cleaned)  # Add space between camelCase
+    
+    # Fix common PDF line break artifacts
+    cleaned = re.sub(r'(\w)-\s*\n\s*(\w)', r'\1\2', cleaned)  # Remove hyphenation breaks
+    
+    return cleaned.strip()
 
 
 def process_streaming_token(token: str, buffer: str = "") -> tuple[str, str]:
