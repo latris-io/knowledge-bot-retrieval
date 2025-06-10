@@ -1,7 +1,8 @@
 # knowledge-bot-ingestion-service/bot.py
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from typing import Optional
@@ -18,6 +19,7 @@ from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains import ConversationalRetrievalChain
 from langchain.schema import LLMResult
 from ratelimit import limits, sleep_and_retry
+from jwt_handler import extract_jwt_claims
 import asyncio
 import logging
 import os
@@ -25,6 +27,9 @@ import uuid
 
 load_dotenv()
 app = FastAPI()
+
+# Mount static files for widget
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Configure logging
 logging.basicConfig(
@@ -46,6 +51,16 @@ def get_session_history(session_id: str) -> InMemoryChatMessageHistory:
     return session_histories[session_id]
 
 class AskRequest(BaseModel):
+    question: str
+    k: Optional[int] = None
+    similarity_threshold: Optional[float] = None
+    session_id: Optional[str] = None
+
+class WidgetAskRequest(BaseModel):
+    question: str
+    session_id: Optional[str] = None
+
+class DirectAskRequest(BaseModel):
     question: str
     company_id: int
     bot_id: int
@@ -202,14 +217,17 @@ async def ask_question(
         raise HTTPException(status_code=500, detail=f"Error processing question: {str(e)}")
 
 @app.post("/ask")
-async def ask_api(request: AskRequest):
+async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_claims)):
     session_id = request.session_id or str(uuid.uuid4())
-    logger.info(f"[API] Received question: {request.question}, company_id: {request.company_id}, bot_id: {request.bot_id}, session_id: {session_id}")
+    company_id = jwt_claims['company_id']
+    bot_id = jwt_claims['bot_id']
+    
+    logger.info(f"[API] Received question: {request.question}, company_id: {company_id}, bot_id: {bot_id}, session_id: {session_id}")
     stream_handler = EventStreamHandler()
     task = ask_question(
         question=request.question,
-        company_id=request.company_id,
-        bot_id=request.bot_id,
+        company_id=company_id,
+        bot_id=bot_id,
         session_id=session_id,
         streaming=True,
         stream_handler=stream_handler,
@@ -223,6 +241,63 @@ async def ask_api(request: AskRequest):
         media_type="text/event-stream",
         headers={"X-Session-ID": session_id}
     )
+
+@app.post("/widget/ask")
+async def ask_widget_api(request: WidgetAskRequest, jwt_claims: dict = Depends(extract_jwt_claims)):
+    """Widget endpoint with JWT authentication - returns JSON response"""
+    session_id = request.session_id or str(uuid.uuid4())
+    company_id = jwt_claims['company_id']
+    bot_id = jwt_claims['bot_id']
+    
+    logger.info(f"[WIDGET] Received question: {request.question}, company_id: {company_id}, bot_id: {bot_id}, session_id: {session_id}")
+    
+    try:
+        result = await ask_question(
+            question=request.question,
+            company_id=company_id,
+            bot_id=bot_id,
+            session_id=session_id,
+            streaming=False,
+            verbose=True
+        )
+        
+        return {
+            "answer": result.get("answer", ""),
+            "sources": [doc.metadata.get('file_name') for doc in result.get("source_documents", [])],
+            "session_id": session_id
+        }
+        
+    except Exception as e:
+        logger.error(f"[WIDGET] Error processing question: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/ask/direct")
+async def ask_direct_api(request: DirectAskRequest):
+    """Direct API endpoint for backend services (no JWT required)"""
+    session_id = request.session_id or str(uuid.uuid4())
+    logger.info(f"[DIRECT] Received question: {request.question}, company_id: {request.company_id}, bot_id: {request.bot_id}, session_id: {session_id}")
+    
+    try:
+        result = await ask_question(
+            question=request.question,
+            company_id=request.company_id,
+            bot_id=request.bot_id,
+            session_id=session_id,
+            streaming=False,
+            k=request.k,
+            similarity_threshold=request.similarity_threshold,
+            verbose=True
+        )
+        
+        return {
+            "answer": result.get("answer", ""),
+            "sources": [doc.metadata.get('file_name') for doc in result.get("source_documents", [])],
+            "session_id": session_id
+        }
+        
+    except Exception as e:
+        logger.error(f"[DIRECT] Error processing question: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     logger.info("[START] Conversational Mode Enabled. Type 'exit' to quit.")

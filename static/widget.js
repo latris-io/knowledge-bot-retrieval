@@ -2,6 +2,33 @@
     const token = document.currentScript.getAttribute("data-token");
     const API_URL = "https://knowledge-bot-retrieval.onrender.com";
   
+    // Session Management
+    class SessionManager {
+        constructor() {
+            this.sessionKey = 'kb-chat-session';
+            this.sessionId = this.getOrCreateSession();
+        }
+
+        getOrCreateSession() {
+            let sessionId = localStorage.getItem(this.sessionKey);
+            if (!sessionId) {
+                sessionId = this.generateSessionId();
+                localStorage.setItem(this.sessionKey, sessionId);
+            }
+            return sessionId;
+        }
+
+        generateSessionId() {
+            return 'widget_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        getSessionId() {
+            return this.sessionId;
+        }
+    }
+
+    const sessionManager = new SessionManager();
+  
     const STYLE = `
       .kb-btn {
         position: fixed;
@@ -181,13 +208,16 @@
       askBtn.disabled = true;
   
       try {
-        const res = await fetch(`${API_URL}/ask`, {
+        const res = await fetch(`${API_URL}/widget/ask`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
           },
-          body: JSON.stringify({ question })
+          body: JSON.stringify({ 
+            question,
+            session_id: sessionManager.getSessionId()
+          })
         });
   
         const data = await res.json();
