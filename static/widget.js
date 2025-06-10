@@ -61,8 +61,10 @@
     function parseMarkdown(text) {
         if (!text) return '';
         
-        // Pre-process common LLM markdown issues (structural characters only)
+        // Pre-process common LLM markdown issues
         let processed = text
+            // Fix orphaned header markers at end of lines
+            .replace(/#{4,6}\s*$/gm, '')
             // Fix headers running into subheaders: "### Header#### Sub" -> "### Header\n#### Sub"
             .replace(/(#{1,6}\s+[^#\n]*?)(#{1,6}\s+)/gm, '$1\n$2')
             // Fix headers running into numbered lists: "### Header1. Item" -> "### Header\n1. Item"
@@ -70,7 +72,11 @@
             // Fix numbered lists running together: "1. Item2. Next" -> "1. Item\n2. Next"
             .replace(/(\d+\.\s+[^\n]*?)(\d+\.\s+)/gm, '$1\n$2')
             // Fix bullet points running together: "- Item- Next" -> "- Item\n- Next"
-            .replace(/(-\s+[^\n]*?)(-\s+)/gm, '$1\n$2');
+            .replace(/(-\s+[^\n]*?)(-\s+)/gm, '$1\n$2')
+            // Fix time ranges being interpreted as lists: "- 7:00 AM - 4:00 PM" -> "7:00 AM - 4:00 PM"
+            .replace(/^(\s*)-\s+(\d+:\d+\s+[AP]M\s+-\s+\d+:\d+\s+[AP]M)/gm, '$1$2')
+            // Clean up trailing header markers
+            .replace(/#{1,6}\s*$/, '');
 
         // Use marked.js if available, fallback to simple parsing
         if (window.marked) {
