@@ -130,6 +130,10 @@ class EventStreamHandler(BaseCallbackHandler):
         self._put_nowait_safe(token)
 
     def on_llm_end(self, response: LLMResult, **kwargs):
+        # Log the raw LLM output for debugging
+        logger.info(f"[RAW LLM OUTPUT] Raw response from LLM:\n{repr(self.accumulated_text)}")
+        logger.info(f"[RAW LLM OUTPUT] Raw response formatted:\n{self.accumulated_text}")
+        
         # Create clean text for conversation history (remove markdown artifacts)
         self.processed_text = process_markdown_to_clean_text(self.accumulated_text)
         
