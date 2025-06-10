@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Streaming Debug</title>
+</head>
+<body>
+    <h1>Simple Streaming Debug</h1>
+    <button onclick="testBasic()">Test Basic Stream</button>
+    <button onclick="testWidgetFormat()">Test Widget Format</button>
+    <button onclick="testActualAsk()">Test Actual /ask</button>
+    <div id="output" style="background: #f0f0f0; padding: 10px; margin: 10px 0; white-space: pre-wrap; font-family: monospace;"></div>
+
+    <script>
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb21wYW55X2lkIjozLCJib3RfaWQiOjF9.ytHVcMRM99aAkFMg_U1I4VZbz3mYxskzzxSUORe3ico";
+        const output = document.getElementById('output');
+
+        async function testStream(url, body = null) {
+            output.innerHTML = "Starting test...\n";
+            
+            try {
+                const options = {
+                    method: body ? 'POST' : 'GET',
+                    headers: body ? {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    } : {}
+                };
+                
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+
+                const response = await fetch(url, options);
+                
+                output.innerHTML += `Response status: ${response.status}\n`;
+                output.innerHTML += `Content-Type: ${response.headers.get('content-type')}\n`;
+                output.innerHTML += "Streaming chunks:\n";
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let chunkCount = 0;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    chunkCount++;
+                    const chunk = decoder.decode(value, { stream: true });
+                    output.innerHTML += `Chunk ${chunkCount}: "${chunk}"\n`;
+                }
+
+                output.innerHTML += `Stream completed after ${chunkCount} chunks.\n`;
+
+            } catch (error) {
+                output.innerHTML += `Error: ${error.message}\n`;
+            }
+        }
+
+        async function testBasic() {
+            await testStream('https://knowledge-bot-retrieval.onrender.com/test-stream');
+        }
+
+        async function testWidgetFormat() {
+            await testStream('https://knowledge-bot-retrieval.onrender.com/test-widget-format');
+        }
+
+        async function testActualAsk() {
+            await testStream('https://knowledge-bot-retrieval.onrender.com/ask', {
+                question: "what is due feb 14, 2025",
+                session_id: "debug_test",
+                k: 12,
+                similarity_threshold: 0.1
+            });
+        }
+    </script>
+</body>
+</html> 

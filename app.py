@@ -352,6 +352,29 @@ async def test_stream():
     
     return StreamingResponse(generate(), media_type="text/event-stream")
 
+@app.get("/test-widget-format")
+async def test_widget_format():
+    """Test endpoint that mimics exactly what the widget should receive"""
+    async def generate():
+        # Start message
+        yield f"data: Starting AI processing...\n\n"
+        await asyncio.sleep(0.5)
+        
+        # Simulate a simple answer
+        answer = "The assignment due February 14, 2025 is the Education, Sharecropping, and Racism in the New South lesson review."
+        words = answer.split()
+        
+        for word in words:
+            yield f"data: {word} \n\n"
+            await asyncio.sleep(0.1)
+            
+        # Add sources
+        yield f"data: \n\n"
+        yield f"data: Sources:\n\n"
+        yield f"data: - School Schedule.pdf\n\n"
+        
+    return StreamingResponse(generate(), media_type="text/event-stream")
+
 @app.get("/test-chroma")
 async def test_chroma():
     """Test Chroma connection and data retrieval"""
