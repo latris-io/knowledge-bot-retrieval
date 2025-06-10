@@ -3,15 +3,90 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+def process_markdown_to_html(markdown_text: str) -> str:
+    """
+    Convert markdown formatting to HTML for rich user experience.
+    
+    This is a production-grade post-processor that converts:
+    - Headers (###, ##, #) → HTML headers
+    - Bold (**text**) → <strong> tags
+    - Italic (*text*) → <em> tags
+    - Lists and bullet points → <ul>/<li> tags
+    - Proper HTML structure
+    
+    Args:
+        markdown_text: Raw markdown text from LLM
+        
+    Returns:
+        HTML formatted text for rich user experience
+    """
+    if not markdown_text:
+        return ""
+    
+    html_text = markdown_text.strip()
+    
+    # Convert headers to HTML
+    html_text = re.sub(r'^### (.+)$', r'<h3>\1</h3>', html_text, flags=re.MULTILINE)
+    html_text = re.sub(r'^## (.+)$', r'<h2>\1</h2>', html_text, flags=re.MULTILINE)
+    html_text = re.sub(r'^# (.+)$', r'<h1>\1</h1>', html_text, flags=re.MULTILINE)
+    
+    # Convert bold text to HTML
+    html_text = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', html_text)
+    
+    # Convert italic text to HTML
+    html_text = re.sub(r'\*(.*?)\*', r'<em>\1</em>', html_text)
+    
+    # Convert code inline
+    html_text = re.sub(r'`([^`]+)`', r'<code>\1</code>', html_text)
+    
+    # Convert bullet points to HTML lists
+    # First, identify bullet point sections
+    lines = html_text.split('\n')
+    processed_lines = []
+    in_list = False
+    
+    for line in lines:
+        # Check if this is a bullet point
+        if re.match(r'^[\s]*[-*+]\s+', line):
+            if not in_list:
+                processed_lines.append('<ul>')
+                in_list = True
+            # Extract the bullet content
+            content = re.sub(r'^[\s]*[-*+]\s+', '', line)
+            processed_lines.append(f'<li>{content}</li>')
+        else:
+            if in_list:
+                processed_lines.append('</ul>')
+                in_list = False
+            if line.strip():  # Only add non-empty lines
+                processed_lines.append(line)
+    
+    # Close any open list
+    if in_list:
+        processed_lines.append('</ul>')
+    
+    html_text = '\n'.join(processed_lines)
+    
+    # Convert paragraphs (double newlines become <br><br>)
+    html_text = re.sub(r'\n\n+', '<br><br>', html_text)
+    
+    # Convert single newlines to <br> for line breaks
+    html_text = re.sub(r'\n', '<br>', html_text)
+    
+    # Convert links
+    html_text = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'<a href="\2">\1</a>', html_text)
+    
+    # Clean up excessive breaks
+    html_text = re.sub(r'(<br>){3,}', '<br><br>', html_text)
+    
+    return html_text.strip()
+
+
 def process_markdown_to_clean_text(markdown_text: str) -> str:
     """
-    Convert markdown formatting to clean, readable text.
+    Convert markdown formatting to clean, readable text for conversation history.
     
-    This is a production-grade post-processor that handles:
-    - Headers (###, ##, #) → Clean section titles
-    - Bold (**text**) → Plain text
-    - Lists and bullet points
-    - Proper spacing and readability
+    This strips markdown symbols to create clean text for follow-up context.
     
     Args:
         markdown_text: Raw markdown text from LLM
@@ -70,10 +145,9 @@ def process_markdown_to_clean_text(markdown_text: str) -> str:
 
 def process_streaming_token(token: str, buffer: str = "") -> tuple[str, str]:
     """
-    Process streaming tokens for real-time markdown conversion.
+    Process streaming tokens for real-time HTML conversion.
     
-    Simple, effective approach: filter out markdown symbols immediately
-    and send clean tokens to users in real-time.
+    Converts markdown to HTML in real-time for rich formatting.
     
     Args:
         token: Current streaming token from LLM
@@ -82,24 +156,62 @@ def process_streaming_token(token: str, buffer: str = "") -> tuple[str, str]:
     Returns:
         Tuple of (processed_token_to_send, updated_buffer)
     """
-    # Simple real-time filtering - remove obvious markdown symbols
-    processed_token = token
+    # Add current token to buffer
+    buffer += token
     
-    # Filter out markdown header symbols
-    if token.strip() in ['#', '##', '###']:
-        return "", buffer  # Don't send header symbols
+    # Check for completed markdown patterns and convert to HTML
     
-    # Filter out asterisks used for bold/italic
-    if token.strip() in ['*', '**']:
-        return "", buffer  # Don't send bold/italic symbols
+    # Bold text: **text** → <strong>text</strong>
+    if '**' in buffer:
+        # Count asterisks to find complete bold patterns
+        asterisk_count = buffer.count('**')
+        if asterisk_count >= 2:  # We have at least one complete bold pattern
+            # Process the first complete bold pattern
+            match = re.search(r'\*\*(.*?)\*\*', buffer)
+            if match:
+                before = buffer[:match.start()]
+                bold_content = match.group(1)
+                after = buffer[match.end():]
+                
+                # Send the before content + HTML bold
+                output = before + f"<strong>{bold_content}</strong>"
+                return output, after
     
-    # Filter out tokens that are just asterisks with spaces
-    if token.replace(' ', '').replace('\n', '') in ['*', '**']:
-        return "", buffer
+    # Headers: ### text → <h3>text</h3>
+    if buffer.strip().startswith(('#', '##', '###')) and '\n' in buffer:
+        lines = buffer.split('\n', 1)
+        if len(lines) >= 2:
+            header_line = lines[0]
+            rest = lines[1]
+            
+            if header_line.startswith('### '):
+                header_content = header_line[4:]
+                html_header = f"<h3>{header_content}</h3>"
+                return html_header + "\n", rest
+            elif header_line.startswith('## '):
+                header_content = header_line[3:]
+                html_header = f"<h2>{header_content}</h2>"
+                return html_header + "\n", rest
+            elif header_line.startswith('# '):
+                header_content = header_line[2:]
+                html_header = f"<h1>{header_content}</h1>"
+                return html_header + "\n", rest
     
-    # Filter out backticks
-    if token == '`':
-        return "", buffer
+    # If we have a complete line with bullet points
+    if buffer.strip().startswith(('-', '*', '+')) and '\n' in buffer:
+        lines = buffer.split('\n', 1)
+        if len(lines) >= 2:
+            bullet_line = lines[0]
+            rest = lines[1]
+            
+            # Convert bullet to HTML
+            content = re.sub(r'^[\s]*[-*+]\s+', '', bullet_line)
+            html_bullet = f"<li>{content}</li>"
+            return html_bullet + "\n", rest
     
-    # Send normal content tokens immediately
-    return processed_token, buffer 
+    # If buffer is getting long without patterns, send as-is
+    if len(buffer) > 100:
+        return buffer, ""
+    
+    # Otherwise, keep buffering
+    return "", buffer 

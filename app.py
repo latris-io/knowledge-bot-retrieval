@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from typing import Optional
 from bot_config import get_openai_api_key
 from prompt_template import get_prompt_template
-from markdown_processor import process_markdown_to_clean_text, process_streaming_token
+from markdown_processor import process_markdown_to_clean_text, process_markdown_to_html, process_streaming_token
 from retriever import RetrieverService
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
@@ -104,6 +104,7 @@ class EventStreamHandler(BaseCallbackHandler):
         self._loop = None
         self.accumulated_text = ""  # Track full response for conversation history
         self.processed_text = ""    # Post-processed version for history
+        self.stream_buffer = ""     # Buffer for real-time HTML processing
 
     async def astream(self):
         while True:
@@ -126,17 +127,25 @@ class EventStreamHandler(BaseCallbackHandler):
     def on_llm_new_token(self, token: str, **kwargs):
         self.accumulated_text += token
         
-        # Process token for real-time streaming with markdown cleanup
-        processed_token, _ = process_streaming_token(token, "")
+        # Process token for real-time HTML conversion
+        html_token, self.stream_buffer = process_streaming_token(token, self.stream_buffer)
         
-        # Send processed token (empty tokens are filtered out)
-        if processed_token:
-            self._put_nowait_safe(processed_token)
+        # Send HTML token if available
+        if html_token:
+            self._put_nowait_safe(html_token)
 
     def on_llm_end(self, response: LLMResult, **kwargs):
-        # Post-process the accumulated markdown text to clean format for history
+        # Send any remaining buffered content as HTML
+        if self.stream_buffer:
+            # Process any remaining buffer content
+            remaining_html = process_markdown_to_html(self.stream_buffer)
+            if remaining_html:
+                self._put_nowait_safe(remaining_html)
+        
+        # Create clean text for conversation history
         self.processed_text = process_markdown_to_clean_text(self.accumulated_text)
-        logger.info(f"[MARKDOWN] Post-processed response: {len(self.accumulated_text)} → {len(self.processed_text)} chars")
+        
+        logger.info(f"[MARKDOWN] Completed streaming. Clean text for history: {len(self.processed_text)} chars")
         self._put_nowait_safe(None)
 
     def on_llm_error(self, error: Exception, **kwargs):
