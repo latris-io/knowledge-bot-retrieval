@@ -12,6 +12,8 @@ from retriever import RetrieverService
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableSequence
+from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.chat_history import InMemoryChatMessageHistory
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.schema import LLMResult
 from ratelimit import limits, sleep_and_retry
@@ -38,6 +40,30 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+session_histories = {}
+
+def get_session_history(session_id: str) -> InMemoryChatMessageHistory:
+    if session_id not in session_histories:
+        session_histories[session_id] = InMemoryChatMessageHistory()
+        logger.info(f"[MEMORY] Created new history for session {session_id}")
+    return session_histories[session_id]
+
+def format_chat_history(chat_history: InMemoryChatMessageHistory) -> str:
+    """Format chat history for inclusion in prompt"""
+    if not chat_history.messages:
+        return ""
+    
+    formatted = []
+    for message in chat_history.messages[-6:]:  # Last 3 Q&A pairs
+        if isinstance(message, HumanMessage):
+            formatted.append(f"Human: {message.content}")
+        elif isinstance(message, AIMessage):
+            formatted.append(f"Assistant: {message.content}")
+    
+    if formatted:
+        return "Previous conversation:\n" + "\n".join(formatted) + "\n\n"
+    return ""
 
 def should_use_multi_query(question: str) -> bool:
     """
@@ -100,6 +126,7 @@ class EventStreamHandler(BaseCallbackHandler):
     def __init__(self):
         self.queue = asyncio.Queue()
         self._loop = None
+        self.accumulated_text = ""  # Track full response for conversation history
 
     async def astream(self):
         while True:
@@ -120,6 +147,7 @@ class EventStreamHandler(BaseCallbackHandler):
             logger.error(f"[STREAM] Error putting item in queue: {e}")
 
     def on_llm_new_token(self, token: str, **kwargs):
+        self.accumulated_text += token
         self._put_nowait_safe(token)
 
     def on_llm_end(self, response: LLMResult, **kwargs):
@@ -180,7 +208,18 @@ async def ask_question(
             openai_api_key=get_openai_api_key()
         )
 
-        # Create a simple, reliable chain without complex conversational handling
+        # Get conversation history for this session
+        chat_history = get_session_history(session_id)
+        conversation_context = format_chat_history(chat_history)
+        
+        # Enhanced prompt with conversation context
+        enhanced_prompt_template = conversation_context + prompt.template
+        enhanced_prompt = PromptTemplate(
+            template=enhanced_prompt_template,
+            input_variables=prompt.input_variables
+        )
+        
+        # Create a simple, reliable chain with conversational context
         from langchain.chains import RetrievalQA
         
         chain = RetrievalQA.from_chain_type(
@@ -190,7 +229,7 @@ async def ask_question(
             return_source_documents=True,
             verbose=verbose,
             chain_type_kwargs={
-                "prompt": prompt,
+                "prompt": enhanced_prompt,
                 "document_prompt": document_prompt
             }
         )
@@ -202,6 +241,12 @@ async def ask_question(
                         chain.invoke,
                         {"query": question}
                     )
+                    
+                    # Save conversation to history using accumulated streaming text
+                    if stream_handler and stream_handler.accumulated_text:
+                        chat_history.add_user_message(question)
+                        chat_history.add_ai_message(stream_handler.accumulated_text)
+                    
                     sources = result.get("source_documents", [])
                     if sources:
                         # Add widget-compatible source markers
@@ -214,15 +259,24 @@ async def ask_question(
                         logger.info(f"[RETRIEVAL] Sources: {[doc.metadata.get('file_name') for doc in sources]}, Scores: {scores}")
                 except Exception as e:
                     logger.error(f"[STREAM] Error in chain: {e}")
-                    await stream_handler.queue.put(f"[ERROR] {str(e)}")
+                    if stream_handler:
+                        await stream_handler.queue.put(f"[ERROR] {str(e)}")
                 finally:
-                    await stream_handler.queue.put(None)
+                    if stream_handler:
+                        await stream_handler.queue.put(None)
             return run_chain()
         else:
             result = await asyncio.to_thread(
                 chain.invoke,
                 {"query": question}
             )
+            
+            # Save conversation to history
+            answer = result.get("result", "")
+            if answer:
+                chat_history.add_user_message(question)
+                chat_history.add_ai_message(answer)
+            
             sources = result.get("source_documents", [])
             scores = [doc.metadata.get('score', 'N/A') for doc in sources]
             logger.info(f"[RETRIEVAL] Sources: {[doc.metadata.get('file_name') for doc in sources]}, Scores: {scores}")
