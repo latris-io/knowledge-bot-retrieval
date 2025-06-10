@@ -46,6 +46,9 @@ session_histories = {}
 # Edge case tracking for continuous improvement
 classification_stats = {"simple": 0, "medium": 0, "complex": 0, "edge_cases": []}
 
+# Configuration for forcing all queries to complex (for testing comprehensive coverage)
+FORCE_ALL_COMPLEX = os.getenv('FORCE_ALL_COMPLEX', 'false').lower() == 'true'
+
 def get_session_history(session_id: str) -> InMemoryChatMessageHistory:
     if session_id not in session_histories:
         session_histories[session_id] = InMemoryChatMessageHistory()
@@ -271,7 +274,11 @@ async def ask_question(
             logger.info(f"[BOT] Using mode: {mode}")
 
         # Optimized hardcoded complexity detection (sub-millisecond performance)
-        complexity = get_query_complexity(question)
+        if FORCE_ALL_COMPLEX:
+            complexity = 'complex'
+            logger.info("[BOT] FORCE_ALL_COMPLEX enabled → All queries complex")
+        else:
+            complexity = get_query_complexity(question)
         
         # Auto-detection logic with performance optimization
         if complexity == 'simple':
@@ -283,9 +290,10 @@ async def ask_question(
             k = 4  # Moderate retrieval
             use_multi_query = False
         else:  # complex
-            logger.info("[BOT] Auto-detected complexity: complex → MultiQuery (comprehensive coverage)")
-            k = 6  # Maximum retrieval for comprehensive results
-            use_multi_query = True
+            # NEW: Fast Complex Mode - comprehensive coverage with 3-5s streaming start
+            logger.info("[BOT] Auto-detected complexity: complex → Fast Comprehensive (3-5s streaming)")
+            k = 8  # High retrieval for comprehensive results without MultiQuery overhead
+            use_multi_query = False  # Use BM25+Vector hybrid instead for speed
 
         retriever_service = RetrieverService()
         retriever = retriever_service.build_retriever(

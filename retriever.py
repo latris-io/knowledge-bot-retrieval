@@ -148,9 +148,19 @@ Alternative queries:"""
                 logger.info(f"[RETRIEVER] Full hybrid retriever with compression — k={k}, threshold={similarity_threshold}")
                 final_retriever = reranked
             else:
-                # Direct mode: vector-only for maximum speed (skip BM25 and compression overhead)
-                logger.info(f"[RETRIEVER] Direct vector-only retriever for maximum speed — k={k}")
-                final_retriever = vector_component
+                # Adaptive direct mode: vector-only for simple/medium, hybrid for complex
+                if k >= 8:
+                    # High-k complex queries: use BM25+Vector hybrid for comprehensive coverage
+                    hybrid = EnsembleRetriever(
+                        retrievers=[vector_component, bm25],
+                        weights=[0.7, 0.3]  # Favor vector but include BM25 for keyword coverage
+                    )
+                    logger.info(f"[RETRIEVER] Fast comprehensive hybrid retriever — k={k} (BM25+Vector)")
+                    final_retriever = hybrid
+                else:
+                    # Simple/medium queries: vector-only for maximum speed
+                    logger.info(f"[RETRIEVER] Direct vector-only retriever for maximum speed — k={k}")
+                    final_retriever = vector_component
 
             if metadatas:
                 sample_meta = metadatas[0]
