@@ -30,8 +30,12 @@
 
     const sessionManager = new SessionManager();
     
-    // Initialize marked.js library
-    loadMarkedLibrary();
+    // Initialize marked.js library asynchronously
+    let markedLoaded = false;
+    loadMarkedLibrary().then(() => {
+        markedLoaded = true;
+        console.log('[MARKED] Ready for use');
+    });
   
     // Load marked.js library for proper markdown parsing
     function loadMarkedLibrary() {
@@ -44,6 +48,7 @@
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
             script.onload = () => {
+                console.log('[MARKED] Library loaded successfully');
                 // Configure marked.js for LLM output - optimized for nested lists
                 marked.setOptions({
                     breaks: false,       // DON'T convert \n to <br> - breaks nested lists
@@ -51,7 +56,13 @@
                     sanitize: false,     // We'll handle sanitization elsewhere
                     smartypants: false   // Keep simple quotes
                 });
+                console.log('[MARKED] Configuration set');
                 resolve();
+            };
+            
+            script.onerror = () => {
+                console.error('[MARKED] Failed to load marked.js from CDN');
+                resolve(); // Still resolve to continue with fallback
             };
             document.head.appendChild(script);
         });
@@ -62,15 +73,21 @@
         if (!text) return '';
         
         // Minimal preprocessing - LLM output is already well-formatted
-        let processed = text;
+        let processed = text
+            .replace(/^(- .+)\n(\*\*[^*]+\*\*)/gm, '$1\n\n$2');  // Fix missing blank line after lists
 
         // Use marked.js if available, fallback to simple parsing
-        if (window.marked) {
+        if (window.marked && markedLoaded) {
             try {
-                return marked.parse(processed);
+                console.log('[MARKED] Input text:', processed);
+                const result = marked.parse(processed);
+                console.log('[MARKED] Output HTML:', result);
+                return result;
             } catch (error) {
-                console.warn('Marked.js parsing failed, using fallback:', error);
+                console.warn('[MARKED] Parsing failed, using fallback:', error);
             }
+        } else {
+            console.warn('[MARKED] marked.js not available (loaded:', markedLoaded, ', window.marked:', !!window.marked, '), using fallback');
         }
         
         // Fallback: basic inline formatting only
@@ -407,6 +424,35 @@
             const { done, value } = await reader.read();
             if (done) {
               console.log(`[Widget] Stream completed after ${chunkCount} chunks`);
+              console.log(`[Widget] Final accumulated text length: ${accumulatedText.length}`);
+              console.log(`[Widget] Final accumulated text:`, accumulatedText);
+              
+              // Stream complete - now parse final markdown
+              if (accumulatedText) {
+                console.log('[Widget] Stream complete, parsing final markdown');
+                const sourceMatches = [...accumulatedText.matchAll(/\[source: (.+?)\]/g)];
+                const allSources = sourceMatches.map(match => match[1]);
+                const uniqueSources = [...new Set(allSources)];
+                const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
+                const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "").trim();
+                
+                console.log('[Widget] Content for markdown parsing:', contentText);
+                
+                // Now parse the complete markdown
+                const mainHtml = parseMarkdown(contentText);
+                const sourcesHtml = uniqueSources.length
+                  ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
+                  : "";
+                
+                console.log('[Widget] Final HTML after parsing:', mainHtml);
+                
+                answerBox.innerHTML = window.DOMPurify
+                  ? DOMPurify.sanitize(mainHtml + sourcesHtml)
+                  : (mainHtml + sourcesHtml);
+              } else {
+                console.log('[Widget] No accumulated text to parse');
+              }
+              
               break;
             }
 
@@ -418,13 +464,14 @@
             for (const line of lines) {
               if (line.startsWith('data: ')) {
                 const data = line.slice(6); // Remove 'data: ' prefix
-                if (data === '[DONE]' || data === '') continue;
+                if (data === '[DONE]') continue;
                 
                 if (data.startsWith('[ERROR]')) {
                   throw new Error(data.replace('[ERROR] ', ''));
                 }
                 
-                accumulatedText += data;
+                // Preserve empty chunks as line breaks, regular chunks as content
+                accumulatedText += data === '' ? '\n' : data;
                 
                 // Check if we have actual response content (not just loading message)
                 const cleanForCheck = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
@@ -447,15 +494,12 @@
                   // Show actual content, removing any loading messages
                   const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "").trim();
                   
-                  // Parse markdown to HTML
-                  const mainHtml = parseMarkdown(contentText);
+                  // Show raw text while streaming (no markdown parsing yet)
                   const sourcesHtml = uniqueSources.length
                     ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
                     : "";
                   
-                  answerBox.innerHTML = window.DOMPurify
-                    ? DOMPurify.sanitize(mainHtml + sourcesHtml)
-                    : (mainHtml + sourcesHtml);
+                  answerBox.innerHTML = `<pre style="white-space: pre-wrap; font-family: inherit; margin: 0;">${contentText}</pre>${sourcesHtml}`;
                 } else {
                   // Still in loading phase, show Thinking with spinner
                   answerBox.innerHTML = `

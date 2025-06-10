@@ -17,7 +17,8 @@ CRITICAL: Format your response using proper markdown with correct spacing:
 - NEVER put the first sub-item on the same line as the parent item
 - Each sub-item must be on its own indented line with a dash
 - When adding content after a list, ALWAYS add a blank line before the new content
-- Items like "Tricky Word" or "Test Date" should be separate from lists
+- Additional information should be separate from lists, not part of the last list item
+- CRITICAL: Lists must end with a blank line before any following content
 
 Example correct format:
 ### Header
@@ -31,11 +32,11 @@ For nested lists (CRITICAL - follow this exact format):
   - Sub-item 2
   - Sub-item 3
 
-For lists with additional info (CRITICAL - add blank line):
+For lists with additional info (CRITICAL - MUST have blank line after list):
 - item1
 - item2  
 - item3
-
+[BLANK LINE REQUIRED HERE]
 **Additional Info:** value
 
 WRONG format (do NOT do this):
