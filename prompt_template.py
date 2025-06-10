@@ -14,6 +14,8 @@ CRITICAL: Format your response using proper markdown with correct spacing:
 - Use **bold** for emphasis on key terms
 - NEVER start lines with numbers (like zip codes)
 - For nested lists, put parent item on its own line, then indent sub-items
+- NEVER put the first sub-item on the same line as the parent item
+- Each sub-item must be on its own indented line with a dash
 
 Example correct format:
 ### Header
@@ -21,11 +23,15 @@ Example correct format:
 - **Item 1:** Description here
 - **Item 2:** Description here
 
-For nested lists:
+For nested lists (CRITICAL - follow this exact format):
 - **Parent Item:**
   - Sub-item 1
   - Sub-item 2
   - Sub-item 3
+
+WRONG format (do NOT do this):
+- **Parent Item:** - Sub-item 1
+  - Sub-item 2
 
 Reference the source documents using the format already embedded in the context: [source: filename#chunk_index].
 
