@@ -74,7 +74,9 @@
         
         // Minimal preprocessing - LLM output is already well-formatted
         let processed = text
-            .replace(/^(- .+)\n(\*\*[^*]+\*\*)/gm, '$1\n\n$2');  // Fix missing blank line after lists
+            .replace(/^(- .+)\n(\*\*[^*]+\*\*)/gm, '$1\n\n$2')  // Fix missing blank line after lists
+            .replace(/([.!?])\n(\*\*[^*]+\*\*)/gm, '$1\n\n$2')  // Fix missing blank line after paragraphs before bold text
+            .replace(/([.!?])\n(- )/gm, '$1\n\n$2');  // Fix missing blank line after paragraphs before lists
 
         // Use marked.js if available, fallback to simple parsing
         if (window.marked && markedLoaded) {
