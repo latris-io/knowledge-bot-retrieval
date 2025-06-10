@@ -6182,3 +6182,383 @@ chromadb.errors.InvalidArgumentError: Collection expecting embedding with dimens
 2025-06-10 10:02:56,788 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
 2025-06-10 10:02:57,418 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 2025-06-10 10:02:57,691 — INFO — app — [RETRIEVAL] Sources: ['sample_word.docx', 'sample_powerpoint.pptx', 'sample_excel.xlsx', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'sample_excel.xlsx', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+2025-06-10 10:06:26,233 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-06-10 10:06:38,430 — INFO — jwt_handler — [JWT] Successfully decoded minimal token for company_id=3, bot_id=1
+2025-06-10 10:06:38,432 — INFO — app — [API] Received question: What is Jennifer phone number?, company_id: 3, bot_id: 1, session_id: 19a791ff-0d2e-430b-9469-05bc1702af71
+2025-06-10 10:06:38,432 — INFO — app — [BOT] Using mode: qa
+2025-06-10 10:06:38,432 — INFO — app — [BOT] Hardcoded complexity detection: simple (took 0.000s)
+2025-06-10 10:06:38,432 — INFO — app — [BOT] Auto-detected complexity: simple → Direct (maximum speed)
+2025-06-10 10:06:38,432 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:06:38,503 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-06-10 10:06:38,970 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-06-10 10:06:39,143 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-06-10 10:06:39,200 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-06-10 10:06:39,330 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-06-10 10:06:39,492 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-06-10 10:06:39,493 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-06-10 10:06:39,493 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-06-10 10:06:39,604 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/261f5616-3e6a-4b1d-90ac-103f902eadcb/get "HTTP/1.1 200 OK"
+2025-06-10 10:06:39,699 — INFO — retriever — [RETRIEVER] Initialized BM25 with 26 documents
+2025-06-10 10:06:39,699 — INFO — retriever — [RETRIEVER] Direct vector-only retriever for maximum speed — k=2
+2025-06-10 10:06:39,699 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "source_page": 1,
+  "document_id": "mzncxlmz2f40bpqxhzy1gswr",
+  "timestamp": "2025-06-10T13:33:24.941614",
+  "file_type": ".pdf",
+  "event_id": 468,
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "ingestion_timestamp": "2025-06-10T13:29:40.261059",
+  "extraction_methods": "standard,ocr_image",
+  "modified_time": 1749562180.2579546,
+  "source": "FDS_Jennifer_Franklin_Resume_b9fc0e516e_519c4c2c6f.pdf",
+  "mime": "application/pdf",
+  "company_id": 3,
+  "mime_type": "application/pdf",
+  "chunk_index": 0,
+  "bot_id": 1,
+  "created_time": 1749562180.2579546,
+  "structural_density": 0.8210000000000001,
+  "storage_key": "FDS_Jennifer_Franklin_Resume_b9fc0e516e_519c4c2c6f.pdf",
+  "chunk_type": "semantic",
+  "file_size": 1205340,
+  "content_type": "unstructured_text",
+  "file_name": "FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf",
+  "contains_image_text": true,
+  "structure_type": "paragraph",
+  "source_type": "pdf"
+}
+2025-06-10 10:06:39,700 — INFO — app — [BOT] Using gpt-3.5-turbo for simple query optimization
+2025-06-10 10:06:39,700 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:06:39,728 — INFO — app — [MEMORY] Created new history for session 19a791ff-0d2e-430b-9469-05bc1702af71
+2025-06-10 10:06:40,542 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-10 10:06:40,740 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/261f5616-3e6a-4b1d-90ac-103f902eadcb/query "HTTP/1.1 200 OK"
+2025-06-10 10:06:41,194 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-10 10:06:41,435 — INFO — app — [RETRIEVAL] Sources: ['FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf'], Scores: ['N/A', 'N/A']
+2025-06-10 10:06:59,330 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-06-10 10:07:11,484 — INFO — jwt_handler — [JWT] Successfully decoded minimal token for company_id=3, bot_id=1
+2025-06-10 10:07:11,485 — INFO — app — [API] Received question: What is Jennifer phone number?, company_id: 3, bot_id: 1, session_id: a80f421a-76e9-4ca7-b49a-a10504f3175d
+2025-06-10 10:07:11,485 — INFO — app — [BOT] Using mode: qa
+2025-06-10 10:07:11,485 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:07:15,168 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-10 10:07:15,352 — INFO — app — [LLM] Classification: simple (took 3.867s)
+2025-06-10 10:07:15,352 — INFO — app — [BOT] LLM complexity detection: simple (took 3.867s)
+2025-06-10 10:07:15,352 — INFO — app — [BOT] Auto-detected complexity: simple → Direct (maximum speed)
+2025-06-10 10:07:15,353 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:07:15,391 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-06-10 10:07:15,633 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-06-10 10:07:15,820 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-06-10 10:07:15,916 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-06-10 10:07:16,095 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-06-10 10:07:16,189 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-06-10 10:07:16,190 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-06-10 10:07:16,190 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-06-10 10:07:16,291 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/261f5616-3e6a-4b1d-90ac-103f902eadcb/get "HTTP/1.1 200 OK"
+2025-06-10 10:07:16,303 — INFO — retriever — [RETRIEVER] Initialized BM25 with 26 documents
+2025-06-10 10:07:16,303 — INFO — retriever — [RETRIEVER] Direct vector-only retriever for maximum speed — k=2
+2025-06-10 10:07:16,304 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "source_page": 1,
+  "ingestion_timestamp": "2025-06-10T13:29:40.261059",
+  "storage_key": "FDS_Jennifer_Franklin_Resume_b9fc0e516e_519c4c2c6f.pdf",
+  "structure_type": "paragraph",
+  "chunk_type": "semantic",
+  "content_type": "unstructured_text",
+  "file_type": ".pdf",
+  "modified_time": 1749562180.2579546,
+  "event_id": 468,
+  "bot_id": 1,
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "document_id": "mzncxlmz2f40bpqxhzy1gswr",
+  "source_type": "pdf",
+  "timestamp": "2025-06-10T13:33:24.941614",
+  "structural_density": 0.8210000000000001,
+  "file_size": 1205340,
+  "file_name": "FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf",
+  "contains_image_text": true,
+  "mime": "application/pdf",
+  "created_time": 1749562180.2579546,
+  "chunk_index": 0,
+  "mime_type": "application/pdf",
+  "source": "FDS_Jennifer_Franklin_Resume_b9fc0e516e_519c4c2c6f.pdf",
+  "company_id": 3,
+  "extraction_methods": "standard,ocr_image"
+}
+2025-06-10 10:07:16,304 — INFO — app — [BOT] Using gpt-3.5-turbo for simple query optimization
+2025-06-10 10:07:16,304 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:07:16,339 — INFO — app — [MEMORY] Created new history for session a80f421a-76e9-4ca7-b49a-a10504f3175d
+2025-06-10 10:07:17,454 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-10 10:07:17,726 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/261f5616-3e6a-4b1d-90ac-103f902eadcb/query "HTTP/1.1 200 OK"
+2025-06-10 10:07:18,181 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-10 10:07:18,282 — INFO — app — [RETRIEVAL] Sources: ['FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf'], Scores: ['N/A', 'N/A']
+2025-06-10 10:07:31,203 — INFO — jwt_handler — [JWT] Successfully decoded minimal token for company_id=3, bot_id=1
+2025-06-10 10:07:31,205 — INFO — app — [API] Received question: I need help understanding the best approach for improving our customer satisfaction metrics, company_id: 3, bot_id: 1, session_id: 8d585cc4-39f4-4854-9eff-932a0b5c2f7b
+2025-06-10 10:07:31,207 — INFO — app — [BOT] Using mode: qa
+2025-06-10 10:07:31,207 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:07:31,740 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-10 10:07:31,742 — INFO — app — [LLM] Classification: complex (took 0.535s)
+2025-06-10 10:07:31,742 — INFO — app — [BOT] LLM complexity detection: complex (took 0.535s)
+2025-06-10 10:07:31,742 — INFO — app — [BOT] Auto-detected complexity: complex → MultiQuery (comprehensive coverage)
+2025-06-10 10:07:31,742 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:07:31,771 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-06-10 10:07:31,915 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-06-10 10:07:32,128 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-06-10 10:07:32,256 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-06-10 10:07:32,356 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-06-10 10:07:32,415 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-06-10 10:07:32,416 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-06-10 10:07:32,416 — INFO — retriever — [RETRIEVER] Using optimized MultiQueryRetriever for enhanced coverage
+2025-06-10 10:07:32,417 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:07:32,522 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/261f5616-3e6a-4b1d-90ac-103f902eadcb/get "HTTP/1.1 200 OK"
+2025-06-10 10:07:32,537 — INFO — retriever — [RETRIEVER] Initialized BM25 with 26 documents
+2025-06-10 10:07:32,537 — INFO — retriever — [RETRIEVER DEBUG] EmbeddingsFilter threshold set to 0.06999999999999999 (relaxed for complex queries)
+2025-06-10 10:07:32,538 — INFO — retriever — [RETRIEVER] Full hybrid retriever with compression — k=6, threshold=0.1
+2025-06-10 10:07:32,539 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "structure_type": "paragraph",
+  "source_page": 1,
+  "chunk_index": 0,
+  "modified_time": 1749562180.2579546,
+  "source": "FDS_Jennifer_Franklin_Resume_b9fc0e516e_519c4c2c6f.pdf",
+  "created_time": 1749562180.2579546,
+  "content_type": "unstructured_text",
+  "file_type": ".pdf",
+  "extraction_methods": "standard,ocr_image",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "chunk_type": "semantic",
+  "mime": "application/pdf",
+  "ingestion_timestamp": "2025-06-10T13:29:40.261059",
+  "storage_key": "FDS_Jennifer_Franklin_Resume_b9fc0e516e_519c4c2c6f.pdf",
+  "file_size": 1205340,
+  "document_id": "mzncxlmz2f40bpqxhzy1gswr",
+  "source_type": "pdf",
+  "timestamp": "2025-06-10T13:33:24.941614",
+  "structural_density": 0.8210000000000001,
+  "event_id": 468,
+  "bot_id": 1,
+  "contains_image_text": true,
+  "company_id": 3,
+  "file_name": "FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf",
+  "mime_type": "application/pdf"
+}
+2025-06-10 10:07:32,539 — INFO — app — [BOT] Using gpt-4o-mini for complex query optimization
+2025-06-10 10:07:32,539 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:07:32,570 — INFO — app — [MEMORY] Created new history for session 8d585cc4-39f4-4854-9eff-932a0b5c2f7b
+2025-06-10 10:07:33,311 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-10 10:07:33,319 — INFO — langchain.retrievers.multi_query — Generated queries: ['1. What strategies can be implemented to enhance customer satisfaction metrics?', '2. How can we optimize customer satisfaction metrics within our organization?']
+2025-06-10 10:07:33,881 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-10 10:07:34,106 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/261f5616-3e6a-4b1d-90ac-103f902eadcb/query "HTTP/1.1 200 OK"
+2025-06-10 10:07:34,393 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-10 10:07:34,514 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/261f5616-3e6a-4b1d-90ac-103f902eadcb/query "HTTP/1.1 200 OK"
+2025-06-10 10:07:34,877 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-10 10:07:35,133 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-10 10:07:35,775 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-10 10:07:36,049 — INFO — app — [RETRIEVAL] Sources: ['sample_powerpoint.pptx', 'sample_word.docx', 'sample_excel.xlsx', 'sample_table.csv', 'sample_text.txt', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'sample_text.txt', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+2025-06-10 10:07:51,101 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-06-10 10:08:05,786 — INFO — jwt_handler — [JWT] Successfully decoded minimal token for company_id=3, bot_id=1
+2025-06-10 10:08:05,788 — INFO — app — [API] Received question: I need help understanding the best approach for improving our customer satisfaction metrics, company_id: 3, bot_id: 1, session_id: 4e4611cd-d567-4441-a884-8fb713bcc902
+2025-06-10 10:08:05,788 — INFO — app — [BOT] Using mode: qa
+2025-06-10 10:08:05,788 — INFO — app — [BOT] Hardcoded complexity detection: medium (took 0.000s)
+2025-06-10 10:08:05,789 — INFO — app — [BOT] Auto-detected complexity: medium → Enhanced Direct (balanced speed+quality)
+2025-06-10 10:08:05,789 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:08:05,872 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-06-10 10:08:06,231 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-06-10 10:08:06,427 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-06-10 10:08:06,563 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-06-10 10:08:06,751 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-06-10 10:08:08,178 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-06-10 10:08:08,180 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-06-10 10:08:08,180 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-06-10 10:08:08,329 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/261f5616-3e6a-4b1d-90ac-103f902eadcb/get "HTTP/1.1 200 OK"
+2025-06-10 10:08:08,334 — INFO — retriever — [RETRIEVER] Initialized BM25 with 26 documents
+2025-06-10 10:08:08,334 — INFO — retriever — [RETRIEVER] Direct vector-only retriever for maximum speed — k=4
+2025-06-10 10:08:08,335 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "mime": "application/pdf",
+  "source_type": "pdf",
+  "extraction_methods": "standard,ocr_image",
+  "file_name": "FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf",
+  "contains_image_text": true,
+  "modified_time": 1749562180.2579546,
+  "mime_type": "application/pdf",
+  "timestamp": "2025-06-10T13:33:24.941614",
+  "source_page": 1,
+  "ingestion_timestamp": "2025-06-10T13:29:40.261059",
+  "file_size": 1205340,
+  "document_id": "mzncxlmz2f40bpqxhzy1gswr",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "structural_density": 0.8210000000000001,
+  "storage_key": "FDS_Jennifer_Franklin_Resume_b9fc0e516e_519c4c2c6f.pdf",
+  "structure_type": "paragraph",
+  "bot_id": 1,
+  "company_id": 3,
+  "event_id": 468,
+  "chunk_index": 0,
+  "source": "FDS_Jennifer_Franklin_Resume_b9fc0e516e_519c4c2c6f.pdf",
+  "file_type": ".pdf",
+  "created_time": 1749562180.2579546,
+  "chunk_type": "semantic",
+  "content_type": "unstructured_text"
+}
+2025-06-10 10:08:08,335 — INFO — app — [BOT] Using gpt-3.5-turbo for medium query optimization
+2025-06-10 10:08:08,335 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:08:08,363 — INFO — app — [MEMORY] Created new history for session 4e4611cd-d567-4441-a884-8fb713bcc902
+2025-06-10 10:08:09,374 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-10 10:08:09,575 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/261f5616-3e6a-4b1d-90ac-103f902eadcb/query "HTTP/1.1 200 OK"
+2025-06-10 10:08:10,032 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-10 10:08:10,759 — INFO — app — [RETRIEVAL] Sources: ['sample_powerpoint.pptx', 'sample_word.docx', 'sample_excel.xlsx', 'sample_table.csv'], Scores: ['N/A', 'N/A', 'N/A', 'N/A']
+2025-06-10 10:13:10,730 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-06-10 10:13:24,441 — INFO — jwt_handler — [JWT] Successfully decoded minimal token for company_id=3, bot_id=1
+2025-06-10 10:13:24,442 — INFO — app — [API] Received question: What is Jennifer email address?, company_id: 3, bot_id: 1, session_id: 82edffe4-00d7-44e0-90bf-8e4f95651061
+2025-06-10 10:13:24,443 — INFO — app — [BOT] Using mode: qa
+2025-06-10 10:13:24,443 — INFO — app — [BOT] Auto-detected complexity: simple → Direct (maximum speed)
+2025-06-10 10:13:24,443 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:13:24,531 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-06-10 10:13:25,171 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-06-10 10:13:25,333 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-06-10 10:13:25,473 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-06-10 10:13:25,567 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-06-10 10:13:25,691 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-06-10 10:13:25,691 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-06-10 10:13:25,692 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-06-10 10:13:25,768 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/261f5616-3e6a-4b1d-90ac-103f902eadcb/get "HTTP/1.1 200 OK"
+2025-06-10 10:13:25,773 — INFO — retriever — [RETRIEVER] Initialized BM25 with 26 documents
+2025-06-10 10:13:25,774 — INFO — retriever — [RETRIEVER] Direct vector-only retriever for maximum speed — k=2
+2025-06-10 10:13:25,774 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "company_id": 3,
+  "chunk_index": 0,
+  "mime": "application/pdf",
+  "chunk_type": "semantic",
+  "source": "FDS_Jennifer_Franklin_Resume_b9fc0e516e_519c4c2c6f.pdf",
+  "extraction_methods": "standard,ocr_image",
+  "source_page": 1,
+  "storage_key": "FDS_Jennifer_Franklin_Resume_b9fc0e516e_519c4c2c6f.pdf",
+  "mime_type": "application/pdf",
+  "file_name": "FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf",
+  "ingestion_timestamp": "2025-06-10T13:29:40.261059",
+  "modified_time": 1749562180.2579546,
+  "structural_density": 0.8210000000000001,
+  "source_type": "pdf",
+  "document_id": "mzncxlmz2f40bpqxhzy1gswr",
+  "file_size": 1205340,
+  "event_id": 468,
+  "file_type": ".pdf",
+  "created_time": 1749562180.2579546,
+  "content_type": "unstructured_text",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "structure_type": "paragraph",
+  "timestamp": "2025-06-10T13:33:24.941614",
+  "bot_id": 1,
+  "contains_image_text": true
+}
+2025-06-10 10:13:25,774 — INFO — app — [BOT] Using gpt-3.5-turbo for simple query optimization
+2025-06-10 10:13:25,774 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:13:25,805 — INFO — app — [MEMORY] Created new history for session 82edffe4-00d7-44e0-90bf-8e4f95651061
+2025-06-10 10:13:26,900 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-10 10:13:27,094 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/261f5616-3e6a-4b1d-90ac-103f902eadcb/query "HTTP/1.1 200 OK"
+2025-06-10 10:13:27,600 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-10 10:13:27,785 — INFO — app — [RETRIEVAL] Sources: ['FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf'], Scores: ['N/A', 'N/A']
+2025-06-10 10:13:41,837 — INFO — jwt_handler — [JWT] Successfully decoded minimal token for company_id=3, bot_id=1
+2025-06-10 10:13:41,837 — INFO — app — [API] Received question: List all the services you offer, company_id: 3, bot_id: 1, session_id: dc00ac27-6b9c-439c-8d0c-8cc06f21757a
+2025-06-10 10:13:41,838 — INFO — app — [BOT] Using mode: qa
+2025-06-10 10:13:41,838 — INFO — app — [BOT] Auto-detected complexity: medium → Enhanced Direct (balanced speed+quality)
+2025-06-10 10:13:41,838 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:13:41,874 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-06-10 10:13:42,075 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-06-10 10:13:42,396 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-06-10 10:13:42,489 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-06-10 10:13:42,615 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-06-10 10:13:42,709 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-06-10 10:13:42,710 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-06-10 10:13:42,710 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-06-10 10:13:42,776 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/261f5616-3e6a-4b1d-90ac-103f902eadcb/get "HTTP/1.1 200 OK"
+2025-06-10 10:13:42,782 — INFO — retriever — [RETRIEVER] Initialized BM25 with 26 documents
+2025-06-10 10:13:42,782 — INFO — retriever — [RETRIEVER] Direct vector-only retriever for maximum speed — k=4
+2025-06-10 10:13:42,782 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "file_size": 1205340,
+  "extraction_methods": "standard,ocr_image",
+  "source_page": 1,
+  "created_time": 1749562180.2579546,
+  "mime_type": "application/pdf",
+  "structure_type": "paragraph",
+  "content_type": "unstructured_text",
+  "structural_density": 0.8210000000000001,
+  "timestamp": "2025-06-10T13:33:24.941614",
+  "mime": "application/pdf",
+  "file_name": "FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf",
+  "storage_key": "FDS_Jennifer_Franklin_Resume_b9fc0e516e_519c4c2c6f.pdf",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "source_type": "pdf",
+  "bot_id": 1,
+  "chunk_type": "semantic",
+  "chunk_index": 0,
+  "ingestion_timestamp": "2025-06-10T13:29:40.261059",
+  "company_id": 3,
+  "modified_time": 1749562180.2579546,
+  "source": "FDS_Jennifer_Franklin_Resume_b9fc0e516e_519c4c2c6f.pdf",
+  "contains_image_text": true,
+  "file_type": ".pdf",
+  "document_id": "mzncxlmz2f40bpqxhzy1gswr",
+  "event_id": 468
+}
+2025-06-10 10:13:42,783 — INFO — app — [BOT] Using gpt-3.5-turbo for medium query optimization
+2025-06-10 10:13:42,783 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:13:42,813 — INFO — app — [MEMORY] Created new history for session dc00ac27-6b9c-439c-8d0c-8cc06f21757a
+2025-06-10 10:13:43,457 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-10 10:13:43,611 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/261f5616-3e6a-4b1d-90ac-103f902eadcb/query "HTTP/1.1 200 OK"
+2025-06-10 10:13:44,238 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-10 10:13:44,507 — INFO — app — [RETRIEVAL] Sources: ['FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf'], Scores: ['N/A', 'N/A', 'N/A', 'N/A']
+2025-06-10 10:13:55,033 — INFO — jwt_handler — [JWT] Successfully decoded minimal token for company_id=3, bot_id=1
+2025-06-10 10:13:55,047 — INFO — app — [API] Received question: Tell me about Jennifer experience and qualifications, company_id: 3, bot_id: 1, session_id: 9a96f269-0a18-4ace-88bf-9fc3bf02ef37
+2025-06-10 10:13:55,048 — INFO — app — [BOT] Using mode: qa
+2025-06-10 10:13:55,048 — INFO — app — [BOT] Auto-detected complexity: complex → MultiQuery (comprehensive coverage)
+2025-06-10 10:13:55,048 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:13:55,082 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-06-10 10:13:55,245 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-06-10 10:13:55,386 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-06-10 10:13:55,515 — INFO — httpx — HTTP Request: GET https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-06-10 10:13:55,586 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-06-10 10:13:55,681 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-06-10 10:13:55,682 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-06-10 10:13:55,683 — INFO — retriever — [RETRIEVER] Using optimized MultiQueryRetriever for enhanced coverage
+2025-06-10 10:13:55,684 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:13:55,787 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/261f5616-3e6a-4b1d-90ac-103f902eadcb/get "HTTP/1.1 200 OK"
+2025-06-10 10:13:55,793 — INFO — retriever — [RETRIEVER] Initialized BM25 with 26 documents
+2025-06-10 10:13:55,793 — INFO — retriever — [RETRIEVER DEBUG] EmbeddingsFilter threshold set to 0.06999999999999999 (relaxed for complex queries)
+2025-06-10 10:13:55,799 — INFO — retriever — [RETRIEVER] Full hybrid retriever with compression — k=6, threshold=0.1
+2025-06-10 10:13:55,800 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "ingestion_timestamp": "2025-06-10T13:29:40.261059",
+  "created_time": 1749562180.2579546,
+  "extraction_methods": "standard,ocr_image",
+  "chunk_index": 0,
+  "company_id": 3,
+  "source": "FDS_Jennifer_Franklin_Resume_b9fc0e516e_519c4c2c6f.pdf",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "timestamp": "2025-06-10T13:33:24.941614",
+  "structural_density": 0.8210000000000001,
+  "storage_key": "FDS_Jennifer_Franklin_Resume_b9fc0e516e_519c4c2c6f.pdf",
+  "chunk_type": "semantic",
+  "source_page": 1,
+  "mime_type": "application/pdf",
+  "contains_image_text": true,
+  "event_id": 468,
+  "file_type": ".pdf",
+  "mime": "application/pdf",
+  "document_id": "mzncxlmz2f40bpqxhzy1gswr",
+  "bot_id": 1,
+  "content_type": "unstructured_text",
+  "modified_time": 1749562180.2579546,
+  "file_size": 1205340,
+  "structure_type": "paragraph",
+  "source_type": "pdf",
+  "file_name": "FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf"
+}
+2025-06-10 10:13:55,800 — INFO — app — [BOT] Using gpt-4o-mini for complex query optimization
+2025-06-10 10:13:55,800 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-06-10 10:13:55,838 — INFO — app — [MEMORY] Created new history for session 9a96f269-0a18-4ace-88bf-9fc3bf02ef37
+2025-06-10 10:13:56,575 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-10 10:13:56,606 — INFO — langchain.retrievers.multi_query — Generated queries: ["1. What are Jennifer's professional qualifications and work experience?", "2. Can you provide information on Jennifer's background, skills, and previous roles?"]
+2025-06-10 10:13:56,994 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-10 10:13:57,275 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/261f5616-3e6a-4b1d-90ac-103f902eadcb/query "HTTP/1.1 200 OK"
+2025-06-10 10:13:57,510 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-10 10:13:57,779 — INFO — httpx — HTTP Request: POST https://knowledge-bot-chroma.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/261f5616-3e6a-4b1d-90ac-103f902eadcb/query "HTTP/1.1 200 OK"
+2025-06-10 10:13:58,241 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-10 10:13:58,664 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-10 10:14:14,228 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-10 10:14:30,953 — INFO — app — [RETRIEVAL] Sources: ['FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf', 'FDS_Jennifer_Franklin_Resume_b9fc0e516e.pdf'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
