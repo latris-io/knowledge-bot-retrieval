@@ -201,11 +201,12 @@ async def ask_question(
                     )
                     sources = result.get("source_documents", [])
                     if sources:
-                        citation_text = "\n\nSources:\n" + "\n".join(
-                            f"- {doc.metadata.get('file_name', 'Unknown')} (chunk {doc.metadata.get('chunk_index')})"
-                            for doc in sources
-                        )
-                        await stream_handler.queue.put(citation_text)
+                        # Add widget-compatible source markers
+                        for doc in sources:
+                            filename = doc.metadata.get('file_name', 'Unknown')
+                            chunk_idx = doc.metadata.get('chunk_index', '')
+                            source_ref = f"{filename}#{chunk_idx}" if chunk_idx else filename
+                            await stream_handler.queue.put(f"[source: {source_ref}]")
                         scores = [doc.metadata.get('score', 'N/A') for doc in sources]
                         logger.info(f"[RETRIEVAL] Sources: {[doc.metadata.get('file_name') for doc in sources]}, Scores: {scores}")
                 except Exception as e:
@@ -234,7 +235,7 @@ async def ask_question(
 async def serve_ui(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-# Fast API endpoint with JWT authentication - returns complete response quickly
+# Fast streaming API endpoint with JWT authentication - real LLM streaming
 @app.post("/ask")
 async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_claims)):
     session_id = request.session_id or str(uuid.uuid4())
@@ -243,40 +244,42 @@ async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_cl
     
     logger.info(f"[API] Received question: {request.question}, company_id: {company_id}, bot_id: {bot_id}, session_id: {session_id}")
     
-    try:
-        # Get complete result quickly (no artificial delays)
-        result = await ask_question(
-            question=request.question,
-            company_id=company_id,
-            bot_id=bot_id,
-            session_id=session_id,
-            streaming=False,
-            k=request.k,
-            similarity_threshold=request.similarity_threshold,
-            verbose=True
-        )
-        
-        # Format sources for widget
-        sources = result.get("source_documents", [])
-        answer = result.get("answer", "")
-        
-        # Add source markers for widget parsing
-        if sources:
-            for doc in sources:
-                filename = doc.metadata.get('file_name', 'Unknown')
-                chunk = doc.metadata.get('chunk_index', '')
-                source_ref = f"{filename}#{chunk}" if chunk else filename
-                answer += f" [source: {source_ref}]"
-        
-        return {
-            "answer": answer,
-            "sources": [doc.metadata.get('file_name') for doc in sources],
-            "session_id": session_id
-        }
-        
-    except Exception as e:
-        logger.error(f"[API] Error processing question: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    async def generate_stream():
+        try:
+            yield f"data: Getting your response... \n\n"
+            
+            # Use real streaming from LLM for maximum speed
+            stream_handler = EventStreamHandler()
+            
+            # Start the AI processing task in background
+            chain_task = asyncio.create_task(ask_question(
+                question=request.question,
+                company_id=company_id,
+                bot_id=bot_id,
+                session_id=session_id,
+                streaming=True,
+                stream_handler=stream_handler,
+                k=request.k,
+                similarity_threshold=request.similarity_threshold,
+                verbose=True
+            ))
+            
+            # Stream tokens as they come from the LLM (real streaming!)
+            async for chunk in stream_handler.astream():
+                yield chunk
+                
+            # Wait for the chain to complete
+            await chain_task
+                    
+        except Exception as e:
+            logger.error(f"[API] Streaming error: {e}")
+            yield f"data: [ERROR] {str(e)}\n\n"
+    
+    return StreamingResponse(
+        generate_stream(),
+        media_type="text/event-stream",
+        headers={"X-Session-ID": session_id}
+    )
 
 @app.post("/ask/stream")
 async def ask_stream_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_claims)):
