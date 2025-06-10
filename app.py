@@ -290,10 +290,18 @@ async def ask_question(
             k = 4  # Moderate retrieval
             use_multi_query = False
         else:  # complex
-            # NEW: Fast Complex Mode - comprehensive coverage with 3-5s streaming start
-            logger.info("[BOT] Auto-detected complexity: complex → Fast Comprehensive (3-5s streaming)")
-            k = 8  # High retrieval for comprehensive results without MultiQuery overhead
-            use_multi_query = False  # Use BM25+Vector hybrid instead for speed
+            # Smart Complex Mode: Use MultiQuery for comparative/analytical queries, Fast for others
+            comparative_indicators = {'compare', 'versus', 'vs', 'difference between', 'analyze', 'contrast'}
+            is_comparative = any(indicator in question.lower() for indicator in comparative_indicators)
+            
+            if is_comparative:
+                logger.info("[BOT] Smart Complex → MultiQuery (comparative analysis detected)")
+                k = 6
+                use_multi_query = True
+            else:
+                logger.info("[BOT] Smart Complex → Fast Comprehensive (standard complex)")
+                k = 8
+                use_multi_query = False
 
         retriever_service = RetrieverService()
         retriever = retriever_service.build_retriever(
