@@ -203,7 +203,7 @@
       answerBox.innerHTML = `
         <div style="display: flex; align-items: center; gap: 8px;">
           <div class="kb-spinner"></div>
-          <span>Getting your response...</span>
+          <span>Thinking...</span>
         </div>
       `;
       askBtn.disabled = true;
@@ -295,13 +295,13 @@
                 
                 accumulatedText += data;
                 
-                // Check if we've moved beyond the initial loading message
+                // Check if we have actual response content (not just loading message)
                 const cleanForCheck = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
-                const hasActualContent = cleanForCheck.length > "Getting your response...".length + 10; // Some buffer
+                const hasActualContent = cleanForCheck.length > 0 && !cleanForCheck.startsWith("Getting your response");
                 
                 if (!responseStarted && hasActualContent) {
                   responseStarted = true;
-                  console.log(`[Widget] Response content detected, hiding spinner`);
+                  console.log(`[Widget] Response content detected, hiding Thinking spinner`);
                 }
                 
                 // Extract and deduplicate sources
@@ -313,7 +313,7 @@
                 const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
                 
                 if (responseStarted) {
-                  // Remove the "Getting your response..." part and show actual content
+                  // Show actual content, removing any loading messages
                   const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "").trim();
                   const mainHtml = marked.parse(contentText);
                   const sourcesHtml = uniqueSources.length
@@ -324,11 +324,11 @@
                     ? DOMPurify.sanitize(mainHtml + sourcesHtml)
                     : (mainHtml + sourcesHtml);
                 } else {
-                  // Still in loading phase, show with spinner
+                  // Still in loading phase, show Thinking with spinner
                   answerBox.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 8px;">
                       <div class="kb-spinner"></div>
-                      <span>Getting your response...</span>
+                      <span>Thinking...</span>
                     </div>
                   `;
                 }

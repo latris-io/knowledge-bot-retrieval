@@ -262,7 +262,6 @@ async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_cl
     
     async def generate_stream():
         try:
-            yield f"data: Getting your response... \n\n"
             
             # Set up real streaming handler
             stream_handler = EventStreamHandler()
