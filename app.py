@@ -1,13 +1,15 @@
 from fastapi import FastAPI, Request, Header, HTTPException, Depends
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from bot import ask_question
+from bot import ask_question, EventStreamHandler
+from typing import Optional
 import jwt
 import uuid
 import os
+import asyncio
 
 # Load global JWT signing secret
 JWT_SECRET = os.getenv("JWT_SECRET", "my-ultra-secure-signing-key")
@@ -30,6 +32,9 @@ app.add_middleware(
 # Pydantic model for incoming request
 class QuestionPayload(BaseModel):
     question: str
+    k: Optional[int] = None
+    similarity_threshold: Optional[float] = None
+    session_id: Optional[str] = None
 
 # JWT auth dependency
 def verify_token(authorization: str = Header(...)) -> dict:
@@ -55,26 +60,34 @@ def verify_token(authorization: str = Header(...)) -> dict:
 async def serve_ui(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-# Secure API route for question answering
+# Secure API route for question answering with streaming
 @app.post("/ask")
 async def ask_question_route(
     payload: QuestionPayload,
     token_data: dict = Depends(verify_token)
 ):
-    try:
-        response = await ask_question(
-            company_id=token_data["company_id"],
-            bot_id=token_data["bot_id"],
-            question=payload.question.strip(),
-            session_id=f"web-{uuid.uuid4()}"
-        )
-
-        if isinstance(response, dict):
-            return {"answer": response.get("answer", str(response))}
-        return {"answer": str(response)}
-
-    except Exception as e:
-        return {"error": f"Error processing question: {str(e)}"}
+    session_id = payload.session_id or str(uuid.uuid4())
+    company_id = token_data['company_id']
+    bot_id = token_data['bot_id']
+    
+    stream_handler = EventStreamHandler()
+    task = ask_question(
+        question=payload.question,
+        company_id=company_id,
+        bot_id=bot_id,
+        session_id=session_id,
+        streaming=True,
+        stream_handler=stream_handler,
+        k=payload.k,
+        similarity_threshold=payload.similarity_threshold,
+        verbose=True
+    )
+    asyncio.create_task(task)
+    return StreamingResponse(
+        stream_handler.astream(),
+        media_type="text/event-stream",
+        headers={"X-Session-ID": session_id}
+    )
 
 # Serve widget.js at a friendly path (optional)
 @app.get("/widget.js")
