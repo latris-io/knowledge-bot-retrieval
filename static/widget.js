@@ -207,9 +207,12 @@
         </div>
       `;
       askBtn.disabled = true;
+      textarea.value = "";
+      
+      let accumulatedText = "";
   
       try {
-        const res = await fetch(`${API_URL}/widget/ask`, {
+        const res = await fetch(`${API_URL}/ask`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -217,33 +220,63 @@
           },
           body: JSON.stringify({ 
             question,
-            session_id: sessionManager.getSessionId()
+            session_id: sessionManager.getSessionId(),
+            k: 12,
+            similarity_threshold: 0.1
           })
         });
-  
-        const data = await res.json();
-        let raw = data.answer || data.error || "No response.";
-  
-        // Extract sources
-        const sourceMatches = [...raw.matchAll(/\[source: (.+?)\]/g)];
-        const sources = sourceMatches.map(match => match[1]);
-  
-        // Remove [source: ...] from main text
-        raw = raw.replace(/\[source: .+?\]/g, "").trim();
-  
-        const mainHtml = marked.parse(raw);
-        const sourcesHtml = sources.length
-          ? `<details class="kb-sources"><summary>Show Sources (${sources.length})</summary><ul>${sources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
-          : "";
-  
-        answerBox.innerHTML = window.DOMPurify
-          ? DOMPurify.sanitize(mainHtml + sourcesHtml)
-          : (mainHtml + sourcesHtml);
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6); // Remove 'data: ' prefix
+              if (data === '[DONE]' || data === '') continue;
+              
+              if (data.startsWith('[ERROR]')) {
+                throw new Error(data.replace('[ERROR] ', ''));
+              }
+              
+              accumulatedText += data;
+              
+              // Extract sources for display
+              const sourceMatches = [...accumulatedText.matchAll(/\[source: (.+?)\]/g)];
+              const sources = sourceMatches.map(match => match[1]);
+              
+              // Remove [source: ...] from main text for display
+              const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
+              
+              const mainHtml = marked.parse(cleanText);
+              const sourcesHtml = sources.length
+                ? `<details class="kb-sources"><summary>Show Sources (${sources.length})</summary><ul>${sources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
+                : "";
+              
+              answerBox.innerHTML = window.DOMPurify
+                ? DOMPurify.sanitize(mainHtml + sourcesHtml)
+                : (mainHtml + sourcesHtml);
+              
+              // Auto-scroll to bottom of answer box
+              answerBox.scrollTop = answerBox.scrollHeight;
+            }
+          }
+        }
       } catch (err) {
+        console.error('Streaming error:', err);
         answerBox.innerHTML = `<strong>Error:</strong> ${err.message}`;
       } finally {
         askBtn.disabled = false;
-        textarea.value = "";
       }
     };
   })();
