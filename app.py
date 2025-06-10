@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from typing import Optional
 from bot_config import get_openai_api_key
 from prompt_template import get_prompt_template
+from markdown_processor import process_markdown_to_clean_text, process_streaming_token
 from retriever import RetrieverService
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
@@ -102,6 +103,8 @@ class EventStreamHandler(BaseCallbackHandler):
         self.queue = asyncio.Queue()
         self._loop = None
         self.accumulated_text = ""  # Track full response for conversation history
+        self.processed_text = ""    # Post-processed version for history
+        self.stream_buffer = ""     # Buffer for real-time markdown processing
 
     async def astream(self):
         while True:
@@ -123,9 +126,25 @@ class EventStreamHandler(BaseCallbackHandler):
 
     def on_llm_new_token(self, token: str, **kwargs):
         self.accumulated_text += token
-        self._put_nowait_safe(token)
+        
+        # Process token for real-time streaming with markdown cleanup
+        processed_token, self.stream_buffer = process_streaming_token(token, self.stream_buffer)
+        
+        # Only send processed token if it's not empty (buffering incomplete markdown)
+        if processed_token:
+            self._put_nowait_safe(processed_token)
 
     def on_llm_end(self, response: LLMResult, **kwargs):
+        # Send any remaining buffered content
+        if self.stream_buffer:
+            # Process final buffer content
+            final_content = process_markdown_to_clean_text(self.stream_buffer)
+            if final_content:
+                self._put_nowait_safe(final_content)
+        
+        # Post-process the accumulated markdown text to clean format for history
+        self.processed_text = process_markdown_to_clean_text(self.accumulated_text)
+        logger.info(f"[MARKDOWN] Post-processed response: {len(self.accumulated_text)} → {len(self.processed_text)} chars")
         self._put_nowait_safe(None)
 
     def on_llm_error(self, error: Exception, **kwargs):
@@ -237,10 +256,10 @@ async def ask_question(
                         {"query": question}
                     )
                     
-                    # Save conversation to history using accumulated streaming text
-                    if stream_handler and stream_handler.accumulated_text:
+                    # Save conversation to history using post-processed clean text
+                    if stream_handler and stream_handler.processed_text:
                         chat_history.add_user_message(question)
-                        chat_history.add_ai_message(stream_handler.accumulated_text)
+                        chat_history.add_ai_message(stream_handler.processed_text)
                     
                     sources = result.get("source_documents", [])
                     if sources:
@@ -266,11 +285,13 @@ async def ask_question(
                 {"query": question}
             )
             
-            # Save conversation to history
+            # Save conversation to history with post-processed clean text
             answer = result.get("result", "")
             if answer:
+                processed_answer = process_markdown_to_clean_text(answer)
                 chat_history.add_user_message(question)
-                chat_history.add_ai_message(answer)
+                chat_history.add_ai_message(processed_answer)
+                logger.info(f"[MARKDOWN] Non-streaming post-processed: {len(answer)} → {len(processed_answer)} chars")
             
             sources = result.get("source_documents", [])
             scores = [doc.metadata.get('score', 'N/A') for doc in sources]

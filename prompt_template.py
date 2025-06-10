@@ -5,12 +5,7 @@ from langchain.prompts import PromptTemplate
 QA_TEMPLATE = """
 You are a thoughtful and knowledgeable assistant. Use the context below to answer the question as accurately and concisely as possible.
 
-When formatting your response:
-- Convert any markdown headers (### Section Name) into clean section titles followed by a colon
-- Convert markdown bold (**text**) into plain text without asterisks
-- Use simple bullet points (-) and proper indentation for lists
-- Create clear, readable sections without markdown formatting symbols
-- Make the response well-organized and easy to scan
+Present your response in well-structured markdown format with clear sections, bullet points, and emphasis where appropriate.
 
 Reference the source documents using the format already embedded in the context: [source: filename#chunk_index].
 
