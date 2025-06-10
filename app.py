@@ -241,21 +241,33 @@ async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_cl
     bot_id = jwt_claims['bot_id']
     
     logger.info(f"[API] Received question: {request.question}, company_id: {company_id}, bot_id: {bot_id}, session_id: {session_id}")
-    stream_handler = EventStreamHandler()
-    task = ask_question(
-        question=request.question,
-        company_id=company_id,
-        bot_id=bot_id,
-        session_id=session_id,
-        streaming=True,
-        stream_handler=stream_handler,
-        k=request.k,
-        similarity_threshold=request.similarity_threshold,
-        verbose=True
-    )
-    asyncio.create_task(task)
+    
+    async def generate_stream():
+        stream_handler = EventStreamHandler()
+        try:
+            # Start the question processing task
+            await ask_question(
+                question=request.question,
+                company_id=company_id,
+                bot_id=bot_id,
+                session_id=session_id,
+                streaming=True,
+                stream_handler=stream_handler,
+                k=request.k,
+                similarity_threshold=request.similarity_threshold,
+                verbose=True
+            )
+            
+            # Stream the results
+            async for chunk in stream_handler.astream():
+                yield chunk
+                
+        except Exception as e:
+            logger.error(f"[API] Streaming error: {e}")
+            yield f"data: [ERROR] {str(e)}\n\n"
+    
     return StreamingResponse(
-        stream_handler.astream(),
+        generate_stream(),
         media_type="text/event-stream",
         headers={"X-Session-ID": session_id}
     )
@@ -316,6 +328,17 @@ async def ask_direct_api(request: DirectAskRequest):
     except Exception as e:
         logger.error(f"[DIRECT] Error processing question: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/test-stream")
+async def test_stream():
+    """Simple test endpoint to verify streaming works"""
+    async def generate():
+        for i in range(5):
+            yield f"data: Test chunk {i + 1}\n\n"
+            await asyncio.sleep(0.5)
+        yield f"data: Stream completed!\n\n"
+    
+    return StreamingResponse(generate(), media_type="text/event-stream")
 
 # Serve widget.js at a friendly path (optional)
 @app.get("/widget.js")
