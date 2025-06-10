@@ -104,7 +104,6 @@ class EventStreamHandler(BaseCallbackHandler):
         self._loop = None
         self.accumulated_text = ""  # Track full response for conversation history
         self.processed_text = ""    # Post-processed version for history
-        self.stream_buffer = ""     # Buffer for real-time markdown processing
 
     async def astream(self):
         while True:
@@ -128,20 +127,13 @@ class EventStreamHandler(BaseCallbackHandler):
         self.accumulated_text += token
         
         # Process token for real-time streaming with markdown cleanup
-        processed_token, self.stream_buffer = process_streaming_token(token, self.stream_buffer)
+        processed_token, _ = process_streaming_token(token, "")
         
-        # Only send processed token if it's not empty (buffering incomplete markdown)
+        # Send processed token (empty tokens are filtered out)
         if processed_token:
             self._put_nowait_safe(processed_token)
 
     def on_llm_end(self, response: LLMResult, **kwargs):
-        # Send any remaining buffered content
-        if self.stream_buffer:
-            # Process final buffer content
-            final_content = process_markdown_to_clean_text(self.stream_buffer)
-            if final_content:
-                self._put_nowait_safe(final_content)
-        
         # Post-process the accumulated markdown text to clean format for history
         self.processed_text = process_markdown_to_clean_text(self.accumulated_text)
         logger.info(f"[MARKDOWN] Post-processed response: {len(self.accumulated_text)} → {len(self.processed_text)} chars")

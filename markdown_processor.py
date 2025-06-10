@@ -72,8 +72,8 @@ def process_streaming_token(token: str, buffer: str = "") -> tuple[str, str]:
     """
     Process streaming tokens for real-time markdown conversion.
     
-    This handles the challenge of converting markdown in real-time streaming
-    by maintaining a buffer to detect markdown patterns that span multiple tokens.
+    Simple, effective approach: filter out markdown symbols immediately
+    and send clean tokens to users in real-time.
     
     Args:
         token: Current streaming token from LLM
@@ -82,35 +82,24 @@ def process_streaming_token(token: str, buffer: str = "") -> tuple[str, str]:
     Returns:
         Tuple of (processed_token_to_send, updated_buffer)
     """
-    # Add current token to buffer
-    buffer += token
+    # Simple real-time filtering - remove obvious markdown symbols
+    processed_token = token
     
-    # For real-time streaming, we can only safely process completed patterns
-    # We'll send most tokens immediately and only buffer when we detect potential markdown
+    # Filter out markdown header symbols
+    if token.strip() in ['#', '##', '###']:
+        return "", buffer  # Don't send header symbols
     
-    # Check if we're in the middle of a potential markdown pattern
-    markdown_patterns = [
-        r'\*\*[^*]*$',  # Incomplete bold
-        r'\*[^*]*$',    # Incomplete italic  
-        r'^#{1,3}\s[^:\n]*$',  # Incomplete header
-        r'`[^`]*$',     # Incomplete code
-    ]
+    # Filter out asterisks used for bold/italic
+    if token.strip() in ['*', '**']:
+        return "", buffer  # Don't send bold/italic symbols
     
-    # If buffer matches incomplete pattern, hold the token
-    for pattern in markdown_patterns:
-        if re.search(pattern, buffer):
-            return "", buffer
+    # Filter out tokens that are just asterisks with spaces
+    if token.replace(' ', '').replace('\n', '') in ['*', '**']:
+        return "", buffer
     
-    # Check for completed patterns and process them
-    if re.search(r'\*\*.*?\*\*', buffer):
-        # Process completed bold
-        processed_buffer = re.sub(r'\*\*(.*?)\*\*', r'\1', buffer)
-        return processed_buffer, ""
+    # Filter out backticks
+    if token == '`':
+        return "", buffer
     
-    if re.search(r'^#{1,3}\s.*?:', buffer, re.MULTILINE):
-        # Process completed header
-        processed_buffer = re.sub(r'^(#{1,3})\s(.+)$', r'\2:', buffer, flags=re.MULTILINE)
-        return processed_buffer, ""
-    
-    # If no markdown patterns detected, send the token
-    return buffer, "" 
+    # Send normal content tokens immediately
+    return processed_token, buffer 
