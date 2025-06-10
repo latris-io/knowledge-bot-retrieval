@@ -77,46 +77,301 @@ def format_chat_history(chat_history: InMemoryChatMessageHistory, complexity: st
 
 def get_query_complexity(question: str) -> str:
     """
-    Determine query complexity level for optimal processing strategy.
+    Comprehensive query complexity analysis for any industry/domain.
     Returns: 'simple', 'medium', or 'complex'
+    
+    Examples across industries:
+    
+    SIMPLE (3s): Direct factual lookups
+    - "What is John's email address?"
+    - "When is the meeting scheduled?"
+    - "Is the product in stock?"
+    - "Who is the CEO of Microsoft?"
+    - "What does API stand for?"
+    - "How much does this cost?"
+    - "Where is your office located?"
+    - "Are you open on Sundays?"
+    
+    MEDIUM (3s): Single-topic exploration, lists
+    - "What services do you offer?"
+    - "How do I apply for a loan?"
+    - "List all the features of this software"
+    - "What are the requirements for this job?"
+    - "Explain the refund policy"
+    - "Show me your pricing plans"
+    - "What projects has Sarah worked on?"
+    - "How does this machine work?"
+    
+    COMPLEX (15-20s): Multi-faceted analysis, comprehensive overviews
+    - "Tell me about the company's financial performance and market strategy"
+    - "Compare the advantages and disadvantages of these two approaches"
+    - "Provide a comprehensive analysis of industry trends and opportunities"
+    - "What are the factors I should consider when choosing between options A and B?"
+    - "Explain the complete workflow from design to implementation"
+    - "Give me a detailed breakdown of risks, costs, and timeline"
+    - "Analyze the competitive landscape and recommend a strategy"
     """
     question_lower = question.lower().strip()
     
-    # High complexity: Multiple aspects, comprehensive analysis
+    # COMPLEX: Multi-faceted analysis, strategic, comprehensive overviews
     complex_patterns = [
-        'tell me about', 'describe', 'overview', 'summary', 'explain',
-        'projects and experience', 'background and', 'history and',
-        'achievements and', 'capabilities and', 'services and',
-        'compare', 'difference', 'versus', 'vs', 'better', 'best'
+        # Comprehensive analysis requests
+        'tell me about', 'give me an overview', 'provide a comprehensive', 'detailed analysis',
+        'complete picture', 'full breakdown', 'thorough review', 'in-depth look',
+        
+        # Multiple aspects combined (using "and")
+        ' and ', 'as well as', 'along with', 'including', 'plus', 'together with',
+        'combined with', 'in addition to', 'not only', 'both',
+        
+        # Strategic/planning queries
+        'strategy', 'plan for', 'approach to', 'roadmap', 'framework', 'methodology',
+        'best practices', 'recommendations', 'suggestions', 'advice', 'guidance',
+        
+        # Comparative analysis
+        'compare', 'comparison', 'versus', 'vs', 'difference between', 'better than',
+        'advantages', 'disadvantages', 'pros and cons', 'strengths and weaknesses',
+        
+        # Trend/market analysis
+        'trends', 'market analysis', 'industry outlook', 'forecast', 'predictions',
+        'future of', 'evolution', 'development', 'growth', 'opportunities',
+        
+        # Research-style queries
+        'research', 'study', 'investigate', 'examine', 'analyze', 'evaluate',
+        'assess', 'review', 'survey', 'comprehensive study',
+        
+        # Multi-dimensional requests
+        'factors', 'considerations', 'aspects', 'dimensions', 'elements',
+        'components', 'variables', 'parameters', 'criteria',
+        
+        # Industry-specific complex analysis
+        'market conditions', 'competitive landscape', 'swot analysis', 'risk assessment',
+        'financial analysis', 'business case', 'feasibility study', 'impact analysis',
+        'performance review', 'due diligence', 'strategic planning', 'operational efficiency',
+        
+        # Healthcare/Medical complex
+        'treatment options', 'side effects', 'contraindications', 'drug interactions',
+        'differential diagnosis', 'prognosis', 'clinical outcomes', 'patient care',
+        
+        # Legal complex  
+        'legal implications', 'regulatory compliance', 'contract terms', 'liability',
+        'intellectual property', 'litigation risk', 'legal framework', 'statutory requirements',
+        
+        # Technical/Engineering complex
+        'system architecture', 'technical specifications', 'integration challenges',
+        'scalability issues', 'performance optimization', 'security considerations',
+        
+        # Educational complex
+        'learning outcomes', 'curriculum design', 'assessment strategies', 'pedagogical approaches',
+        'student performance', 'educational effectiveness', 'learning methodologies'
     ]
     
-    # Medium complexity: Lists, single broad topics
+    # MEDIUM: Single-topic exploration, lists, moderate analysis
     medium_patterns = [
-        'list', 'what are', 'show me', 'projects', 'experience', 
-        'background', 'history', 'achievements', 'services', 
-        'offerings', 'capabilities', 'expertise', 'how does', 'why'
+        # List requests
+        'list', 'what are', 'show me', 'give me', 'provide', 'enumerate',
+        'identify', 'name', 'specify', 'outline', 'detail',
+        
+        # Single-topic exploration
+        'explain', 'describe', 'how does', 'how to', 'why', 'what makes',
+        'process', 'procedure', 'steps', 'method', 'way to', 'approach',
+        
+        # Professional/business single topics
+        'experience', 'background', 'qualifications', 'skills', 'expertise',
+        'projects', 'achievements', 'accomplishments', 'work history',
+        'education', 'training', 'certifications', 'credentials',
+        
+        # Industry-specific single topics
+        'services', 'products', 'offerings', 'solutions', 'capabilities',
+        'features', 'benefits', 'applications', 'uses', 'functions',
+        
+        # Technical explanations
+        'specifications', 'requirements', 'standards', 'guidelines',
+        'protocols', 'policies', 'regulations', 'compliance',
+        
+        # Financial/business metrics
+        'costs', 'pricing', 'budget', 'revenue', 'profit', 'expenses',
+        'performance', 'metrics', 'results', 'outcomes', 'statistics',
+        
+        # Process/workflow queries
+        'workflow', 'timeline', 'schedule', 'phases', 'stages',
+        'milestones', 'deliverables', 'objectives', 'goals',
+        
+        # Industry-specific medium complexity
+        'inventory', 'catalog', 'portfolio', 'menu', 'roster', 'directory',
+        'curriculum', 'syllabus', 'agenda', 'itinerary', 'program',
+        
+        # Healthcare/Medical medium
+        'symptoms', 'treatments', 'medications', 'procedures', 'tests',
+        'diagnoses', 'specialists', 'departments', 'facilities',
+        
+        # Legal medium
+        'laws', 'regulations', 'statutes', 'ordinances', 'codes',
+        'procedures', 'forms', 'documents', 'requirements', 'filings',
+        
+        # Technical/IT medium
+        'features', 'functions', 'tools', 'utilities', 'modules',
+        'components', 'interfaces', 'APIs', 'integrations', 'plugins',
+        
+        # Finance/Business medium
+        'rates', 'fees', 'charges', 'packages', 'plans', 'options',
+        'terms', 'conditions', 'policies', 'procedures', 'guidelines',
+        
+        # Real Estate medium
+        'properties', 'listings', 'amenities', 'neighborhoods', 'schools',
+        'transportation', 'utilities', 'taxes', 'HOA', 'restrictions',
+        
+        # Manufacturing/Supply Chain medium
+        'materials', 'suppliers', 'vendors', 'distributors', 'logistics',
+        'equipment', 'machinery', 'tools', 'resources', 'capacity',
+        
+        # Education medium
+        'courses', 'programs', 'degrees', 'majors', 'requirements',
+        'faculty', 'staff', 'departments', 'resources', 'facilities'
     ]
     
-    # Simple: Direct factual questions
+    # SIMPLE: Direct factual lookups, single pieces of information
     simple_patterns = [
-        'who is', 'what is', 'when is', 'where is',
-        'phone', 'email', 'address', 'contact', 'hours', 'schedule',
-        'is', 'does', 'can', 'will', 'has'
+        # Basic identification
+        'who is', 'what is', 'when is', 'where is', 'which is',
+        'who are', 'what are', 'when are', 'where are', 'which are',
+        
+        # Contact information
+        'phone', 'email', 'address', 'contact', 'location', 'website',
+        'fax', 'telephone', 'mobile', 'cell', 'number', 'reach',
+        
+        # Operating information
+        'hours', 'schedule', 'open', 'closed', 'available', 'timing',
+        'when open', 'operating hours', 'business hours', 'availability',
+        
+        # Yes/no questions
+        'is ', 'are ', 'does ', 'do ', 'can ', 'will ', 'has ', 'have ',
+        'was ', 'were ', 'did ', 'would ', 'could ', 'should ',
+        
+        # Single attribute queries
+        'title', 'position', 'role', 'job', 'department', 'division',
+        'age', 'date', 'time', 'year', 'month', 'day', 'size', 'type',
+        
+        # Status checks
+        'status', 'state', 'condition', 'available', 'in stock',
+        'active', 'inactive', 'current', 'latest', 'recent',
+        
+        # Single measurements/values
+        'price', 'cost', 'fee', 'rate', 'amount', 'quantity', 'count',
+        'weight', 'height', 'length', 'width', 'volume', 'capacity',
+        
+        # Simple definitions
+        'definition', 'meaning', 'what does', 'stands for', 'refers to',
+        'means', 'defines', 'represents', 'indicates', 'signifies',
+        
+        # Location/direction queries
+        'directions', 'how to get', 'find', 'located', 'situated',
+        'based', 'headquarters', 'office', 'branch', 'facility',
+        
+        # Industry-specific simple factual queries
+        'license number', 'registration', 'certification', 'accreditation',
+        'model number', 'part number', 'serial number', 'version',
+        'account number', 'policy number', 'reference number', 'ID',
+        
+        # Financial simple
+        'balance', 'payment', 'due date', 'interest rate', 'APR',
+        'minimum payment', 'credit limit', 'available credit',
+        
+        # Healthcare simple
+        'doctor', 'physician', 'nurse', 'appointment', 'prescription',
+        'insurance', 'copay', 'deductible', 'coverage',
+        
+        # Legal simple
+        'lawyer', 'attorney', 'case number', 'court date', 'filing fee',
+        'legal aid', 'consultation', 'retainer',
+        
+        # Technical simple
+        'username', 'password', 'login', 'account', 'support',
+        'version number', 'build', 'release date', 'compatibility',
+        
+        # Real Estate simple
+        'square footage', 'bedrooms', 'bathrooms', 'lot size',
+        'property tax', 'MLS number', 'listing agent', 'asking price',
+        
+        # Employment simple
+        'salary', 'wages', 'benefits', 'vacation days', 'sick leave',
+        'supervisor', 'manager', 'HR', 'employee ID',
+        
+        # Education simple
+        'tuition', 'enrollment', 'registration', 'GPA', 'credits',
+        'semester', 'quarter', 'graduation date', 'transcript',
+        
+        # Travel/Hospitality simple
+        'reservation', 'booking', 'check-in', 'check-out', 'cancellation',
+        'confirmation number', 'flight number', 'gate', 'terminal',
+        
+        # Retail simple
+        'SKU', 'barcode', 'warranty', 'return policy', 'exchange',
+        'store hours', 'pickup', 'delivery', 'shipping'
     ]
     
-    # Check for complex patterns first (most comprehensive)
-    if any(pattern in question_lower for pattern in complex_patterns):
+    # Multi-word phrase detection for complex queries
+    complex_multi_word = [
+        'tell me everything about', 'give me a complete overview of',
+        'what can you tell me about', 'i want to know about',
+        'provide information on', 'i need details on',
+        'comprehensive analysis of', 'detailed breakdown of',
+        'full explanation of', 'complete guide to'
+    ]
+    
+    # Check for complex multi-word phrases first
+    for phrase in complex_multi_word:
+        if phrase in question_lower:
+            return 'complex'
+    
+    # Count complexity indicators
+    complex_count = sum(1 for pattern in complex_patterns if pattern in question_lower)
+    medium_count = sum(1 for pattern in medium_patterns if pattern in question_lower)
+    simple_count = sum(1 for pattern in simple_patterns if pattern in question_lower)
+    
+    # Multiple complex indicators = definitely complex
+    if complex_count >= 2:
         return 'complex'
     
-    # Check for medium patterns (moderate coverage)
-    if any(pattern in question_lower for pattern in medium_patterns):
-        return 'medium'
+    # Question length-based complexity (longer questions tend to be more complex)
+    word_count = len(question_lower.split())
+    if word_count > 15:
+        if complex_count >= 1:
+            return 'complex'
+        elif medium_count >= 1:
+            return 'medium'
+    elif word_count > 8:
+        if complex_count >= 1:
+            return 'complex'
     
-    # Check for simple patterns (direct retrieval)
-    if any(pattern in question_lower for pattern in simple_patterns):
+    # Pattern-based classification
+    if complex_count > 0:
+        return 'complex'
+    elif medium_count > 0:
+        return 'medium'
+    elif simple_count > 0:
         return 'simple'
     
-    # Default: simple for speed (most queries are specific)
+    # Default classification based on question structure
+    question_starters_complex = ['explain how', 'describe how', 'what are the factors',
+                                'how can i', 'what should i', 'help me understand']
+    question_starters_medium = ['how do', 'what kind', 'which type', 'how many',
+                               'what sort', 'how much', 'how long']
+    question_starters_simple = ['what', 'who', 'when', 'where', 'which', 'is', 'are',
+                               'does', 'do', 'can', 'will', 'has', 'have']
+    
+    for starter in question_starters_complex:
+        if question_lower.startswith(starter):
+            return 'complex'
+    
+    for starter in question_starters_medium:
+        if question_lower.startswith(starter):
+            return 'medium'
+    
+    for starter in question_starters_simple:
+        if question_lower.startswith(starter):
+            return 'simple'
+    
+    # Final fallback: default to simple for speed
     return 'simple'
 
 def should_use_multi_query(question: str) -> bool:
