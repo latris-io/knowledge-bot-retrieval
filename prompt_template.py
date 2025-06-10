@@ -16,6 +16,8 @@ CRITICAL: Format your response using proper markdown with correct spacing:
 - For nested lists, put parent item on its own line, then indent sub-items
 - NEVER put the first sub-item on the same line as the parent item
 - Each sub-item must be on its own indented line with a dash
+- When adding content after a list, ALWAYS add a blank line before the new content
+- Items like "Tricky Word" or "Test Date" should be separate from lists
 
 Example correct format:
 ### Header
@@ -29,9 +31,18 @@ For nested lists (CRITICAL - follow this exact format):
   - Sub-item 2
   - Sub-item 3
 
+For lists with additional info (CRITICAL - add blank line):
+- item1
+- item2  
+- item3
+
+**Additional Info:** value
+
 WRONG format (do NOT do this):
 - **Parent Item:** - Sub-item 1
   - Sub-item 2
+- item3
+**Additional Info:** value
 
 Reference the source documents using the format already embedded in the context: [source: filename#chunk_index].
 
