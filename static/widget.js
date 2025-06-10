@@ -293,21 +293,12 @@
                 
                 accumulatedText += data;
                 
-                // Extract sources for display
-                const sourceMatches = [...accumulatedText.matchAll(/\[source: (.+?)\]/g)];
-                const sources = sourceMatches.map(match => match[1]);
-                
-                // Remove [source: ...] from main text for display
-                const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
-                
-                const mainHtml = marked.parse(cleanText);
-                const sourcesHtml = sources.length
-                  ? `<details class="kb-sources"><summary>Show Sources (${sources.length})</summary><ul>${sources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
-                  : "";
+                // Parse the accumulated text and render it
+                const mainHtml = marked.parse(accumulatedText);
                 
                 answerBox.innerHTML = window.DOMPurify
-                  ? DOMPurify.sanitize(mainHtml + sourcesHtml)
-                  : (mainHtml + sourcesHtml);
+                  ? DOMPurify.sanitize(mainHtml)
+                  : mainHtml;
                 
                 // Auto-scroll to bottom of answer box
                 answerBox.scrollTop = answerBox.scrollHeight;

@@ -258,21 +258,40 @@ async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_cl
                 verbose=True
             )
             
-            # Simulate streaming the complete answer
+            # Simulate streaming the complete answer with better formatting
             answer = result.get("answer", "No answer generated")
-            words = answer.split()
             
-            for i, word in enumerate(words):
-                yield f"data: {word} \n\n"
-                await asyncio.sleep(0.1)  # Simulate streaming delay
+            # Split into sentences for better pacing
+            import re
+            sentences = re.split(r'(?<=[.!?])\s+', answer)
+            
+            for sentence in sentences:
+                words = sentence.split()
+                for i, word in enumerate(words):
+                    if i < len(words) - 1:
+                        yield f"data: {word} \n\n"
+                    else:
+                        yield f"data: {word}\n\n"
+                    await asyncio.sleep(0.05)  # Faster streaming
                 
-            # Add sources
+                # Add proper spacing after sentence
+                yield f"data: \n\n"
+                await asyncio.sleep(0.2)  # Pause between sentences
+                
+            # Add sources with proper formatting and deduplication
             sources = result.get("source_documents", [])
             if sources:
-                yield f"data: \n\nSources:\n"
+                # Deduplicate sources by filename
+                unique_sources = {}
                 for doc in sources:
-                    source_text = f"- {doc.metadata.get('file_name', 'Unknown')}"
-                    yield f"data: {source_text}\n\n"
+                    filename = doc.metadata.get('file_name', 'Unknown')
+                    chunk = doc.metadata.get('chunk_index', '')
+                    key = f"{filename}#{chunk}" if chunk else filename
+                    unique_sources[filename] = key
+                
+                yield f"data: \n\n**Sources:**\n\n"
+                for filename, source_key in unique_sources.items():
+                    yield f"data: - {source_key}\n\n"
                     
         except Exception as e:
             logger.error(f"[API] Streaming error: {e}")
