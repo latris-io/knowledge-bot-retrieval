@@ -110,31 +110,39 @@ class RetrieverService:
             bm25.k = k
             logger.info(f"[RETRIEVER] Initialized BM25 with {len(texts)} documents")
 
-            hybrid = EnsembleRetriever(
-                retrievers=[vector_component, bm25],
-                weights=[0.8, 0.2]
-            )
-
-            logger.info(f"[RETRIEVER DEBUG] EmbeddingsFilter threshold set to {similarity_threshold}")
-            compressor = DocumentCompressorPipeline(transformers=[
-                EmbeddingsFilter(
-                    embeddings=self.embedding_function,
-                    similarity_threshold=similarity_threshold
+            # For maximum speed in direct mode, skip redundant embedding compression
+            if use_multi_query:
+                # Full hybrid with compression for comprehensive queries
+                hybrid = EnsembleRetriever(
+                    retrievers=[vector_component, bm25],
+                    weights=[0.8, 0.2]
                 )
-            ])
 
-            reranked = ContextualCompressionRetriever(
-                base_retriever=hybrid,
-                base_compressor=compressor
-            )
+                logger.info(f"[RETRIEVER DEBUG] EmbeddingsFilter threshold set to {similarity_threshold}")
+                compressor = DocumentCompressorPipeline(transformers=[
+                    EmbeddingsFilter(
+                        embeddings=self.embedding_function,
+                        similarity_threshold=similarity_threshold
+                    )
+                ])
 
-            logger.info(f"[RETRIEVER] Hybrid retriever ready — k={k}, threshold={similarity_threshold}")
+                reranked = ContextualCompressionRetriever(
+                    base_retriever=hybrid,
+                    base_compressor=compressor
+                )
+                
+                logger.info(f"[RETRIEVER] Full hybrid retriever with compression — k={k}, threshold={similarity_threshold}")
+                final_retriever = reranked
+            else:
+                # Direct mode: vector-only for maximum speed (skip BM25 and compression overhead)
+                logger.info(f"[RETRIEVER] Direct vector-only retriever for maximum speed — k={k}")
+                final_retriever = vector_component
 
             if metadatas:
                 sample_meta = metadatas[0]
                 logger.info(f"[RETRIEVER DEBUG] Sample document metadata: {json.dumps(sample_meta, indent=2)}")
 
-            return reranked
+            return final_retriever
 
         except Exception as e:
             logger.error(f"[RETRIEVER] Error building retriever: {e}", exc_info=True)
