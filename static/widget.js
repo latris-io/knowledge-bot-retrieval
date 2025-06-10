@@ -36,8 +36,8 @@
         
         // First, fix missing line breaks after headers and numbered lists
         let html = text
-            // Fix specific pattern: "# HeaderThe content" -> "# Header\nThe content"
-            .replace(/^(#{1,3}\s+[^#\n]*?)([A-Z][a-z])/gm, '$1\n$2')
+            // Fix header followed by sentence: "# Office LocationsThe following" -> "# Office Locations\nThe following"
+            .replace(/^(#{1,3}\s+[A-Za-z\s]+)([A-Z][a-z]+\s+(are|is|have|has|following|available|located))/gm, '$1\n$2')
             // Fix numbered lists: "1. ItemNext item" -> "1. Item\nNext item"  
             .replace(/^(\d+\.\s+.*?)(\d+\.)/gm, '$1\n$2')
             // Normalize paragraph breaks
