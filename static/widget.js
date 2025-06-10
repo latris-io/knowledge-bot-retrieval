@@ -30,72 +30,66 @@
 
     const sessionManager = new SessionManager();
     
-    // Initialize marked.js library asynchronously
-    let markedLoaded = false;
-    loadMarkedLibrary().then(() => {
-        markedLoaded = true;
-        console.log('[MARKED] Ready for use');
+    // Initialize markdown-it library asynchronously
+    let markdownLoaded = false;
+    loadMarkdownLibrary().then(() => {
+        markdownLoaded = true;
+        console.log('[MARKDOWN-IT] Ready for use');
     });
   
-    // Load marked.js library for proper markdown parsing
-    function loadMarkedLibrary() {
+    // Load markdown-it library for robust markdown parsing
+    function loadMarkdownLibrary() {
         return new Promise((resolve) => {
-            if (window.marked) {
+            if (window.markdownit) {
                 resolve();
                 return;
             }
             
             const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+            script.src = 'https://cdn.jsdelivr.net/npm/markdown-it@14.0.0/dist/markdown-it.min.js';
             script.onload = () => {
-                console.log('[MARKED] Library loaded successfully');
-                // Configure marked.js for LLM output - optimized for nested lists
-                marked.setOptions({
-                    breaks: false,       // DON'T convert \n to <br> - breaks nested lists
-                    gfm: true,           // GitHub Flavored Markdown
-                    sanitize: false,     // We'll handle sanitization elsewhere
-                    smartypants: false   // Keep simple quotes
+                console.log('[MARKDOWN-IT] Library loaded successfully');
+                // Initialize markdown-it with robust LLM-friendly settings
+                window.md = window.markdownit({
+                    html: false,         // Disable HTML tags in source
+                    xhtmlOut: false,     // Use HTML5
+                    breaks: false,       // Don't convert \n to <br>
+                    langPrefix: 'language-',
+                    linkify: false,      // Don't auto-convert URLs
+                    typographer: false   // Don't use smart quotes
                 });
-                console.log('[MARKED] Configuration set');
+                console.log('[MARKDOWN-IT] Configuration set');
                 resolve();
             };
             
             script.onerror = () => {
-                console.error('[MARKED] Failed to load marked.js from CDN');
+                console.error('[MARKDOWN-IT] Failed to load markdown-it from CDN');
                 resolve(); // Still resolve to continue with fallback
             };
             document.head.appendChild(script);
         });
     }
 
-    // Standard markdown parsing using marked.js with LLM preprocessing
+    // Industry-standard markdown parsing using markdown-it
     function parseMarkdown(text) {
         if (!text) return '';
         
-        // Minimal preprocessing - LLM output is already well-formatted
-        let processed = text
-            .replace(/^(- .+)\n(\*\*[^*]+\*\*)/gm, '$1\n\n$2')  // Fix missing blank line after lists
-            .replace(/([.!?])\n(\*\*[^*]+\*\*)/gm, '$1\n\n$2')  // Fix missing blank line after paragraphs before bold text
-            .replace(/([.!?])\n(- )/gm, '$1\n\n$2')  // Fix missing blank line after paragraphs before lists
-            .replace(/([.!?:]) ?(- \*\*)/g, '$1\n\n$2')  // Fix missing newline between sentence/colon and list item
-            .replace(/([.!?:])\n(- \*\*)/g, '$1\n\n$2');  // Fix missing blank line after colon before list
-
-        // Use marked.js if available, fallback to simple parsing
-        if (window.marked && markedLoaded) {
+        // Use markdown-it if available (robust, industry-standard)
+        if (window.md && markdownLoaded) {
             try {
-                console.log('[MARKED] Input text:', processed);
-                const result = marked.parse(processed);
-                console.log('[MARKED] Output HTML:', result);
+                console.log('[MARKDOWN-IT] Input text:', text);
+                const result = window.md.render(text);
+                console.log('[MARKDOWN-IT] Output HTML:', result);
                 return result;
             } catch (error) {
-                console.warn('[MARKED] Parsing failed, using fallback:', error);
+                console.warn('[MARKDOWN-IT] Parsing failed, using fallback:', error);
             }
         } else {
-            console.warn('[MARKED] marked.js not available (loaded:', markedLoaded, ', window.marked:', !!window.marked, '), using fallback');
+            console.warn('[MARKDOWN-IT] markdown-it not available (loaded:', markdownLoaded, ', window.md:', !!window.md, '), using fallback');
         }
         
         // Fallback: basic inline formatting only
-        return processed
+        return text
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
             .replace(/`([^`]+)`/g, '<code>$1</code>')
