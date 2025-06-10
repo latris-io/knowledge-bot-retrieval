@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Maggie's NICU Care Hub 💕</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Floating hearts animation */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(5deg); }
+    }
+
+    .heart {
+      position: absolute;
+      color: rgba(255, 182, 193, 0.3);
+      font-size: 20px;
+      animation: float 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .heart:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+    .heart:nth-child(2) { top: 20%; right: 10%; animation-delay: 1s; }
+    .heart:nth-child(3) { top: 70%; left: 15%; animation-delay: 2s; }
+    .heart:nth-child(4) { bottom: 10%; right: 20%; animation-delay: 0.5s; }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      background: white;
+      border-radius: 25px;
+      padding: 3rem 2rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 182, 193, 0.1), transparent);
+      animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%) translateY(-100%); }
+      100% { transform: translateX(100%) translateY(100%); }
+    }
+
+    .header h1 {
+      font-size: 3rem;
+      background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+      font-weight: 700;
+      position: relative;
+      z-index: 2;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: #666;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .tagline {
+      font-size: 1rem;
+      color: #888;
+      font-style: italic;
+      position: relative;
+      z-index: 2;
+    }
+
+    .intro-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+    }
+
+    .card-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .card h3 {
+      color: #333;
+      margin-bottom: 1rem;
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    .card p {
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .demo-section {
+      background: white;
+      border-radius: 25px;
+      padding: 3rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .demo-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+      border-radius: 25px 25px 0 0;
+    }
+
+    .demo-section h2 {
+      color: #333;
+      margin-bottom: 1rem;
+      font-size: 2rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .demo-section p {
+      color: #666;
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    .footer {
+      text-align: center;
+      color: rgba(255,255,255,0.8);
+      font-size: 0.9rem;
+      margin-top: 2rem;
+    }
+
+    .footer a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .intro-section {
+        grid-template-columns: 1fr;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .container {
+        padding: 1rem;
+      }
+    }
+
+    /* Custom styling for the knowledge bot widget */
+    .kb-modal {
+      font-family: 'Poppins', sans-serif !important;
+    }
+
+    .kb-btn {
+      background: linear-gradient(135deg, #ff6b6b, #4ecdc4) !important;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
+    }
+
+    .kb-btn:hover {
+      transform: scale(1.05) !important;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Floating hearts -->
+  <div class="heart">💕</div>
+  <div class="heart">👶</div>
+  <div class="heart">💝</div>
+  <div class="heart">🌸</div>
+
+  <div class="container">
+    <header class="header">
+      <h1>Maggie's NICU Care Hub</h1>
+      <p class="subtitle">Dedicated NICU Nurse • Loving Mom of Two Amazing Boys • Heart Full of Love</p>
+      <p class="tagline">"Every tiny heartbeat matters, every moment is precious" 💕</p>
+    </header>
+
+    <section class="intro-section">
+      <div class="card">
+        <span class="card-icon">👶</span>
+        <h3>NICU Expertise</h3>
+        <p>Bringing years of specialized neonatal intensive care experience to provide the most tender, expert care for our tiniest patients. Every baby deserves the world's best care.</p>
+      </div>
+
+      <div class="card">
+        <span class="card-icon">👨‍👩‍👦‍👦</span>
+        <h3>Mom Life</h3>
+        <p>Balancing the beautiful chaos of raising two wonderful boys while caring for the most vulnerable babies. Family first, always - whether at home or in the NICU.</p>
+      </div>
+    </section>
+
+    <section class="demo-section">
+      <h2>Ask Me Anything! 🤗</h2>
+      <p>
+        Hi there! I'm here to help with any questions you might have. Whether it's about patient care, 
+        family support, or anything else - just click the chat button and let's talk! 
+        I love connecting with families and colleagues who share the same passion for caring.
+      </p>
+      <p style="font-style: italic; color: #999;">
+        💡 Try asking about office locations, hours, or any other information you need!
+      </p>
+    </section>
+
+    <footer class="footer">
+      <p>Made with 💕 for Maggie • Proudest NICU Nurse & Mom</p>
+    </footer>
+  </div>
+
+  <!-- Markdown renderer --> 
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> 
+
+  <!-- (Optional) Sanitizer --> 
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.2/dist/purify.min.js"></script> 
+  
+  <!-- Your widget loader --> 
+  <script>
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb21wYW55X2lkIjozLCJib3RfaWQiOjF9.ytHVcMRM99aAkFMg_U1I4VZbz3mYxskzzxSUORe3ico";
+    const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const script = document.createElement("script");
+
+    script.src = isLocalhost 
+      ? "http://localhost:8000/static/widget.js" 
+      : "https://knowledge-bot-retrieval.onrender.com/static/widget.js";
+
+    script.setAttribute("data-token", token);
+    script.defer = true;
+    document.head.appendChild(script);
+  </script>
+</body>
+</html> 
