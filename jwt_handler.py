@@ -23,7 +23,8 @@ class JWTHandler:
             if token.startswith('Bearer '):
                 token = token[7:]
             
-            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
+            # Decode without verifying expiration since our tokens don't expire
+            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm], options={"verify_exp": False})
             
             # Validate required fields
             if 'company_id' not in payload:
@@ -31,31 +32,24 @@ class JWTHandler:
             if 'bot_id' not in payload:
                 raise HTTPException(status_code=400, detail="Missing bot_id in token")
             
-            logger.info(f"[JWT] Successfully decoded token for company_id={payload['company_id']}, bot_id={payload['bot_id']}")
+            logger.info(f"[JWT] Successfully decoded minimal token for company_id={payload['company_id']}, bot_id={payload['bot_id']}")
             return payload
             
-        except jwt.ExpiredSignatureError:
-            logger.error("[JWT] Token has expired")
-            raise HTTPException(status_code=401, detail="Token has expired")
         except jwt.InvalidTokenError as e:
             logger.error(f"[JWT] Invalid token: {e}")
             raise HTTPException(status_code=401, detail="Invalid token")
     
-    def create_token(self, company_id: int, bot_id: int, expires_in_hours: int = 24) -> str:
+    def create_token(self, company_id: int, bot_id: int, expires_in_hours: int = None) -> str:
         """
-        Create JWT token for testing purposes
+        Create JWT token - minimal payload with just company_id and bot_id
         """
-        import datetime
-        
         payload = {
             'company_id': company_id,
-            'bot_id': bot_id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=expires_in_hours),
-            'iat': datetime.datetime.utcnow()
+            'bot_id': bot_id
         }
         
         token = jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
-        logger.info(f"[JWT] Created token for company_id={company_id}, bot_id={bot_id}")
+        logger.info(f"[JWT] Created minimal token for company_id={company_id}, bot_id={bot_id}")
         return token
 
 def extract_jwt_claims(authorization: Optional[str] = Header(None)) -> Dict:
