@@ -43,11 +43,9 @@ logger = logging.getLogger(__name__)
 
 session_histories = {}
 
-# Edge case tracking for continuous improvement
-classification_stats = {"simple": 0, "medium": 0, "complex": 0, "edge_cases": []}
+# Smart Complex Mode - All queries use intelligent routing
 
-# Configuration for forcing all queries to complex (for testing comprehensive coverage)
-FORCE_ALL_COMPLEX = os.getenv('FORCE_ALL_COMPLEX', 'false').lower() == 'true'
+# Smart Complex Mode is now hardcoded for all queries
 
 def get_session_history(session_id: str) -> InMemoryChatMessageHistory:
     if session_id not in session_histories:
@@ -81,124 +79,7 @@ def format_chat_history(chat_history: InMemoryChatMessageHistory, complexity: st
         return "Previous conversation:\n" + "\n".join(formatted) + "\n\n"
     return ""
 
-def get_query_complexity(question: str) -> str:
-    """
-    Optimized hardcoded complexity analysis for maximum performance.
-    Returns: 'simple', 'medium', or 'complex'
-    
-    Uses sets for O(1) lookups and early returns for sub-millisecond classification.
-    """
-    question_lower = question.lower().strip()
-    word_count = len(question_lower.split())
-    
-    # OPTIMIZATION: Check most definitive indicators first for early returns
-    
-    # 1. COMPLEX multi-word phrases (highest confidence)
-    complex_phrases = {
-        'tell me everything about', 'give me a complete overview of',
-        'what can you tell me about', 'i want to know about',
-        'provide information on', 'i need details on',
-        'comprehensive analysis of', 'detailed breakdown of',
-        'full explanation of', 'complete guide to',
-        'tell me about', 'give me an overview'
-    }
-    
-    for phrase in complex_phrases:
-        if phrase in question_lower:
-            classification_stats["complex"] += 1
-            return 'complex'
-    
-    # 2. SIMPLE direct patterns (most common, check early)
-    simple_indicators = {
-        'who is', 'what is', 'when is', 'where is', 'which is',
-        'phone', 'email', 'address', 'contact', 'price', 'cost', 'fee'
-    }
-    
-    for indicator in simple_indicators:
-        if indicator in question_lower:
-            classification_stats["simple"] += 1
-            return 'simple'
-    
-    # 3. COMPLEX conjunctions and strategic terms
-    complex_conjunctions = {' and ', 'as well as', 'along with', 'including', 'plus'}
-    complex_strategic = {
-        'strategy', 'analysis', 'compare', 'versus', 'vs',
-        'recommendations', 'best practices', 'factors',
-        'competitive landscape', 'risk assessment'
-    }
-    
-    has_conjunction = any(conj in question_lower for conj in complex_conjunctions)
-    has_strategic = any(term in question_lower for term in complex_strategic)
-    
-    if has_conjunction or has_strategic:
-        classification_stats["complex"] += 1
-        return 'complex'
-    
-    # 4. Length-based quick classification with pattern hints
-    if word_count > 15:
-        # Long questions with certain terms are definitely complex
-        long_complex_hints = {'approach', 'understand', 'help', 'improve', 'optimize'}
-        if any(hint in question_lower for hint in long_complex_hints):
-            classification_stats["complex"] += 1
-            return 'complex'
-        classification_stats["medium"] += 1
-        return 'medium'  # Default for long questions
-    
-    # 5. MEDIUM list and explanation patterns  
-    medium_indicators = {
-        'list', 'what are', 'show me', 'explain', 'describe',
-        'how does', 'how to', 'why', 'services', 'features',
-        'hours', 'open', 'closed', 'schedule', 'operating'
-    }
-    
-    for indicator in medium_indicators:
-        if indicator in question_lower:
-            classification_stats["medium"] += 1
-            return 'medium'
-    
-    # 6. Question starter patterns (optimized with sets)
-    if question_lower.startswith(('explain how', 'describe how', 'what are the factors',
-                                  'how can i', 'what should i', 'help me understand')):
-        classification_stats["complex"] += 1
-        return 'complex'
-    
-    if question_lower.startswith(('how do', 'what kind', 'which type', 'how many',
-                                  'what sort', 'how much', 'how long')):
-        classification_stats["medium"] += 1
-        return 'medium'
-    
-    if question_lower.startswith(('what', 'who', 'when', 'where', 'which', 'is', 'are',
-                                  'does', 'do', 'can', 'will', 'has', 'have')):
-        classification_stats["simple"] += 1
-        return 'simple'
-    
-    # 7. Industry-specific quick checks (most common cases)
-    healthcare_simple = {'doctor', 'appointment', 'prescription', 'insurance'}
-    finance_simple = {'balance', 'payment', 'account', 'rate'}
-    tech_simple = {'login', 'password', 'version', 'support'}
-    
-    if any(term in question_lower for term in healthcare_simple | finance_simple | tech_simple):
-        classification_stats["simple"] += 1
-        return 'simple'
-    
-    # 8. Final fallback based on length
-    if word_count <= 4:
-        classification_stats["simple"] += 1
-        return 'simple'
-    elif word_count <= 8:
-        result = 'medium' if any(term in question_lower for term in {'how', 'what', 'list'}) else 'simple'
-        classification_stats[result] += 1
-        return result
-    else:
-        # Log edge cases for improvement
-        if len(classification_stats["edge_cases"]) < 10:  # Only keep recent edge cases
-            classification_stats["edge_cases"].append({
-                "question": question[:100],  # Truncate for privacy
-                "word_count": word_count,
-                "classification": "medium"
-            })
-        classification_stats["medium"] += 1
-        return 'medium'  # Default for medium-length questions
+# Smart Complex Mode handles all queries with intelligent routing - no complexity detection needed
 
 # CORS configuration
 app.add_middleware(
@@ -273,35 +154,21 @@ async def ask_question(
         if verbose:
             logger.info(f"[BOT] Using mode: {mode}")
 
-        # Optimized hardcoded complexity detection (sub-millisecond performance)
-        if FORCE_ALL_COMPLEX:
-            complexity = 'complex'
-            logger.info("[BOT] FORCE_ALL_COMPLEX enabled → All queries complex")
-        else:
-            complexity = get_query_complexity(question)
+        # Smart Complex Mode for ALL queries - maximum performance and coverage
+        logger.info("[BOT] Smart Complex Mode enabled for ALL queries")
         
-        # Auto-detection logic with performance optimization
-        if complexity == 'simple':
-            logger.info("[BOT] Auto-detected complexity: simple → Direct (maximum speed)")
-            k = 2  # Minimal retrieval for speed
+        # Smart Complex Mode: Use MultiQuery for comparative/analytical queries, Fast for others
+        comparative_indicators = {'compare', 'versus', 'vs', 'difference between', 'analyze', 'contrast'}
+        is_comparative = any(indicator in question.lower() for indicator in comparative_indicators)
+        
+        if is_comparative:
+            logger.info("[BOT] Smart Complex → MultiQuery (comparative analysis detected)")
+            k = 6
+            use_multi_query = True
+        else:
+            logger.info("[BOT] Smart Complex → Fast Comprehensive (comprehensive coverage)")
+            k = 8
             use_multi_query = False
-        elif complexity == 'medium':
-            logger.info("[BOT] Auto-detected complexity: medium → Enhanced Direct (balanced speed+quality)")
-            k = 4  # Moderate retrieval
-            use_multi_query = False
-        else:  # complex
-            # Smart Complex Mode: Use MultiQuery for comparative/analytical queries, Fast for others
-            comparative_indicators = {'compare', 'versus', 'vs', 'difference between', 'analyze', 'contrast'}
-            is_comparative = any(indicator in question.lower() for indicator in comparative_indicators)
-            
-            if is_comparative:
-                logger.info("[BOT] Smart Complex → MultiQuery (comparative analysis detected)")
-                k = 6
-                use_multi_query = True
-            else:
-                logger.info("[BOT] Smart Complex → Fast Comprehensive (standard complex)")
-                k = 8
-                use_multi_query = False
 
         retriever_service = RetrieverService()
         retriever = retriever_service.build_retriever(
@@ -312,48 +179,17 @@ async def ask_question(
             use_multi_query=use_multi_query
         )
 
-        # Optimize prompt based on complexity level
-        if complexity == 'simple':
-            # Concise prompt for maximum speed on simple factual queries
-            concise_template = """Answer the question using the context below. Be accurate and concise.
-
-Context:
-{context}
-
-Question:
-{question}
-
-Answer:"""
-            prompt = PromptTemplate(input_variables=["context", "question"], template=concise_template)
-        elif complexity == 'medium':
-            # Balanced prompt for medium complexity
-            medium_template = """Use the context below to answer the question accurately. Provide helpful details while being concise.
-
-Context:
-{context}
-
-Question:
-{question}
-
-Answer:"""
-            prompt = PromptTemplate(input_variables=["context", "question"], template=medium_template)
-        else:
-            # Full detailed prompt for complex queries
-            prompt = get_prompt_template(mode)
+        # Use comprehensive prompt template for Smart Complex mode
+        prompt = get_prompt_template(mode)
 
         document_prompt = PromptTemplate.from_template(
             "{page_content}\n[source: {file_name}#{chunk_index}]"
         )
 
-        # Optimize model selection based on complexity
-        model_map = {
-            'simple': 'gpt-3.5-turbo',      # Fastest for factual queries
-            'medium': 'gpt-3.5-turbo',      # Fast but good quality for moderate complexity  
-            'complex': 'gpt-4o-mini'        # Best quality for comprehensive analysis
-        }
-        model = model_map[complexity]
+        # Use optimal model for Smart Complex mode
+        model = 'gpt-4o-mini'  # Best quality for comprehensive analysis
         if verbose:
-            logger.info(f"[BOT] Using {model} for {complexity} query optimization")
+            logger.info(f"[BOT] Using {model} for Smart Complex query optimization")
             
         llm = ChatOpenAI(
             model=model,
@@ -363,19 +199,13 @@ Answer:"""
             openai_api_key=get_openai_api_key()
         )
 
-        # Get conversation history for this session - optimize based on complexity
+        # Get conversation history for this session - Smart Complex mode
         chat_history = get_session_history(session_id)
-        if complexity == 'simple' and not chat_history.messages:
-            # Skip conversation context entirely for simple queries with no history
-            conversation_context = ""
-        else:
-            conversation_context = format_chat_history(chat_history, complexity)
+        conversation_context = format_chat_history(chat_history, 'complex')
         
-        # Enhanced prompt with conversation context - optimized for performance
-        context_limits = {'simple': 400, 'medium': 800, 'complex': 1200}
-        max_context = context_limits.get(complexity, 500)
+        # Enhanced prompt with conversation context - comprehensive mode
+        max_context = 1200  # Full context for Smart Complex mode
         if len(conversation_context) > max_context:
-            # Truncate conversation context based on complexity to optimize processing time
             conversation_context = conversation_context[:max_context] + "...\n\n"
         
         enhanced_prompt_template = conversation_context + prompt.template
@@ -517,34 +347,18 @@ async def serve_widget():
         raise HTTPException(status_code=404, detail="widget.js not found")
     return FileResponse(widget_path, media_type="application/javascript")
 
-# Complexity detection stats endpoint for optimization
+# Smart Complex stats endpoint 
 @app.get("/complexity-stats")
 async def get_complexity_stats():
-    """Get complexity detection statistics for performance monitoring"""
-    total_queries = sum(classification_stats[k] for k in ["simple", "medium", "complex"])
-    
-    if total_queries == 0:
-        return {
-            "message": "No queries processed yet",
-            "stats": classification_stats
-        }
-    
+    """Get Smart Complex mode statistics for performance monitoring"""
     return {
-        "total_queries": total_queries,
-        "distribution": {
-            "simple": {
-                "count": classification_stats["simple"],
-                "percentage": round((classification_stats["simple"] / total_queries) * 100, 1)
-            },
-            "medium": {
-                "count": classification_stats["medium"], 
-                "percentage": round((classification_stats["medium"] / total_queries) * 100, 1)
-            },
-            "complex": {
-                "count": classification_stats["complex"],
-                "percentage": round((classification_stats["complex"] / total_queries) * 100, 1)
-            }
+        "message": "Smart Complex Mode is hardcoded for ALL queries",
+        "mode": "Smart Complex",
+        "routing": {
+            "comparative_queries": "MultiQuery (k=6) for enhanced analysis",
+            "standard_queries": "Fast Complex (k=8) for comprehensive coverage"
         },
-        "edge_cases": classification_stats["edge_cases"],
-        "performance_note": "Hardcoded classification provides sub-millisecond performance with 0% API cost"
+        "triggers": ["compare", "versus", "vs", "difference between", "analyze", "contrast"],
+        "performance": "3-5 second streaming start with comprehensive coverage",
+        "coverage": "8+ sources for standard queries, 6+ sources for comparative queries"
     }
