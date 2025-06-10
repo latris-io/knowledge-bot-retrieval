@@ -270,6 +270,7 @@
           const reader = res.body.getReader();
           const decoder = new TextDecoder();
           let chunkCount = 0;
+          let responseStarted = false; // Track if actual response content has started
 
           while (true) {
             const { done, value } = await reader.read();
@@ -294,6 +295,15 @@
                 
                 accumulatedText += data;
                 
+                // Check if we've moved beyond the initial loading message
+                const cleanForCheck = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
+                const hasActualContent = cleanForCheck.length > "Getting your response...".length + 10; // Some buffer
+                
+                if (!responseStarted && hasActualContent) {
+                  responseStarted = true;
+                  console.log(`[Widget] Response content detected, hiding spinner`);
+                }
+                
                 // Extract and deduplicate sources
                 const sourceMatches = [...accumulatedText.matchAll(/\[source: (.+?)\]/g)];
                 const allSources = sourceMatches.map(match => match[1]);
@@ -302,14 +312,26 @@
                 // Remove [source: ...] from main text for display
                 const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
                 
-                const mainHtml = marked.parse(cleanText);
-                const sourcesHtml = uniqueSources.length
-                  ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
-                  : "";
-                
-                answerBox.innerHTML = window.DOMPurify
-                  ? DOMPurify.sanitize(mainHtml + sourcesHtml)
-                  : (mainHtml + sourcesHtml);
+                if (responseStarted) {
+                  // Remove the "Getting your response..." part and show actual content
+                  const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "").trim();
+                  const mainHtml = marked.parse(contentText);
+                  const sourcesHtml = uniqueSources.length
+                    ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
+                    : "";
+                  
+                  answerBox.innerHTML = window.DOMPurify
+                    ? DOMPurify.sanitize(mainHtml + sourcesHtml)
+                    : (mainHtml + sourcesHtml);
+                } else {
+                  // Still in loading phase, show with spinner
+                  answerBox.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <div class="kb-spinner"></div>
+                      <span>Getting your response...</span>
+                    </div>
+                  `;
+                }
                 
                 // Auto-scroll to bottom of answer box
                 answerBox.scrollTop = answerBox.scrollHeight;
