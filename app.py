@@ -12,11 +12,7 @@ from retriever import RetrieverService
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableSequence
-from langchain_core.messages import HumanMessage, AIMessage
-from langchain_core.chat_history import InMemoryChatMessageHistory
-from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain.callbacks.base import BaseCallbackHandler
-from langchain.chains import ConversationalRetrievalChain
 from langchain.schema import LLMResult
 from ratelimit import limits, sleep_and_retry
 from jwt_handler import extract_jwt_claims
@@ -42,8 +38,6 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
-
-session_histories = {}
 
 def should_use_multi_query(question: str) -> bool:
     """
@@ -85,12 +79,6 @@ def should_use_multi_query(question: str) -> bool:
     
     # Default: use Direct for speed (most queries are specific)
     return False
-
-def get_session_history(session_id: str) -> InMemoryChatMessageHistory:
-    if session_id not in session_histories:
-        session_histories[session_id] = InMemoryChatMessageHistory()
-        logger.info(f"[MEMORY] Created new history for session {session_id}")
-    return session_histories[session_id]
 
 # CORS configuration
 app.add_middleware(
@@ -192,33 +180,27 @@ async def ask_question(
             openai_api_key=get_openai_api_key()
         )
 
-        chain = ConversationalRetrievalChain.from_llm(
+        # Create a simple, reliable chain without complex conversational handling
+        from langchain.chains import RetrievalQA
+        
+        chain = RetrievalQA.from_chain_type(
             llm=llm,
+            chain_type="stuff",
             retriever=retriever,
-            combine_docs_chain_kwargs={
-                "prompt": prompt,
-                "document_prompt": document_prompt
-            },
             return_source_documents=True,
             verbose=verbose,
-            output_key="answer"
-        )
-
-        chain_with_history = RunnableWithMessageHistory(
-            runnable=chain,
-            get_session_history=get_session_history,
-            input_messages_key="question",
-            history_messages_key="chat_history",
-            output_messages_key="answer"
+            chain_type_kwargs={
+                "prompt": prompt,
+                "document_prompt": document_prompt
+            }
         )
 
         if streaming:
             async def run_chain():
                 try:
                     result = await asyncio.to_thread(
-                        chain_with_history.invoke,
-                        {"question": question},
-                        config={"configurable": {"session_id": session_id}}
+                        chain.invoke,
+                        {"query": question}
                     )
                     sources = result.get("source_documents", [])
                     if sources:
@@ -238,9 +220,8 @@ async def ask_question(
             return run_chain()
         else:
             result = await asyncio.to_thread(
-                chain_with_history.invoke,
-                {"question": question},
-                config={"configurable": {"session_id": session_id}}
+                chain.invoke,
+                {"query": question}
             )
             sources = result.get("source_documents", [])
             scores = [doc.metadata.get('score', 'N/A') for doc in sources]
