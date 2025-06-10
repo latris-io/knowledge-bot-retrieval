@@ -203,7 +203,7 @@
       answerBox.innerHTML = `
         <div style="display: flex; align-items: center; gap: 8px;">
           <div class="kb-spinner"></div>
-          <span>Thinking...</span>
+          <span>Getting your response...</span>
         </div>
       `;
       askBtn.disabled = true;

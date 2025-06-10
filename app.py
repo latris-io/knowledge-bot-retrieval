@@ -144,9 +144,10 @@ async def ask_question(
         if not question.strip():
             raise HTTPException(status_code=400, detail="Question cannot be empty")
 
-        mode = classify_mode(question)
+        # Skip classification for speed - use qa mode (most common)
+        mode = "qa"
         if verbose:
-            logger.info(f"[BOT] Detected mode: {mode}")
+            logger.info(f"[BOT] Using mode: {mode} (fast mode)")
 
         retriever_service = RetrieverService()
         retriever = retriever_service.build_retriever(
@@ -233,7 +234,7 @@ async def ask_question(
 async def serve_ui(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-# Streaming API endpoint with JWT authentication  
+# Fast API endpoint with JWT authentication - returns complete response quickly
 @app.post("/ask")
 async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_claims)):
     session_id = request.session_id or str(uuid.uuid4())
@@ -242,13 +243,55 @@ async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_cl
     
     logger.info(f"[API] Received question: {request.question}, company_id: {company_id}, bot_id: {bot_id}, session_id: {session_id}")
     
+    try:
+        # Get complete result quickly (no artificial delays)
+        result = await ask_question(
+            question=request.question,
+            company_id=company_id,
+            bot_id=bot_id,
+            session_id=session_id,
+            streaming=False,
+            k=request.k,
+            similarity_threshold=request.similarity_threshold,
+            verbose=True
+        )
+        
+        # Format sources for widget
+        sources = result.get("source_documents", [])
+        answer = result.get("answer", "")
+        
+        # Add source markers for widget parsing
+        if sources:
+            for doc in sources:
+                filename = doc.metadata.get('file_name', 'Unknown')
+                chunk = doc.metadata.get('chunk_index', '')
+                source_ref = f"{filename}#{chunk}" if chunk else filename
+                answer += f" [source: {source_ref}]"
+        
+        return {
+            "answer": answer,
+            "sources": [doc.metadata.get('file_name') for doc in sources],
+            "session_id": session_id
+        }
+        
+    except Exception as e:
+        logger.error(f"[API] Error processing question: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/ask/stream")
+async def ask_stream_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_claims)):
+    """Optional streaming endpoint for visual effect (slower but looks nice)"""
+    session_id = request.session_id or str(uuid.uuid4())
+    company_id = jwt_claims['company_id']
+    bot_id = jwt_claims['bot_id']
+    
+    logger.info(f"[STREAM] Received question: {request.question}, company_id: {company_id}, bot_id: {bot_id}, session_id: {session_id}")
+    
     async def generate_stream():
         try:
-            yield f"data: Getting your response...\n\n"
-            await asyncio.sleep(0.3)  # Brief pause
-            yield f"data:  \n\n"  # Add space separator
+            yield f"data: Getting your response... \n\n"
             
-            # Get non-streaming result first to test
+            # Get complete result first
             result = await ask_question(
                 question=request.question,
                 company_id=company_id,
@@ -260,32 +303,15 @@ async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_cl
                 verbose=True
             )
             
-            # Simulate streaming the complete answer with better formatting
-            answer = result.get("answer", "No answer generated").strip()
+            # Stream the answer with minimal delays for visual effect
+            answer = result.get("answer", "").strip()
+            words = answer.split()
             
-            # Split into sentences for better pacing
-            import re
-            sentences = re.split(r'(?<=[.!?])\s+', answer)
+            for word in words:
+                yield f"data: {word} \n\n"
+                await asyncio.sleep(0.02)  # Much faster than before
             
-            for sent_idx, sentence in enumerate(sentences):
-                if not sentence.strip():
-                    continue
-                    
-                words = sentence.split()
-                for i, word in enumerate(words):
-                    yield f"data: {word}\n\n"
-                    await asyncio.sleep(0.05)  # Faster streaming
-                    
-                    # Add space after each word except the last in sentence
-                    if i < len(words) - 1:
-                        yield f"data:  \n\n"
-                
-                # Add proper spacing after sentence (except last sentence)
-                if sent_idx < len(sentences) - 1:
-                    yield f"data:  \n\n"
-                    await asyncio.sleep(0.1)  # Brief pause between sentences
-                
-            # Add invisible source markers for widget to parse
+            # Add sources
             sources = result.get("source_documents", [])
             if sources:
                 for doc in sources:
@@ -295,7 +321,7 @@ async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_cl
                     yield f"data: [source: {source_ref}]\n\n"
                     
         except Exception as e:
-            logger.error(f"[API] Streaming error: {e}")
+            logger.error(f"[STREAM] Streaming error: {e}")
             yield f"data: [ERROR] {str(e)}\n\n"
     
     return StreamingResponse(
@@ -374,41 +400,15 @@ async def test_stream():
 
 @app.get("/test-widget-format")
 async def test_widget_format():
-    """Test endpoint that mimics exactly what the widget should receive"""
-    async def generate():
-        # Start message
-        yield f"data: Getting your response...\n\n"
-        await asyncio.sleep(0.3)
-        yield f"data:  \n\n"  # Space separator
-        
-        # Simulate a simple answer with proper formatting
-        answer = "The assignment due February 14, 2025 is the Education, Sharecropping, and Racism in the New South lesson review."
-        
-        import re
-        sentences = re.split(r'(?<=[.!?])\s+', answer)
-        
-        for sent_idx, sentence in enumerate(sentences):
-            if not sentence.strip():
-                continue
-                
-            words = sentence.split()
-            for i, word in enumerate(words):
-                yield f"data: {word}\n\n"
-                await asyncio.sleep(0.05)
-                
-                # Add space after each word except the last in sentence
-                if i < len(words) - 1:
-                    yield f"data:  \n\n"
-            
-            # Add spacing after sentence (except last sentence)
-            if sent_idx < len(sentences) - 1:
-                yield f"data:  \n\n"
-                await asyncio.sleep(0.1)
-        
-        # Add sources with proper formatting
-        yield f"data: [source: School Schedule.pdf#1]\n\n"
-        
-    return StreamingResponse(generate(), media_type="text/event-stream")
+    """Test endpoint that returns fast JSON response like the main endpoint"""
+    answer = "The assignment due February 14, 2025 is the Education, Sharecropping, and Racism in the New South lesson review."
+    answer += " [source: School Schedule.pdf#1]"
+    
+    return {
+        "answer": answer,
+        "sources": ["School Schedule.pdf"],
+        "session_id": "test_session"
+    }
 
 @app.get("/test-chroma")
 async def test_chroma():
