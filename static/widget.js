@@ -212,6 +212,10 @@
       let accumulatedText = "";
   
       try {
+        console.log(`[Widget] Making request to ${API_URL}/ask`);
+        console.log(`[Widget] Question: "${question}"`);
+        console.log(`[Widget] Session: ${sessionManager.getSessionId()}`);
+        
         const res = await fetch(`${API_URL}/ask`, {
           method: "POST",
           headers: {
@@ -226,57 +230,97 @@
           })
         });
 
+        console.log(`[Widget] Response status: ${res.status}`);
+        console.log(`[Widget] Response headers:`, Array.from(res.headers.entries()));
+
         if (!res.ok) {
           throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         }
 
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder();
+        // Check content type to determine response format
+        const contentType = res.headers.get('content-type');
+        console.log(`[Widget] Content-Type: "${contentType}"`);
+        
+        if (contentType && contentType.includes('application/json')) {
+          console.log(`[Widget] Handling as JSON response`);
+          // Handle JSON response (fallback for production)
+          const data = await res.json();
+          let raw = data.answer || data.error || "No response.";
+          
+          // Extract sources
+          const sourceMatches = [...raw.matchAll(/\[source: (.+?)\]/g)];
+          const sources = sourceMatches.map(match => match[1]);
+          
+          // Remove [source: ...] from main text
+          raw = raw.replace(/\[source: .+?\]/g, "").trim();
+          
+          const mainHtml = marked.parse(raw);
+          const sourcesHtml = sources.length
+            ? `<details class="kb-sources"><summary>Show Sources (${sources.length})</summary><ul>${sources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
+            : "";
+          
+          answerBox.innerHTML = window.DOMPurify
+            ? DOMPurify.sanitize(mainHtml + sourcesHtml)
+            : (mainHtml + sourcesHtml);
+            
+        } else {
+          // Handle streaming response (Server-Sent Events)
+          console.log(`[Widget] Handling as streaming response`);
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let chunkCount = 0;
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+              console.log(`[Widget] Stream completed after ${chunkCount} chunks`);
+              break;
+            }
 
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n');
+            chunkCount++;
+            const chunk = decoder.decode(value, { stream: true });
+            console.log(`[Widget] Chunk ${chunkCount}: "${chunk}"`);
+            const lines = chunk.split('\n');
 
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const data = line.slice(6); // Remove 'data: ' prefix
-              if (data === '[DONE]' || data === '') continue;
-              
-              if (data.startsWith('[ERROR]')) {
-                throw new Error(data.replace('[ERROR] ', ''));
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6); // Remove 'data: ' prefix
+                if (data === '[DONE]' || data === '') continue;
+                
+                if (data.startsWith('[ERROR]')) {
+                  throw new Error(data.replace('[ERROR] ', ''));
+                }
+                
+                accumulatedText += data;
+                
+                // Extract sources for display
+                const sourceMatches = [...accumulatedText.matchAll(/\[source: (.+?)\]/g)];
+                const sources = sourceMatches.map(match => match[1]);
+                
+                // Remove [source: ...] from main text for display
+                const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
+                
+                const mainHtml = marked.parse(cleanText);
+                const sourcesHtml = sources.length
+                  ? `<details class="kb-sources"><summary>Show Sources (${sources.length})</summary><ul>${sources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
+                  : "";
+                
+                answerBox.innerHTML = window.DOMPurify
+                  ? DOMPurify.sanitize(mainHtml + sourcesHtml)
+                  : (mainHtml + sourcesHtml);
+                
+                // Auto-scroll to bottom of answer box
+                answerBox.scrollTop = answerBox.scrollHeight;
               }
-              
-              accumulatedText += data;
-              
-              // Extract sources for display
-              const sourceMatches = [...accumulatedText.matchAll(/\[source: (.+?)\]/g)];
-              const sources = sourceMatches.map(match => match[1]);
-              
-              // Remove [source: ...] from main text for display
-              const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
-              
-              const mainHtml = marked.parse(cleanText);
-              const sourcesHtml = sources.length
-                ? `<details class="kb-sources"><summary>Show Sources (${sources.length})</summary><ul>${sources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
-                : "";
-              
-              answerBox.innerHTML = window.DOMPurify
-                ? DOMPurify.sanitize(mainHtml + sourcesHtml)
-                : (mainHtml + sourcesHtml);
-              
-              // Auto-scroll to bottom of answer box
-              answerBox.scrollTop = answerBox.scrollHeight;
             }
           }
         }
       } catch (err) {
-        console.error('Streaming error:', err);
+        console.error('[Widget] Streaming error:', err);
         answerBox.innerHTML = `<strong>Error:</strong> ${err.message}`;
       } finally {
         askBtn.disabled = false;
+        console.log('[Widget] Request completed');
       }
     };
   })();
