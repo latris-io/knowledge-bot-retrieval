@@ -278,20 +278,14 @@ async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_cl
                 yield f"data: \n\n"
                 await asyncio.sleep(0.2)  # Pause between sentences
                 
-            # Add sources with proper formatting and deduplication
+            # Add invisible source markers for widget to parse
             sources = result.get("source_documents", [])
             if sources:
-                # Deduplicate sources by filename
-                unique_sources = {}
                 for doc in sources:
                     filename = doc.metadata.get('file_name', 'Unknown')
                     chunk = doc.metadata.get('chunk_index', '')
-                    key = f"{filename}#{chunk}" if chunk else filename
-                    unique_sources[filename] = key
-                
-                yield f"data: \n\n**Sources:**\n\n"
-                for filename, source_key in unique_sources.items():
-                    yield f"data: - {source_key}\n\n"
+                    source_ref = f"{filename}#{chunk}" if chunk else filename
+                    yield f"data: [source: {source_ref}]\n\n"
                     
         except Exception as e:
             logger.error(f"[API] Streaming error: {e}")

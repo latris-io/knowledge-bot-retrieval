@@ -247,16 +247,17 @@
           const data = await res.json();
           let raw = data.answer || data.error || "No response.";
           
-          // Extract sources
+          // Extract and deduplicate sources
           const sourceMatches = [...raw.matchAll(/\[source: (.+?)\]/g)];
-          const sources = sourceMatches.map(match => match[1]);
+          const allSources = sourceMatches.map(match => match[1]);
+          const uniqueSources = [...new Set(allSources)]; // Deduplicate
           
           // Remove [source: ...] from main text
           raw = raw.replace(/\[source: .+?\]/g, "").trim();
           
           const mainHtml = marked.parse(raw);
-          const sourcesHtml = sources.length
-            ? `<details class="kb-sources"><summary>Show Sources (${sources.length})</summary><ul>${sources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
+          const sourcesHtml = uniqueSources.length
+            ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
             : "";
           
           answerBox.innerHTML = window.DOMPurify
@@ -293,12 +294,22 @@
                 
                 accumulatedText += data;
                 
-                // Parse the accumulated text and render it
-                const mainHtml = marked.parse(accumulatedText);
+                // Extract and deduplicate sources
+                const sourceMatches = [...accumulatedText.matchAll(/\[source: (.+?)\]/g)];
+                const allSources = sourceMatches.map(match => match[1]);
+                const uniqueSources = [...new Set(allSources)]; // Deduplicate
+                
+                // Remove [source: ...] from main text for display
+                const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
+                
+                const mainHtml = marked.parse(cleanText);
+                const sourcesHtml = uniqueSources.length
+                  ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
+                  : "";
                 
                 answerBox.innerHTML = window.DOMPurify
-                  ? DOMPurify.sanitize(mainHtml)
-                  : mainHtml;
+                  ? DOMPurify.sanitize(mainHtml + sourcesHtml)
+                  : (mainHtml + sourcesHtml);
                 
                 // Auto-scroll to bottom of answer box
                 answerBox.scrollTop = answerBox.scrollHeight;
