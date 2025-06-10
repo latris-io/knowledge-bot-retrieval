@@ -244,7 +244,7 @@ async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_cl
     
     async def generate_stream():
         try:
-            yield f"data: Starting AI processing...\n\n"
+            yield f"data: Getting your response...\n\n"
             
             # Get non-streaming result first to test
             result = await ask_question(
@@ -370,7 +370,7 @@ async def test_widget_format():
     """Test endpoint that mimics exactly what the widget should receive"""
     async def generate():
         # Start message
-        yield f"data: Starting AI processing...\n\n"
+        yield f"data: Getting your response...\n\n"
         await asyncio.sleep(0.5)
         
         # Simulate a simple answer
