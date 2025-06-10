@@ -243,25 +243,37 @@ async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_cl
     logger.info(f"[API] Received question: {request.question}, company_id: {company_id}, bot_id: {bot_id}, session_id: {session_id}")
     
     async def generate_stream():
-        stream_handler = EventStreamHandler()
         try:
-            # Start the question processing task
-            await ask_question(
+            yield f"data: Starting AI processing...\n\n"
+            
+            # Get non-streaming result first to test
+            result = await ask_question(
                 question=request.question,
                 company_id=company_id,
                 bot_id=bot_id,
                 session_id=session_id,
-                streaming=True,
-                stream_handler=stream_handler,
+                streaming=False,
                 k=request.k,
                 similarity_threshold=request.similarity_threshold,
                 verbose=True
             )
             
-            # Stream the results
-            async for chunk in stream_handler.astream():
-                yield chunk
+            # Simulate streaming the complete answer
+            answer = result.get("answer", "No answer generated")
+            words = answer.split()
+            
+            for i, word in enumerate(words):
+                yield f"data: {word} \n\n"
+                await asyncio.sleep(0.1)  # Simulate streaming delay
                 
+            # Add sources
+            sources = result.get("source_documents", [])
+            if sources:
+                yield f"data: \n\nSources:\n"
+                for doc in sources:
+                    source_text = f"- {doc.metadata.get('file_name', 'Unknown')}"
+                    yield f"data: {source_text}\n\n"
+                    
         except Exception as e:
             logger.error(f"[API] Streaming error: {e}")
             yield f"data: [ERROR] {str(e)}\n\n"
