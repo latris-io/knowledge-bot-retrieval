@@ -63,18 +63,26 @@
         
         // Pre-process common LLM markdown issues
         let processed = text
+            // Fix zip codes being treated as list markers: "37064. **Office**" -> "ZIP 37064. **Office**"
+            .replace(/^(\d{5})(\.\s+\*\*)/gm, 'ZIP $1$2')
             // Fix orphaned header markers at end of lines
             .replace(/#{4,6}\s*$/gm, '')
             // Fix headers running into subheaders: "### Header#### Sub" -> "### Header\n#### Sub"
             .replace(/(#{1,6}\s+[^#\n]*?)(#{1,6}\s+)/gm, '$1\n$2')
             // Fix headers running into numbered lists: "### Header1. Item" -> "### Header\n1. Item"
             .replace(/(#{1,6}\s+[^#\n]*?)(\d+\.\s+)/gm, '$1\n$2')
+            // Fix headers followed by bullet lists: "### Header- Item" -> "### Header\n- Item"
+            .replace(/(#{1,6}\s+[^#\n]*?)(-\s+)/gm, '$1\n$2')
+            // Fix headers ending with colon followed by text: "### Header:Text" -> "### Header:\nText"
+            .replace(/(#{1,6}\s+[^:\n]*:)([^\n])/gm, '$1\n$2')
             // Fix numbered lists running together: "1. Item2. Next" -> "1. Item\n2. Next"
             .replace(/(\d+\.\s+[^\n]*?)(\d+\.\s+)/gm, '$1\n$2')
             // Fix bullet points running together: "- Item- Next" -> "- Item\n- Next"
             .replace(/(-\s+[^\n]*?)(-\s+)/gm, '$1\n$2')
-            // Fix time ranges being interpreted as lists: "- 7:00 AM - 4:00 PM" -> "7:00 AM - 4:00 PM"
-            .replace(/^(\s*)-\s+(\d+:\d+\s+[AP]M\s+-\s+\d+:\d+\s+[AP]M)/gm, '$1$2')
+            // Fix multiple offices in one line by splitting on office names
+            .replace(/(\*\*[^*]+Office\*\*[^*]*?)(\*\*[^*]+Office\*\*)/gm, '$1\n- $2')
+            // Fix time ranges split across lines - combine "AM" with "- PM" patterns
+            .replace(/(\d+:\d+\s+[AP]M)\s*[\n\r]\s*-\s*(\d+:\d+\s+[AP]M)/g, '$1 - $2')
             // Clean up trailing header markers
             .replace(/#{1,6}\s*$/, '');
 
