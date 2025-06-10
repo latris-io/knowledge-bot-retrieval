@@ -10,7 +10,8 @@ class JWTHandler:
     """Handle JWT token validation and extraction for widget authentication"""
     
     def __init__(self):
-        self.secret_key = os.getenv("JWT_SECRET_KEY", "your-secret-key-here")
+        # Use JWT_SECRET for consistency with the rest of the system
+        self.secret_key = os.getenv("JWT_SECRET", "my-ultra-secure-signing-key")
         self.algorithm = "HS256"
     
     def decode_token(self, token: str) -> Dict:
