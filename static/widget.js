@@ -108,6 +108,51 @@
         font-size: 14px;
         max-height: 200px;
         overflow-y: auto;
+        line-height: 1.5;
+      }
+
+      .kb-answer h1, .kb-answer h2, .kb-answer h3 {
+        margin: 12px 0 8px 0;
+        color: #1f2937;
+        font-weight: 600;
+      }
+
+      .kb-answer h1 {
+        font-size: 18px;
+      }
+
+      .kb-answer h2 {
+        font-size: 16px;
+      }
+
+      .kb-answer h3 {
+        font-size: 15px;
+      }
+
+      .kb-answer strong {
+        font-weight: 600;
+        color: #1f2937;
+      }
+
+      .kb-answer em {
+        font-style: italic;
+      }
+
+      .kb-answer ul {
+        margin: 8px 0;
+        padding-left: 20px;
+      }
+
+      .kb-answer li {
+        margin: 4px 0;
+      }
+
+      .kb-answer code {
+        background: #e5e7eb;
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-family: monospace;
+        font-size: 13px;
       }
   
       .kb-spinner {
@@ -255,7 +300,8 @@
           // Remove [source: ...] from main text
           raw = raw.replace(/\[source: .+?\]/g, "").trim();
           
-          const mainHtml = marked.parse(raw);
+          // Content is already HTML from server, no need for markdown parsing
+          const mainHtml = raw;
           const sourcesHtml = uniqueSources.length
             ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
             : "";
@@ -315,7 +361,9 @@
                 if (responseStarted) {
                   // Show actual content, removing any loading messages
                   const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "").trim();
-                  const mainHtml = marked.parse(contentText);
+                  
+                  // Content is already HTML from server, no need for markdown parsing
+                  const mainHtml = contentText;
                   const sourcesHtml = uniqueSources.length
                     ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
                     : "";
