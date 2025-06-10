@@ -5,6 +5,12 @@ from langchain.prompts import PromptTemplate
 QA_TEMPLATE = """
 You are a thoughtful and knowledgeable assistant. Use the context below to answer the question as accurately and concisely as possible.
 
+When formatting your response:
+- Use markdown headers (###, ##, #) from the context to create well-structured sections
+- Convert ### headers into clear section titles
+- Organize information hierarchically with proper headings and bullet points
+- Preserve the document structure to make responses easy to scan and read
+
 Reference the source documents using the format already embedded in the context: [source: filename#chunk_index].
 
 Only use the provided context. If the answer is not present, say "I'm not sure."
