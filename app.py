@@ -29,8 +29,7 @@ load_dotenv()
 
 app = FastAPI()
 
-# Mount Jinja2 templates and static files (including widget.js)
-templates = Jinja2Templates(directory="templates")
+# Mount static files for widget.js
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Configure logging
@@ -52,30 +51,18 @@ def get_session_history(session_id: str) -> InMemoryChatMessageHistory:
         logger.info(f"[MEMORY] Created new history for session {session_id}")
     return session_histories[session_id]
 
-# CORS: allow all during dev (restrict in prod)
+# CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 🔒 Update for production
+    allow_origins=["*"],  # Update for production as needed
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Pydantic models for different request types
+# Request model
 class AskRequest(BaseModel):
     question: str
-    k: Optional[int] = None
-    similarity_threshold: Optional[float] = None
-    session_id: Optional[str] = None
-
-class WidgetAskRequest(BaseModel):
-    question: str
-    session_id: Optional[str] = None
-
-class DirectAskRequest(BaseModel):
-    question: str
-    company_id: int
-    bot_id: int
     k: Optional[int] = None
     similarity_threshold: Optional[float] = None
     session_id: Optional[str] = None
@@ -83,6 +70,7 @@ class DirectAskRequest(BaseModel):
 class EventStreamHandler(BaseCallbackHandler):
     def __init__(self):
         self.queue = asyncio.Queue()
+        self._loop = None
 
     async def astream(self):
         while True:
@@ -96,36 +84,20 @@ class EventStreamHandler(BaseCallbackHandler):
                 yield f"data: [ERROR] {str(e)}\n\n"
                 break
 
+    def _put_nowait_safe(self, item):
+        try:
+            self.queue.put_nowait(item)
+        except Exception as e:
+            logger.error(f"[STREAM] Error putting item in queue: {e}")
+
     def on_llm_new_token(self, token: str, **kwargs):
-        asyncio.create_task(self.queue.put(token))
+        self._put_nowait_safe(token)
 
     def on_llm_end(self, response: LLMResult, **kwargs):
-        asyncio.create_task(self.queue.put(None))
+        self._put_nowait_safe(None)
 
     def on_llm_error(self, error: Exception, **kwargs):
-        asyncio.create_task(self.queue.put(f"[ERROR] LLM failed: {str(error)}"))
-
-@sleep_and_retry
-@limits(calls=100, period=60)
-def classify_mode(question: str) -> str:
-    prompt = PromptTemplate.from_template(
-        "You are a classification bot.\n"
-        "Classify the intent of this question: \"{question}\"\n"
-        "Your output must be one of: qa, summarize, action_items."
-    )
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=0,
-        openai_api_key=get_openai_api_key()
-    )
-    chain = RunnableSequence(prompt | llm)
-    try:
-        result = chain.invoke({"question": question}).content.strip().lower()
-        logger.info(f"[CLASSIFIER] Question: {question}, Mode: {result}")
-        return result if result in {"qa", "summarize", "action_items"} else "qa"
-    except Exception as e:
-        logger.error(f"[CLASSIFIER] Error classifying question: {e}")
-        return "qa"
+        self._put_nowait_safe(f"[ERROR] LLM failed: {str(error)}")
 
 @sleep_and_retry
 @limits(calls=100, period=60)
@@ -144,10 +116,10 @@ async def ask_question(
         if not question.strip():
             raise HTTPException(status_code=400, detail="Question cannot be empty")
 
-        # Skip classification for speed - use qa mode (most common)
+        # Use qa mode for optimal performance
         mode = "qa"
         if verbose:
-            logger.info(f"[BOT] Using mode: {mode} (fast mode)")
+            logger.info(f"[BOT] Using mode: {mode}")
 
         retriever_service = RetrieverService()
         retriever = retriever_service.build_retriever(
@@ -230,12 +202,7 @@ async def ask_question(
         logger.error(f"[BOT] Error processing question: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Error processing question: {str(e)}")
 
-# Route to serve optional in-browser test UI
-@app.get("/", response_class=HTMLResponse)
-async def serve_ui(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
-# Fast streaming API endpoint with JWT authentication - real LLM streaming
+# Main API endpoint with JWT authentication and real LLM streaming
 @app.post("/ask")
 async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_claims)):
     session_id = request.session_id or str(uuid.uuid4())
@@ -248,28 +215,40 @@ async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_cl
         try:
             yield f"data: Getting your response... \n\n"
             
-            # Use real streaming from LLM for maximum speed
+            # Set up real streaming handler
             stream_handler = EventStreamHandler()
             
-            # Start the AI processing task in background
-            chain_task = asyncio.create_task(ask_question(
-                question=request.question,
-                company_id=company_id,
-                bot_id=bot_id,
-                session_id=session_id,
-                streaming=True,
-                stream_handler=stream_handler,
-                k=request.k,
-                similarity_threshold=request.similarity_threshold,
-                verbose=True
-            ))
+            # Start LLM processing in background (this will feed the stream_handler)
+            async def run_llm_chain():
+                try:
+                    result = await ask_question(
+                        question=request.question,
+                        company_id=company_id,
+                        bot_id=bot_id,
+                        session_id=session_id,
+                        streaming=True,
+                        stream_handler=stream_handler,
+                        k=request.k,
+                        similarity_threshold=request.similarity_threshold,
+                        verbose=True
+                    )
+                    # Get the actual coroutine result
+                    if hasattr(result, '__await__'):
+                        await result
+                except Exception as e:
+                    logger.error(f"[STREAM] Chain error: {e}")
+                    await stream_handler.queue.put(f"[ERROR] {str(e)}")
+                    await stream_handler.queue.put(None)
             
-            # Stream tokens as they come from the LLM (real streaming!)
+            # Start the LLM chain
+            llm_task = asyncio.create_task(run_llm_chain())
+            
+            # Stream tokens as they come from the LLM in real-time
             async for chunk in stream_handler.astream():
                 yield chunk
                 
-            # Wait for the chain to complete
-            await chain_task
+            # Ensure the task completes
+            await llm_task
                     
         except Exception as e:
             logger.error(f"[API] Streaming error: {e}")
@@ -281,165 +260,7 @@ async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_cl
         headers={"X-Session-ID": session_id}
     )
 
-@app.post("/ask/stream")
-async def ask_stream_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_claims)):
-    """Optional streaming endpoint for visual effect (slower but looks nice)"""
-    session_id = request.session_id or str(uuid.uuid4())
-    company_id = jwt_claims['company_id']
-    bot_id = jwt_claims['bot_id']
-    
-    logger.info(f"[STREAM] Received question: {request.question}, company_id: {company_id}, bot_id: {bot_id}, session_id: {session_id}")
-    
-    async def generate_stream():
-        try:
-            yield f"data: Getting your response... \n\n"
-            
-            # Get complete result first
-            result = await ask_question(
-                question=request.question,
-                company_id=company_id,
-                bot_id=bot_id,
-                session_id=session_id,
-                streaming=False,
-                k=request.k,
-                similarity_threshold=request.similarity_threshold,
-                verbose=True
-            )
-            
-            # Stream the answer with minimal delays for visual effect
-            answer = result.get("answer", "").strip()
-            words = answer.split()
-            
-            for word in words:
-                yield f"data: {word} \n\n"
-                await asyncio.sleep(0.02)  # Much faster than before
-            
-            # Add sources
-            sources = result.get("source_documents", [])
-            if sources:
-                for doc in sources:
-                    filename = doc.metadata.get('file_name', 'Unknown')
-                    chunk = doc.metadata.get('chunk_index', '')
-                    source_ref = f"{filename}#{chunk}" if chunk else filename
-                    yield f"data: [source: {source_ref}]\n\n"
-                    
-        except Exception as e:
-            logger.error(f"[STREAM] Streaming error: {e}")
-            yield f"data: [ERROR] {str(e)}\n\n"
-    
-    return StreamingResponse(
-        generate_stream(),
-        media_type="text/event-stream",
-        headers={"X-Session-ID": session_id}
-    )
-
-@app.post("/widget/ask")
-async def ask_widget_api(request: WidgetAskRequest, jwt_claims: dict = Depends(extract_jwt_claims)):
-    """Widget endpoint with JWT authentication - returns JSON response"""
-    session_id = request.session_id or str(uuid.uuid4())
-    company_id = jwt_claims['company_id']
-    bot_id = jwt_claims['bot_id']
-    
-    logger.info(f"[WIDGET] Received question: {request.question}, company_id: {company_id}, bot_id: {bot_id}, session_id: {session_id}")
-    
-    try:
-        result = await ask_question(
-            question=request.question,
-            company_id=company_id,
-            bot_id=bot_id,
-            session_id=session_id,
-            streaming=False,
-            verbose=True
-        )
-        
-        return {
-            "answer": result.get("answer", ""),
-            "sources": [doc.metadata.get('file_name') for doc in result.get("source_documents", [])],
-            "session_id": session_id
-        }
-        
-    except Exception as e:
-        logger.error(f"[WIDGET] Error processing question: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/ask/direct")
-async def ask_direct_api(request: DirectAskRequest):
-    """Direct API endpoint for backend services (no JWT required)"""
-    session_id = request.session_id or str(uuid.uuid4())
-    logger.info(f"[DIRECT] Received question: {request.question}, company_id: {request.company_id}, bot_id: {request.bot_id}, session_id: {session_id}")
-    
-    try:
-        result = await ask_question(
-            question=request.question,
-            company_id=request.company_id,
-            bot_id=request.bot_id,
-            session_id=session_id,
-            streaming=False,
-            k=request.k,
-            similarity_threshold=request.similarity_threshold,
-            verbose=True
-        )
-        
-        return {
-            "answer": result.get("answer", ""),
-            "sources": [doc.metadata.get('file_name') for doc in result.get("source_documents", [])],
-            "session_id": session_id
-        }
-        
-    except Exception as e:
-        logger.error(f"[DIRECT] Error processing question: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/test-stream")
-async def test_stream():
-    """Simple test endpoint to verify streaming works"""
-    async def generate():
-        for i in range(5):
-            yield f"data: Test chunk {i + 1}\n\n"
-            await asyncio.sleep(0.5)
-        yield f"data: Stream completed!\n\n"
-    
-    return StreamingResponse(generate(), media_type="text/event-stream")
-
-@app.get("/test-widget-format")
-async def test_widget_format():
-    """Test endpoint that returns fast JSON response like the main endpoint"""
-    answer = "The assignment due February 14, 2025 is the Education, Sharecropping, and Racism in the New South lesson review."
-    answer += " [source: School Schedule.pdf#1]"
-    
-    return {
-        "answer": answer,
-        "sources": ["School Schedule.pdf"],
-        "session_id": "test_session"
-    }
-
-@app.get("/test-chroma")
-async def test_chroma():
-    """Test Chroma connection and data retrieval"""
-    try:
-        retriever_service = RetrieverService()
-        retriever = retriever_service.build_retriever(
-            company_id=3,
-            bot_id=1,
-            k=5,
-            similarity_threshold=0.1
-        )
-        
-        # Try to retrieve some documents
-        docs = retriever.get_relevant_documents("office hours")
-        
-        return {
-            "status": "success",
-            "message": "Chroma connection working",
-            "documents_found": len(docs),
-            "sample_docs": [{"content": doc.page_content[:100], "metadata": doc.metadata} for doc in docs[:2]]
-        }
-        
-    except Exception as e:
-        logger.error(f"[TEST] Chroma test failed: {e}")
-        return {"status": "error", "message": str(e)}
-
-# Serve widget.js at a friendly path (optional)
+# Serve widget.js
 @app.get("/widget.js")
 async def serve_widget():
     widget_path = os.path.join("static", "widget.js")
