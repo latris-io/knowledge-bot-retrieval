@@ -245,6 +245,8 @@ async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_cl
     async def generate_stream():
         try:
             yield f"data: Getting your response...\n\n"
+            await asyncio.sleep(0.3)  # Brief pause
+            yield f"data:  \n\n"  # Add space separator
             
             # Get non-streaming result first to test
             result = await ask_question(
@@ -259,24 +261,29 @@ async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_cl
             )
             
             # Simulate streaming the complete answer with better formatting
-            answer = result.get("answer", "No answer generated")
+            answer = result.get("answer", "No answer generated").strip()
             
             # Split into sentences for better pacing
             import re
             sentences = re.split(r'(?<=[.!?])\s+', answer)
             
-            for sentence in sentences:
+            for sent_idx, sentence in enumerate(sentences):
+                if not sentence.strip():
+                    continue
+                    
                 words = sentence.split()
                 for i, word in enumerate(words):
-                    if i < len(words) - 1:
-                        yield f"data: {word} \n\n"
-                    else:
-                        yield f"data: {word}\n\n"
+                    yield f"data: {word}\n\n"
                     await asyncio.sleep(0.05)  # Faster streaming
+                    
+                    # Add space after each word except the last in sentence
+                    if i < len(words) - 1:
+                        yield f"data:  \n\n"
                 
-                # Add proper spacing after sentence
-                yield f"data: \n\n"
-                await asyncio.sleep(0.2)  # Pause between sentences
+                # Add proper spacing after sentence (except last sentence)
+                if sent_idx < len(sentences) - 1:
+                    yield f"data:  \n\n"
+                    await asyncio.sleep(0.1)  # Brief pause between sentences
                 
             # Add invisible source markers for widget to parse
             sources = result.get("source_documents", [])
@@ -371,20 +378,35 @@ async def test_widget_format():
     async def generate():
         # Start message
         yield f"data: Getting your response...\n\n"
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.3)
+        yield f"data:  \n\n"  # Space separator
         
-        # Simulate a simple answer
+        # Simulate a simple answer with proper formatting
         answer = "The assignment due February 14, 2025 is the Education, Sharecropping, and Racism in the New South lesson review."
-        words = answer.split()
         
-        for word in words:
-            yield f"data: {word} \n\n"
-            await asyncio.sleep(0.1)
+        import re
+        sentences = re.split(r'(?<=[.!?])\s+', answer)
+        
+        for sent_idx, sentence in enumerate(sentences):
+            if not sentence.strip():
+                continue
+                
+            words = sentence.split()
+            for i, word in enumerate(words):
+                yield f"data: {word}\n\n"
+                await asyncio.sleep(0.05)
+                
+                # Add space after each word except the last in sentence
+                if i < len(words) - 1:
+                    yield f"data:  \n\n"
             
-        # Add sources
-        yield f"data: \n\n"
-        yield f"data: Sources:\n\n"
-        yield f"data: - School Schedule.pdf\n\n"
+            # Add spacing after sentence (except last sentence)
+            if sent_idx < len(sentences) - 1:
+                yield f"data:  \n\n"
+                await asyncio.sleep(0.1)
+        
+        # Add sources with proper formatting
+        yield f"data: [source: School Schedule.pdf#1]\n\n"
         
     return StreamingResponse(generate(), media_type="text/event-stream")
 
