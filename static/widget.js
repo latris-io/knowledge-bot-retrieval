@@ -36,10 +36,8 @@
         
         // First, fix missing line breaks after headers and numbered lists
         let html = text
-            // Fix header immediately followed by common sentence starters
-            .replace(/^(#{1,3}\s+.*?)([Y]es[,\s]+)/gm, '$1\n$2')
-            .replace(/^(#{1,3}\s+.*?)(Here\s+\w+)/gm, '$1\n$2')
-            .replace(/^(#{1,3}\s+.*?)(The\s+\w+)/gm, '$1\n$2')
+            // Fix header immediately followed by capital letter (start of new sentence): "### HeaderSentence" -> "### Header\nSentence"
+            .replace(/^(#{1,3}\s+[^#\n]*?)([A-Z][a-z])/gm, '$1\n$2')
             // Fix numbered lists: "1. ItemNext item" -> "1. Item\nNext item"  
             .replace(/^(\d+\.\s+.*?)(\d+\.)/gm, '$1\n$2')
             // Normalize paragraph breaks
