@@ -78,7 +78,63 @@
         if (window.md && markdownLoaded) {
             try {
                 console.log('[MARKDOWN-IT] Input text:', text);
-                const result = window.md.render(text);
+                
+                // Preprocessing: Fix markdown structure issues
+                let processedText = text;
+                
+                // Pattern: Ensure proper header separation (headers need double line breaks)
+                processedText = processedText.replace(
+                    /([^\n])\n(### )/g,
+                    '$1\n\n$2'
+                );
+                
+                // Pattern: Ensure proper line breaks between list items
+                // Handle cases where list items are separated by periods, spaces, or insufficient breaks
+                processedText = processedText.replace(
+                    /(\n- [^\n]+[.!?])\s*(\n- )/g,
+                    '$1\n$2'
+                );
+                
+                // Pattern: Fix missing line breaks between list items when they run together
+                processedText = processedText.replace(
+                    /(\n- [^-\n]*[.!?])\s*- \*\*/g,
+                    '$1\n- **'
+                );
+                
+                // Pattern: More aggressive list item separation - handle periods followed by dashes
+                processedText = processedText.replace(
+                    /([.!?])-\s*\*\*/g,
+                    '$1\n- **'
+                );
+                
+                // Pattern: Handle periods followed by text followed by dashes  
+                processedText = processedText.replace(
+                    /([.!?])\s*([A-Z][^.!?]*[.!?])\s*-\s*\*\*/g,
+                    '$1\n\n$2\n- **'
+                );
+                
+                // Pattern: List ending followed by bold text (common in our LLM output)
+                // This adds extra blank lines to ensure proper list termination
+                processedText = processedText.replace(
+                    /(\n- [^\n]+\n+)(\*\*[^*]+\*\*:)/g,
+                    '$1\n$2'
+                );
+                
+                // Pattern: Consecutive bold items need separation
+                // This ensures proper spacing between bold items like "**Tricky Word**:" and "**Test Date**:"
+                processedText = processedText.replace(
+                    /(\*\*[^*]+\*\*:[^\n]*\n+)(\*\*[^*]+\*\*:)/g,
+                    '$1\n$2'
+                );
+                
+                // Pattern: Text followed by header needs proper separation
+                processedText = processedText.replace(
+                    /([.!?])\s*(###)/g,
+                    '$1\n\n$2'
+                );
+                
+                console.log('[MARKDOWN-IT] Processed text:', processedText);
+                const result = window.md.render(processedText);
                 console.log('[MARKDOWN-IT] Output HTML:', result);
                 return result;
             } catch (error) {
@@ -425,14 +481,16 @@
               console.log(`[Widget] Final accumulated text length: ${accumulatedText.length}`);
               console.log(`[Widget] Final accumulated text:`, accumulatedText);
               
-              // Stream complete - now parse final markdown
-              if (accumulatedText) {
-                console.log('[Widget] Stream complete, parsing final markdown');
-                const sourceMatches = [...accumulatedText.matchAll(/\[source: (.+?)\]/g)];
-                const allSources = sourceMatches.map(match => match[1]);
-                const uniqueSources = [...new Set(allSources)];
-                const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
-                const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "").trim();
+                              // Stream complete - now parse final markdown
+                if (accumulatedText) {
+                  console.log('[Widget] Stream complete, parsing final markdown');
+                  const sourceMatches = [...accumulatedText.matchAll(/\[source: (.+?)\]/g)];
+                  const allSources = sourceMatches.map(match => match[1]);
+                  const uniqueSources = [...new Set(allSources)];
+                  // Remove sources but preserve line breaks - don't trim!
+                  const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "");
+                  // Remove loading message but preserve line breaks - don't trim!
+                  const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "");
                 
                 console.log('[Widget] Content for markdown parsing:', contentText);
                 
@@ -489,8 +547,8 @@
                 const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
                 
                 if (responseStarted) {
-                  // Show actual content, removing any loading messages
-                  const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "").trim();
+                  // Show actual content, removing any loading messages - preserve line breaks!
+                  const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "");
                   
                   // Show raw text while streaming (no markdown parsing yet)
                   const sourcesHtml = uniqueSources.length

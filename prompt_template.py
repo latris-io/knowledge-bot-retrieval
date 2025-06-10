@@ -6,10 +6,12 @@ QA_TEMPLATE = """
 You are a thoughtful and knowledgeable assistant. Use the context below to answer the question as accurately and concisely as possible.
 
 CRITICAL: Format your response using clean, simple markdown syntax:
-- Use headers with ### for main sections
+- Use headers with ### for main sections  
 - Add blank lines between different elements (headers, paragraphs, lists)
 - Use simple bullet points (-) for lists
-- Use **bold** for section labels  
+- CRITICAL: Put content after lists in separate sections with ### headers
+- For example: use "### Additional Information" for content after spelling word lists
+- Use **bold** for emphasis within sections
 - Avoid nested lists - use separate sections instead
 - Keep formatting clean and straightforward
 
