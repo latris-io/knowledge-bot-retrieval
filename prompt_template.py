@@ -13,12 +13,19 @@ CRITICAL: Format your response using proper markdown with correct spacing:
 - Add blank lines between different sections
 - Use **bold** for emphasis on key terms
 - NEVER start lines with numbers (like zip codes)
+- For nested lists, put parent item on its own line, then indent sub-items
 
 Example correct format:
 ### Header
 
 - **Item 1:** Description here
 - **Item 2:** Description here
+
+For nested lists:
+- **Parent Item:**
+  - Sub-item 1
+  - Sub-item 2
+  - Sub-item 3
 
 Reference the source documents using the format already embedded in the context: [source: filename#chunk_index].
 
