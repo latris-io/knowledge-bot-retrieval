@@ -340,6 +340,32 @@ async def test_stream():
     
     return StreamingResponse(generate(), media_type="text/event-stream")
 
+@app.get("/test-chroma")
+async def test_chroma():
+    """Test Chroma connection and data retrieval"""
+    try:
+        retriever_service = RetrieverService()
+        retriever = retriever_service.build_retriever(
+            company_id=3,
+            bot_id=1,
+            k=5,
+            similarity_threshold=0.1
+        )
+        
+        # Try to retrieve some documents
+        docs = retriever.get_relevant_documents("office hours")
+        
+        return {
+            "status": "success",
+            "message": "Chroma connection working",
+            "documents_found": len(docs),
+            "sample_docs": [{"content": doc.page_content[:100], "metadata": doc.metadata} for doc in docs[:2]]
+        }
+        
+    except Exception as e:
+        logger.error(f"[TEST] Chroma test failed: {e}")
+        return {"status": "error", "message": str(e)}
+
 # Serve widget.js at a friendly path (optional)
 @app.get("/widget.js")
 async def serve_widget():
