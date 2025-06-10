@@ -30,6 +30,66 @@
 
     const sessionManager = new SessionManager();
   
+    // Simple markdown to HTML converter
+    function parseMarkdown(text) {
+        if (!text) return '';
+        
+        let html = text;
+        
+        // Headers
+        html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+        html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+        html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+        
+        // Bold
+        html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Italic
+        html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        // Code
+        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+        
+        // Links
+        html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+        
+        // Lists
+        const lines = html.split('\n');
+        let inList = false;
+        const processedLines = [];
+        
+        for (const line of lines) {
+            if (line.match(/^[\s]*[-*+]\s+/)) {
+                if (!inList) {
+                    processedLines.push('<ul>');
+                    inList = true;
+                }
+                const content = line.replace(/^[\s]*[-*+]\s+/, '');
+                processedLines.push(`<li>${content}</li>`);
+            } else {
+                if (inList) {
+                    processedLines.push('</ul>');
+                    inList = false;
+                }
+                if (line.trim()) {
+                    processedLines.push(line);
+                }
+            }
+        }
+        
+        if (inList) {
+            processedLines.push('</ul>');
+        }
+        
+        html = processedLines.join('\n');
+        
+        // Line breaks
+        html = html.replace(/\n\n+/g, '<br><br>');
+        html = html.replace(/\n/g, '<br>');
+        
+        return html.trim();
+    }
+  
     const STYLE = `
       .kb-btn {
         position: fixed;
@@ -327,8 +387,8 @@
           // Remove [source: ...] from main text
           raw = raw.replace(/\[source: .+?\]/g, "").trim();
           
-          // Content is already HTML from server, no need for markdown parsing
-          const mainHtml = raw;
+          // Parse markdown to HTML
+          const mainHtml = parseMarkdown(raw);
           const sourcesHtml = uniqueSources.length
             ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
             : "";
@@ -389,8 +449,8 @@
                   // Show actual content, removing any loading messages
                   const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "").trim();
                   
-                  // Content is already HTML from server, no need for markdown parsing
-                  const mainHtml = contentText;
+                  // Parse markdown to HTML
+                  const mainHtml = parseMarkdown(contentText);
                   const sourcesHtml = uniqueSources.length
                     ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
                     : "";

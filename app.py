@@ -103,8 +103,7 @@ class EventStreamHandler(BaseCallbackHandler):
         self.queue = asyncio.Queue()
         self._loop = None
         self.accumulated_text = ""  # Track full response for conversation history
-        self.processed_text = ""    # Post-processed version for history
-        self.stream_buffer = ""     # Buffer for real-time HTML processing
+        self.processed_text = ""    # Clean version for history
 
     async def astream(self):
         while True:
@@ -127,25 +126,14 @@ class EventStreamHandler(BaseCallbackHandler):
     def on_llm_new_token(self, token: str, **kwargs):
         self.accumulated_text += token
         
-        # Process token for real-time HTML conversion
-        html_token, self.stream_buffer = process_streaming_token(token, self.stream_buffer)
-        
-        # Send HTML token if available
-        if html_token:
-            self._put_nowait_safe(html_token)
+        # Stream the raw token directly - no HTML processing
+        self._put_nowait_safe(token)
 
     def on_llm_end(self, response: LLMResult, **kwargs):
-        # Send any remaining buffered content as HTML
-        if self.stream_buffer:
-            # Process any remaining buffer content
-            remaining_html = process_markdown_to_html(self.stream_buffer)
-            if remaining_html:
-                self._put_nowait_safe(remaining_html)
-        
-        # Create clean text for conversation history
+        # Create clean text for conversation history (remove markdown artifacts)
         self.processed_text = process_markdown_to_clean_text(self.accumulated_text)
         
-        logger.info(f"[MARKDOWN] Completed streaming. Clean text for history: {len(self.processed_text)} chars")
+        logger.info(f"[STREAM] Completed streaming. Clean text for history: {len(self.processed_text)} chars")
         self._put_nowait_safe(None)
 
     def on_llm_error(self, error: Exception, **kwargs):
