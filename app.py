@@ -108,8 +108,7 @@ def get_query_complexity(question: str) -> str:
     # 2. SIMPLE direct patterns (most common, check early)
     simple_indicators = {
         'who is', 'what is', 'when is', 'where is', 'which is',
-        'phone', 'email', 'address', 'contact', 'hours',
-        'open', 'closed', 'price', 'cost', 'fee'
+        'phone', 'email', 'address', 'contact', 'price', 'cost', 'fee'
     }
     
     for indicator in simple_indicators:
@@ -145,7 +144,8 @@ def get_query_complexity(question: str) -> str:
     # 5. MEDIUM list and explanation patterns  
     medium_indicators = {
         'list', 'what are', 'show me', 'explain', 'describe',
-        'how does', 'how to', 'why', 'services', 'features'
+        'how does', 'how to', 'why', 'services', 'features',
+        'hours', 'open', 'closed', 'schedule', 'operating'
     }
     
     for indicator in medium_indicators:
