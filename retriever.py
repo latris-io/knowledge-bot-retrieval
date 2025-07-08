@@ -17,6 +17,9 @@ from langchain.retrievers.document_compressors import DocumentCompressorPipeline
 from langchain_community.vectorstores import Chroma
 from langchain.schema import Document
 from langchain.prompts import PromptTemplate
+from langchain_core.retrievers import BaseRetriever
+from langchain_core.callbacks import CallbackManagerForRetrieverRun
+from langchain_core.documents import Document as CoreDocument
 
 from chromadb import HttpClient
 from chromadb.config import Settings
@@ -464,11 +467,22 @@ class RetrieverService:
                 enhanced_results = self.enhanced_retriever.reweight_results(query, enhanced_results)
                 
                 # Create a custom retriever that returns these results
-                class EnhancedCustomRetriever:
+                class EnhancedCustomRetriever(BaseRetriever):
                     def __init__(self, results):
+                        super().__init__()
                         self.results = results
                     
+                    def _get_relevant_documents(
+                        self, 
+                        query: str, 
+                        *, 
+                        run_manager: CallbackManagerForRetrieverRun
+                    ) -> List[Document]:
+                        """Required method for BaseRetriever"""
+                        return self.results
+                    
                     def get_relevant_documents(self, query: str) -> List[Document]:
+                        """Legacy method for compatibility"""
                         return self.results
                 
                 return EnhancedCustomRetriever(enhanced_results)
