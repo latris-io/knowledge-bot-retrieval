@@ -175,11 +175,11 @@ async def ask_question(
         
         if is_comparative:
             logger.info("[BOT] Smart Complex → MultiQuery (comparative analysis detected)")
-            k = 6
+            k = 8  # Increased from 6 for better coverage
             use_multi_query = True
         else:
             logger.info("[BOT] Smart Complex → Fast Comprehensive (comprehensive coverage)")
-            k = 8
+            k = 12  # Increased from 8 for better coverage
             use_multi_query = False
 
         retriever_service = RetrieverService()
@@ -240,6 +240,17 @@ async def ask_question(
                 "document_prompt": document_prompt
             }
         )
+        
+        # Debug logging for retrieval testing
+        logger.info(f"[RETRIEVAL DEBUG] Testing retrieval for query: '{question}'")
+        try:
+            test_docs = retriever.get_relevant_documents(question)
+            logger.info(f"[RETRIEVAL DEBUG] Retrieved {len(test_docs)} documents:")
+            for i, doc in enumerate(test_docs[:3]):  # Show first 3 docs
+                logger.info(f"[RETRIEVAL DEBUG] Doc {i}: {doc.page_content[:150]}...")
+                logger.info(f"[RETRIEVAL DEBUG] Metadata: {doc.metadata.get('file_name', 'Unknown')}")
+        except Exception as e:
+            logger.error(f"[RETRIEVAL DEBUG] Error testing retrieval: {e}")
 
         if streaming:
             async def run_chain():
@@ -366,13 +377,18 @@ async def serve_widget():
 async def get_complexity_stats():
     """Get Smart Complex mode statistics for performance monitoring"""
     return {
-        "message": "Smart Complex Mode is hardcoded for ALL queries",
-        "mode": "Smart Complex",
+        "message": "Smart Complex Mode is hardcoded for ALL queries with improved retrieval",
+        "mode": "Smart Complex Enhanced",
         "routing": {
-            "comparative_queries": "MultiQuery (k=6) for enhanced analysis",
-            "standard_queries": "Fast Complex (k=8) for comprehensive coverage"
+            "comparative_queries": "MultiQuery (k=8) for enhanced analysis",
+            "standard_queries": "Fast Complex (k=12) for comprehensive coverage"
         },
         "triggers": ["compare", "versus", "vs", "difference between", "analyze", "contrast"],
         "performance": "3-5 second streaming start with comprehensive coverage",
-        "coverage": "8+ sources for standard queries, 6+ sources for comparative queries"
+        "coverage": "12+ sources for standard queries, 8+ sources for comparative queries",
+        "improvements": {
+            "similarity_threshold": "Lowered to 0.05 for broader matching",
+            "bm25_weight": "Increased to 0.4 for better keyword matching",
+            "synonym_expansion": "Added office hours terminology support"
+        }
     }
