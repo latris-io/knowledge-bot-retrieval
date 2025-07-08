@@ -4,7 +4,7 @@ import json
 import urllib.parse
 import re
 import numpy as np
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, Optional, List, Tuple, Any
 from collections import defaultdict, Counter
 from datetime import datetime, timedelta
 
@@ -375,6 +375,27 @@ Return only the alternative phrasings, one per line, without numbers or bullets.
         return unique_results[:k]
 
 
+class EnhancedCustomRetriever(BaseRetriever):
+    """Custom retriever that returns pre-computed enhanced results"""
+    
+    def __init__(self, results: List[Document]):
+        super().__init__()
+        self._results = results
+    
+    def _get_relevant_documents(
+        self, 
+        query: str, 
+        *, 
+        run_manager: CallbackManagerForRetrieverRun
+    ) -> List[Document]:
+        """Required method for BaseRetriever"""
+        return self._results
+    
+    def get_relevant_documents(self, query: str) -> List[Document]:
+        """Legacy method for compatibility"""
+        return self._results
+
+
 class RetrieverService:
     def __init__(self):
         self.embedding_function = OpenAIEmbeddings(
@@ -466,25 +487,7 @@ class RetrieverService:
                 # Apply learned patterns
                 enhanced_results = self.enhanced_retriever.reweight_results(query, enhanced_results)
                 
-                # Create a custom retriever that returns these results
-                class EnhancedCustomRetriever(BaseRetriever):
-                    def __init__(self, results):
-                        super().__init__()
-                        self.results = results
-                    
-                    def _get_relevant_documents(
-                        self, 
-                        query: str, 
-                        *, 
-                        run_manager: CallbackManagerForRetrieverRun
-                    ) -> List[Document]:
-                        """Required method for BaseRetriever"""
-                        return self.results
-                    
-                    def get_relevant_documents(self, query: str) -> List[Document]:
-                        """Legacy method for compatibility"""
-                        return self.results
-                
+                # Return enhanced custom retriever with pre-computed results
                 return EnhancedCustomRetriever(enhanced_results)
             
             else:
