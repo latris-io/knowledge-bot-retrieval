@@ -127,7 +127,7 @@ Alternative queries:"""
                 # Full hybrid with compression for comprehensive queries
                 hybrid = EnsembleRetriever(
                     retrievers=[vector_component, bm25],
-                    weights=[0.7, 0.3]  # Adjusted to improve keyword matching for multi-query scenarios
+                    weights=[0.7, 0.3]  # Adjusted to enhance keyword matching for multi-query scenarios
                 )
 
                 # Use relaxed threshold for complex queries to speed up filtering
@@ -153,7 +153,7 @@ Alternative queries:"""
                     # High-k complex queries: use BM25+Vector hybrid for comprehensive coverage
                     hybrid = EnsembleRetriever(
                         retrievers=[vector_component, bm25],
-                        weights=[0.6, 0.4]  # Adjusted to favor keyword matching for better office hours retrieval
+                        weights=[0.6, 0.4]  # Adjusted to favor keyword matching for improved retrieval accuracy
                     )
                     logger.info(f"[RETRIEVER] Fast comprehensive hybrid retriever — k={k} (BM25+Vector)")
                     final_retriever = hybrid

@@ -387,8 +387,8 @@ async def get_complexity_stats():
         "performance": "3-5 second streaming start with comprehensive coverage",
         "coverage": "12+ sources for standard queries, 8+ sources for comparative queries",
         "improvements": {
-            "similarity_threshold": "Lowered to 0.05 for broader matching",
-            "bm25_weight": "Increased to 0.4 for better keyword matching",
-            "synonym_expansion": "Added office hours terminology support"
+            "similarity_threshold": "Lowered to 0.05 for broader document matching",
+            "bm25_weight": "Increased to 0.4 for enhanced keyword matching",
+            "semantic_enhancement": "Improved semantic variation and synonym handling"
         }
     }

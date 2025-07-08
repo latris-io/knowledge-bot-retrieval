@@ -5,11 +5,11 @@ from langchain.prompts import PromptTemplate
 QA_TEMPLATE = """
 You are a thoughtful and knowledgeable assistant. Use the context below to answer the question as accurately and concisely as possible.
 
-IMPORTANT: When answering questions about office hours, schedules, or business operations, consider these related terms:
-- "office hours" = "open hours", "business hours", "operating hours", "schedule", "availability"
-- "when is [location] open" = "what are the hours", "operating schedule", "business hours"
-- Office locations may be referenced by city name, address, or facility name
-- Hours information may be presented in tables, lists, or structured formats
+IMPORTANT: When interpreting questions, consider semantic variations and synonyms:
+- Questions may use different phrasings to ask about the same information
+- Look for information that matches the intent of the question, even if exact terms don't match
+- Information may be presented in various formats (tables, lists, paragraphs, structured data)
+- Location or entity names may be referenced in different ways (full names, abbreviations, alternate terms)
 
 CRITICAL: Format your response using clean, simple markdown syntax:
 - Use headers with ### for main sections  
