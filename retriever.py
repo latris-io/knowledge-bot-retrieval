@@ -85,9 +85,32 @@ class ContentAgnosticRetriever:
         tech_terms = re.findall(r'\b[a-zA-Z]+\d+[a-zA-Z]*\b|\b[a-zA-Z]+\.[a-zA-Z]+\b', query)
         entities.extend(tech_terms)
         
+        # Find potential names and significant terms (even if lowercase)
+        # Look for words that might be names or important terms
+        words = re.findall(r'\b[a-zA-Z]+\b', query)
+        for word in words:
+            # Skip very common words
+            if word.lower() in {'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'about', 'have', 'has', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'cannot', 'what', 'when', 'where', 'who', 'why', 'how', 'experience', 'skilled', 'know', 'familiar', 'worked', 'used'}:
+                continue
+            
+            # Include words that look like names or important terms
+            if len(word) > 2:
+                # Check if it's a potential name (starts with common name patterns)
+                # or if it's a compound word, or if it's longer than 4 characters (likely specific)
+                if (len(word) > 4 or 
+                    re.match(r'^[a-zA-Z]*[bcdfghjklmnpqrstvwxyz][aeiou]', word.lower()) or
+                    re.search(r'[aeiou][bcdfghjklmnpqrstvwxyz][aeiou]', word.lower()) or
+                    word.lower().endswith('soft') or word.lower().endswith('force') or
+                    word.lower().endswith('ware') or word.lower().endswith('tech') or
+                    word.lower().endswith('sys') or word.lower().endswith('log') or
+                    word.lower().endswith('base') or word.lower().endswith('hub') or
+                    word.lower().endswith('lab') or word.lower().endswith('labs') or
+                    word.lower().endswith('corp') or word.lower().endswith('inc') or
+                    word.lower().endswith('ltd') or word.lower().endswith('llc')):
+                    entities.append(word)
+        
         # Remove duplicates and common words
-        common_words = {'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'about', 'have', 'has', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'cannot'}
-        entities = list(set([e.lower() for e in entities if e.lower() not in common_words and len(e) > 2]))
+        entities = list(set([e.lower() for e in entities if len(e) > 2]))
         
         self.entity_cache[query] = entities
         return entities

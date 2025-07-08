@@ -15522,3 +15522,7 @@ ValueError: Not Found
 2025-07-08 09:27:55,361 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
 2025-07-08 09:27:55,581 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
 2025-07-08 09:27:55,798 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-08 09:38:55,232 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-08 09:38:55,274 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-08 09:38:55,390 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-08 09:38:55,429 — INFO — retriever — [RETRIEVER] Initialized RetrieverService with enhanced capabilities
