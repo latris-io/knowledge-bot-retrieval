@@ -54,18 +54,98 @@ def get_session_history(session_id: str) -> InMemoryChatMessageHistory:
         logger.info(f"[MEMORY] Created new history for session {session_id}")
     return session_histories[session_id]
 
-def format_chat_history(chat_history: InMemoryChatMessageHistory, complexity: str = 'simple') -> str:
-    """Format chat history for inclusion in prompt based on query complexity"""
+def detect_topic_change(current_question: str, chat_history: InMemoryChatMessageHistory) -> bool:
+    """
+    Detect if the current question represents a significant topic change
+    from the previous conversation context. Returns True if topics are different.
+    """
+    if not chat_history.messages:
+        return False
+    
+    # Get the last user question for comparison
+    last_user_message = None
+    for message in reversed(chat_history.messages):
+        if isinstance(message, HumanMessage):
+            last_user_message = message.content
+            break
+    
+    if not last_user_message:
+        return False
+    
+    # Simple topic change detection using key topics/domains
+    # This could be enhanced with semantic similarity in the future
+    
+    # Define topic keywords for common domains
+    topic_keywords = {
+        'schedule': ['field trip', 'event', 'date', 'when', 'schedule', 'calendar'],
+        'location': ['office', 'location', 'address', 'where', 'building', 'room'],
+        'hours': ['hours', 'open', 'closed', 'time', 'available', 'schedule'],
+        'contact': ['phone', 'email', 'contact', 'call', 'reach'],
+        'people': ['who', 'staff', 'employee', 'person', 'team'],
+        'documents': ['document', 'file', 'report', 'form', 'paper'],
+        'process': ['how', 'process', 'procedure', 'steps', 'workflow']
+    }
+    
+    def get_topic(text: str) -> str:
+        """Determine the primary topic of a question"""
+        text_lower = text.lower()
+        topic_scores = {}
+        
+        for topic, keywords in topic_keywords.items():
+            score = sum(1 for keyword in keywords if keyword in text_lower)
+            if score > 0:
+                topic_scores[topic] = score
+        
+        # Return the topic with the highest score, or 'general' if no clear topic
+        if topic_scores:
+            return max(topic_scores, key=topic_scores.get)
+        return 'general'
+    
+    current_topic = get_topic(current_question)
+    previous_topic = get_topic(last_user_message)
+    
+    # Consider it a topic change if:
+    # 1. Topics are clearly different
+    # 2. Current topic is specific but previous was general
+    topic_change = (current_topic != previous_topic and 
+                   current_topic != 'general' and 
+                   previous_topic != 'general')
+    
+    if topic_change:
+        logger.info(f"[TOPIC] Topic change detected: '{previous_topic}' → '{current_topic}'")
+        logger.info(f"[TOPIC] Previous: '{last_user_message[:100]}...'")
+        logger.info(f"[TOPIC] Current: '{current_question[:100]}...'")
+    
+    return topic_change
+
+def format_chat_history_smart(chat_history: InMemoryChatMessageHistory, current_question: str, complexity: str = 'simple') -> str:
+    """
+    Format chat history with smart topic change detection.
+    Reduces or eliminates conversation context when topic changes are detected.
+    """
     if not chat_history.messages:
         return ""
     
-    # Optimize context based on complexity: simple=1 pair, medium=2 pairs, complex=3 pairs  
-    context_limits = {'simple': 2, 'medium': 4, 'complex': 6}  # Q&A pairs * 2
-    context_limit = context_limits.get(complexity, 2)
+    # Check for topic change
+    topic_changed = detect_topic_change(current_question, chat_history)
     
-    # Optimize truncation based on complexity
-    truncate_limits = {'simple': 150, 'medium': 250, 'complex': 400}
+    if topic_changed:
+        logger.info("[CONTEXT] Topic change detected - using minimal conversation context")
+        # For topic changes, only include the most recent exchange (if any) with reduced context
+        context_limits = {'simple': 0, 'medium': 2, 'complex': 2}  # Much more conservative
+        truncate_limits = {'simple': 50, 'medium': 100, 'complex': 150}  # Shorter context
+    else:
+        logger.info("[CONTEXT] Same topic - using full conversation context")
+        # Original behavior for same topic
+        context_limits = {'simple': 2, 'medium': 4, 'complex': 6}
+        truncate_limits = {'simple': 150, 'medium': 250, 'complex': 400}
+    
+    context_limit = context_limits.get(complexity, 2)
     truncate_limit = truncate_limits.get(complexity, 200)
+    
+    if context_limit == 0:
+        # No conversation context for topic changes in simple mode
+        return ""
     
     formatted = []
     for message in chat_history.messages[-context_limit:]:
@@ -77,7 +157,8 @@ def format_chat_history(chat_history: InMemoryChatMessageHistory, complexity: st
             formatted.append(f"Assistant: {content}")
     
     if formatted:
-        return "Previous conversation:\n" + "\n".join(formatted) + "\n\n"
+        context_prefix = "Previous conversation:\n" if not topic_changed else "Recent context:\n"
+        return context_prefix + "\n".join(formatted) + "\n\n"
     return ""
 
 # Smart Complex Mode handles all queries with intelligent routing - no complexity detection needed
@@ -211,11 +292,11 @@ async def ask_question(
             openai_api_key=get_openai_api_key()
         )
 
-        # Get conversation history for this session - Smart Complex mode
+        # Get conversation history for this session - Smart Complex mode with topic change detection
         chat_history = get_session_history(session_id)
-        conversation_context = format_chat_history(chat_history, 'complex')
+        conversation_context = format_chat_history_smart(chat_history, question, 'complex')
         
-        # Enhanced prompt with conversation context - comprehensive mode
+        # Enhanced prompt with smart conversation context - comprehensive mode
         max_context = 1200  # Full context for Smart Complex mode
         if len(conversation_context) > max_context:
             conversation_context = conversation_context[:max_context] + "...\n\n"
@@ -389,6 +470,7 @@ async def get_complexity_stats():
         "improvements": {
             "similarity_threshold": "Lowered to 0.05 for broader document matching",
             "bm25_weight": "Increased to 0.4 for enhanced keyword matching",
-            "semantic_enhancement": "Improved semantic variation and synonym handling"
+            "semantic_enhancement": "Improved semantic variation and synonym handling",
+            "topic_change_detection": "Smart conversation context when switching topics"
         }
     }
