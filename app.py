@@ -23,6 +23,7 @@ import asyncio
 import logging
 import os
 import uuid
+import numpy as np
 
 load_dotenv()
 
@@ -54,10 +55,10 @@ def get_session_history(session_id: str) -> InMemoryChatMessageHistory:
         logger.info(f"[MEMORY] Created new history for session {session_id}")
     return session_histories[session_id]
 
-def detect_topic_change(current_question: str, chat_history: InMemoryChatMessageHistory) -> bool:
+async def detect_topic_change_semantic(current_question: str, chat_history: InMemoryChatMessageHistory, embedding_function) -> bool:
     """
-    Detect if the current question represents a significant topic change
-    from the previous conversation context. Returns True if topics are different.
+    Content-agnostic topic change detection using semantic similarity.
+    Detects when current question is semantically different from recent conversation.
     """
     if not chat_history.messages:
         return False
@@ -72,62 +73,49 @@ def detect_topic_change(current_question: str, chat_history: InMemoryChatMessage
     if not last_user_message:
         return False
     
-    # Simple topic change detection using key topics/domains
-    # This could be enhanced with semantic similarity in the future
-    
-    # Define topic keywords for common domains
-    topic_keywords = {
-        'schedule': ['field trip', 'event', 'date', 'when', 'schedule', 'calendar'],
-        'location': ['office', 'location', 'address', 'where', 'building', 'room'],
-        'hours': ['hours', 'open', 'closed', 'time', 'available', 'schedule'],
-        'contact': ['phone', 'email', 'contact', 'call', 'reach'],
-        'people': ['who', 'staff', 'employee', 'person', 'team'],
-        'documents': ['document', 'file', 'report', 'form', 'paper'],
-        'process': ['how', 'process', 'procedure', 'steps', 'workflow']
-    }
-    
-    def get_topic(text: str) -> str:
-        """Determine the primary topic of a question"""
-        text_lower = text.lower()
-        topic_scores = {}
+    try:
+        # Use semantic similarity to detect topic changes
+        current_embedding = await asyncio.to_thread(
+            embedding_function.embed_query, current_question
+        )
+        previous_embedding = await asyncio.to_thread(
+            embedding_function.embed_query, last_user_message
+        )
         
-        for topic, keywords in topic_keywords.items():
-            score = sum(1 for keyword in keywords if keyword in text_lower)
-            if score > 0:
-                topic_scores[topic] = score
+        # Calculate cosine similarity
+        similarity = np.dot(current_embedding, previous_embedding) / (
+            np.linalg.norm(current_embedding) * np.linalg.norm(previous_embedding)
+        )
         
-        # Return the topic with the highest score, or 'general' if no clear topic
-        if topic_scores:
-            return max(topic_scores, key=topic_scores.get)
-        return 'general'
-    
-    current_topic = get_topic(current_question)
-    previous_topic = get_topic(last_user_message)
-    
-    # Consider it a topic change if:
-    # 1. Topics are clearly different
-    # 2. Current topic is specific but previous was general
-    topic_change = (current_topic != previous_topic and 
-                   current_topic != 'general' and 
-                   previous_topic != 'general')
-    
-    if topic_change:
-        logger.info(f"[TOPIC] Topic change detected: '{previous_topic}' → '{current_topic}'")
-        logger.info(f"[TOPIC] Previous: '{last_user_message[:100]}...'")
-        logger.info(f"[TOPIC] Current: '{current_question[:100]}...'")
-    
-    return topic_change
+        # Threshold for topic change detection - tunable based on testing
+        # Lower similarity indicates different topics
+        topic_change_threshold = 0.7  # Conservative threshold
+        topic_changed = similarity < topic_change_threshold
+        
+        if topic_changed:
+            logger.info(f"[TOPIC] Semantic topic change detected (similarity: {similarity:.3f} < {topic_change_threshold})")
+            logger.info(f"[TOPIC] Previous: '{last_user_message[:100]}...'")
+            logger.info(f"[TOPIC] Current: '{current_question[:100]}...'")
+        else:
+            logger.info(f"[TOPIC] Same topic detected (similarity: {similarity:.3f})")
+        
+        return topic_changed
+        
+    except Exception as e:
+        logger.error(f"[TOPIC] Error in semantic topic detection: {e}")
+        # Fallback: assume no topic change if detection fails
+        return False
 
-def format_chat_history_smart(chat_history: InMemoryChatMessageHistory, current_question: str, complexity: str = 'simple') -> str:
+async def format_chat_history_smart(chat_history: InMemoryChatMessageHistory, current_question: str, embedding_function, complexity: str = 'simple') -> str:
     """
-    Format chat history with smart topic change detection.
+    Format chat history with smart semantic topic change detection.
     Reduces or eliminates conversation context when topic changes are detected.
     """
     if not chat_history.messages:
         return ""
     
-    # Check for topic change
-    topic_changed = detect_topic_change(current_question, chat_history)
+    # Check for topic change using semantic similarity
+    topic_changed = await detect_topic_change_semantic(current_question, chat_history, embedding_function)
     
     if topic_changed:
         logger.info("[CONTEXT] Topic change detected - using minimal conversation context")
@@ -292,9 +280,9 @@ async def ask_question(
             openai_api_key=get_openai_api_key()
         )
 
-        # Get conversation history for this session - Smart Complex mode with topic change detection
+        # Get conversation history for this session - Smart Complex mode with semantic topic change detection
         chat_history = get_session_history(session_id)
-        conversation_context = format_chat_history_smart(chat_history, question, 'complex')
+        conversation_context = await format_chat_history_smart(chat_history, question, retriever_service.embedding_function, 'complex')
         
         # Enhanced prompt with smart conversation context - comprehensive mode
         max_context = 1200  # Full context for Smart Complex mode
@@ -471,6 +459,6 @@ async def get_complexity_stats():
             "similarity_threshold": "Lowered to 0.05 for broader document matching",
             "bm25_weight": "Increased to 0.4 for enhanced keyword matching",
             "semantic_enhancement": "Improved semantic variation and synonym handling",
-            "topic_change_detection": "Smart conversation context when switching topics"
+            "topic_change_detection": "Semantic similarity-based topic change detection (content-agnostic)"
         }
     }
