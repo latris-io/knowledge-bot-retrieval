@@ -252,12 +252,16 @@ async def ask_question(
             use_multi_query = False
 
         retriever_service = RetrieverService()
-        retriever = retriever_service.build_retriever(
+        
+        # Use enhanced retriever with content-agnostic improvements
+        retriever = await retriever_service.build_enhanced_retriever(
             company_id=company_id,
             bot_id=bot_id,
+            query=question,  # Pass the query for adaptive processing
             k=k,
             similarity_threshold=similarity_threshold,
-            use_multi_query=use_multi_query
+            use_multi_query=use_multi_query,
+            use_enhanced_search=True  # Enable enhanced search by default
         )
 
         # Use comprehensive prompt template for Smart Complex mode
