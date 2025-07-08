@@ -139,8 +139,10 @@ Focus on how this information might be presented in resumes, documents, or profe
 
 Return only the alternative phrasings, one per line, without numbers or bullets."""
             
-            response = await self.llm.agenerate([expansion_prompt])
-            alternatives = [line.strip() for line in response.generations[0][0].text.strip().split('\n') if line.strip()]
+            # Use invoke instead of agenerate for more reliable results
+            response = await self.llm.ainvoke(expansion_prompt)
+            response_text = response.content if hasattr(response, 'content') else str(response)
+            alternatives = [line.strip() for line in response_text.strip().split('\n') if line.strip()]
             
             # Limit to 3 alternatives to avoid overwhelming the system
             alternatives = alternatives[:3]
