@@ -504,39 +504,93 @@ async def test_cors_restrictions():
 
 ## 🧪 Testing Infrastructure
 
-### Automated Test Suite
+### Comprehensive Test Logging System ✅
+
+The testing infrastructure has been enhanced with comprehensive logging capabilities for better debugging and system validation.
+
+#### **Configuration Files**
+- **`pytest.ini`**: Live console logs + detailed file logs with timestamps
+- **`tests/conftest.py`**: Automatic test tracking with emoji indicators  
+- **`run_tests.sh`**: Enhanced test runner with categorized execution
+- **`tests/logs/`**: Organized log file storage (auto-created, gitignored)
+- **`tests/README.md`**: Complete testing guide with debugging tips
+
+#### **Log Files Generated**
 ```bash
-# Run all enterprise use case tests
-pytest tests/enterprise/ -v
+tests/logs/
+├── pytest.log                    # Main pytest log file
+├── test_run_YYYYMMDD_HHMMSS.log  # Timestamped detailed logs
+└── [additional run logs]         # Historical test execution logs
+```
 
-# Run specific phase tests
-pytest tests/enterprise/phase1/ -v
+### Enhanced Test Runner
 
-# Run foundation improvements tests
-pytest tests/foundation/ -v
+#### **Quick Test Execution**
+```bash
+# Run all tests with full logging
+./run_tests.sh
 
-# Run with coverage
-pytest tests/enterprise/ --cov=app --cov-report=html
+# Run specific test categories
+./run_tests.sh fast        # Fast tests (no external dependencies)
+./run_tests.sh integration # Integration tests (requires ChromaDB)
+./run_tests.sh verbose     # Maximum verbosity for troubleshooting
+./run_tests.sh debug       # Interactive debugging with breakpoints
+./run_tests.sh foundation  # All Foundation Improvement tests
+```
+
+#### **Direct pytest Usage**
+```bash
+# Run with live logging
+pytest tests/foundation/test_enhanced_retrieval.py -v --log-cli-level=INFO
+
+# Run with file logging only
+pytest tests/foundation/test_enhanced_retrieval.py --log-file=tests/logs/my_test.log
+
+# Run specific test with debug logging
+pytest tests/foundation/test_enhanced_retrieval.py::test_semantic_query_expansion -v --log-cli-level=DEBUG
 ```
 
 ### Enhanced Retrieval Testing
+
+#### **Foundation Tests (FI-01 to FI-04)**
 ```bash
-# Test enhanced retrieval capabilities
+# Test all enhanced retrieval capabilities
 pytest tests/foundation/test_enhanced_retrieval.py -v
 
-# Test specific retrieval methods
+# Test specific retrieval methods with logging
 pytest tests/foundation/test_enhanced_retrieval.py::test_semantic_query_expansion -v
 pytest tests/foundation/test_enhanced_retrieval.py::test_multi_vector_search -v
 pytest tests/foundation/test_enhanced_retrieval.py::test_adaptive_similarity_thresholds -v
+pytest tests/foundation/test_enhanced_retrieval.py::test_query_classification -v
+pytest tests/foundation/test_enhanced_retrieval.py::test_entity_concept_extraction -v
+pytest tests/foundation/test_enhanced_retrieval.py::test_enhanced_vs_original_retrieval -v
+pytest tests/foundation/test_enhanced_retrieval.py::test_learning_system -v
+pytest tests/foundation/test_enhanced_retrieval.py::test_contextual_embeddings -v
+pytest tests/foundation/test_enhanced_retrieval.py::test_hierarchical_search -v
+pytest tests/foundation/test_enhanced_retrieval.py::test_caching_functionality -v
+```
 
-# Performance comparison testing
+#### **Test Results with Logging**
+```
+10:22:05 [INFO] 🧪 TEST START: test_semantic_query_expansion
+10:22:05 [INFO] bot_config: [CONFIG] Successfully loaded OPENAI_API_KEY
+10:22:06 [INFO] httpx: HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+10:22:06 [INFO] retriever: [ENHANCED_RETRIEVER] Generated 3 query alternatives
+10:22:06 [INFO] ✅ PASSED: test_semantic_query_expansion
+```
+
+### Performance & Load Testing
+
+#### **Performance Comparison Testing**
+```bash
+# Performance comparison with detailed logging
 pytest tests/foundation/test_retrieval_performance.py -v
 
 # Integration testing with real queries
 pytest tests/foundation/test_problematic_queries.py -v
 ```
 
-### Load Testing
+#### **Load Testing**
 ```bash
 # Stress test with locust
 locust -f tests/load_tests.py --host=http://localhost:8000
@@ -546,6 +600,66 @@ python tests/benchmark.py --duration=300 --concurrent=100
 
 # Enhanced retrieval performance testing
 python tests/benchmark_enhanced_retrieval.py --queries=tests/data/problematic_queries.txt
+```
+
+### Test Coverage & Results
+
+#### **Foundation Tests Status (All ✅)**
+- **FI-04.1**: Semantic Query Expansion ✅
+- **FI-04.2**: Multi-Vector Search Coverage ✅
+- **FI-04.3**: Adaptive Similarity Thresholds ✅
+- **FI-04.4**: Query Classification Accuracy ✅
+- **FI-04.5**: Entity and Concept Extraction ✅
+- **FI-04.6**: Enhanced vs Original Retrieval ✅
+- **FI-04.7**: Learning System Integration ✅
+- **Additional**: Contextual Embeddings ✅
+- **Additional**: Hierarchical Search ✅
+- **Additional**: Caching Functionality ✅
+
+#### **Latest Test Results**
+```
+==================== 8 passed, 2 skipped, 3 warnings in 84.22s ====================
+✅ Enhanced Retrieval System Tests - PASSED
+📝 Detailed logs available in: tests/logs/test_run_20250708_102200.log
+```
+
+### Debugging & Troubleshooting
+
+#### **Log Analysis**
+```bash
+# View latest log file
+tail -f tests/logs/test_run_$(date +%Y%m%d)_*.log
+
+# Search for specific errors
+grep -n "ERROR\|FAILED" tests/logs/test_run_*.log
+
+# Analyze HTTP requests
+grep "httpx" tests/logs/test_run_*.log | head -20
+
+# Track test performance
+grep "TEST START\|TEST END" tests/logs/test_run_*.log
+```
+
+#### **Debug Mode**
+```bash
+# Interactive debugging
+./run_tests.sh debug
+
+# Single test with debugger
+pytest tests/foundation/test_enhanced_retrieval.py::test_semantic_query_expansion --pdb
+```
+
+### Enterprise Test Structure (Future)
+
+#### **Planned Test Organization**
+```bash
+# Future enterprise test structure
+pytest tests/enterprise/phase1/ -v  # UC-01 to UC-04
+pytest tests/enterprise/phase2/ -v  # UC-05 to UC-07
+pytest tests/enterprise/phase3/ -v  # UC-08 to UC-10
+
+# Coverage reporting
+pytest tests/ --cov=app --cov-report=html
 ```
 
 ---

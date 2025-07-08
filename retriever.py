@@ -7,6 +7,11 @@ import numpy as np
 from typing import Dict, Optional, List, Tuple, Any
 from collections import defaultdict, Counter
 from datetime import datetime, timedelta
+import asyncio
+import hashlib
+import time
+from functools import lru_cache
+from concurrent.futures import ThreadPoolExecutor
 
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain.retrievers.multi_query import MultiQueryRetriever
@@ -27,10 +32,178 @@ from chromadb.config import Settings
 from bot_config import get_openai_api_key
 from ratelimit import limits, sleep_and_retry
 
+# Performance optimizations
+DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "false").lower() == "true"
+CACHE_EMBEDDINGS = os.getenv("CACHE_EMBEDDINGS", "true").lower() == "true"
+BATCH_EMBEDDINGS = os.getenv("BATCH_EMBEDDINGS", "true").lower() == "true"
+
 logger = logging.getLogger(__name__)
 
 DEFAULT_K = int(os.getenv("RETRIEVER_K", 15))  # Increased for better coverage
 DEFAULT_SIMILARITY_THRESHOLD = float(os.getenv("RETRIEVER_SIMILARITY_THRESHOLD", 0.05))  # Lowered for broader matching
+
+
+class EmbeddingCache:
+    """High-performance embedding cache with LRU eviction"""
+    
+    def __init__(self, max_size: int = 1000):
+        self.cache = {}
+        self.access_times = {}
+        self.max_size = max_size
+        self._hits = 0
+        self._misses = 0
+    
+    def _evict_lru(self):
+        """Evict least recently used item"""
+        if len(self.cache) >= self.max_size:
+            lru_key = min(self.access_times.keys(), key=lambda k: self.access_times[k])
+            del self.cache[lru_key]
+            del self.access_times[lru_key]
+    
+    def get(self, text: str) -> Optional[List[float]]:
+        """Get cached embedding"""
+        text_hash = hashlib.md5(text.encode()).hexdigest()
+        if text_hash in self.cache:
+            self.access_times[text_hash] = time.time()
+            self._hits += 1
+            return self.cache[text_hash]
+        self._misses += 1
+        return None
+    
+    def put(self, text: str, embedding: List[float]):
+        """Cache embedding"""
+        text_hash = hashlib.md5(text.encode()).hexdigest()
+        self._evict_lru()
+        self.cache[text_hash] = embedding
+        self.access_times[text_hash] = time.time()
+    
+    def stats(self) -> Dict:
+        """Get cache statistics"""
+        total = self._hits + self._misses
+        hit_rate = (self._hits / total * 100) if total > 0 else 0
+        return {
+            "hits": self._hits,
+            "misses": self._misses,
+            "hit_rate": f"{hit_rate:.1f}%",
+            "cache_size": len(self.cache)
+        }
+
+class MockEmbedding:
+    """Mock embedding for development mode"""
+    
+    @staticmethod
+    def embed_query(text: str) -> List[float]:
+        """Generate deterministic mock embedding"""
+        # Use text hash to generate consistent mock embeddings
+        text_hash = hashlib.md5(text.encode()).hexdigest()
+        # Generate 1536-dimensional embedding (OpenAI's dimension)
+        np.random.seed(int(text_hash[:8], 16))  # Seed from hash for consistency
+        return np.random.normal(0, 1, 1536).tolist()
+    
+    @staticmethod
+    def embed_documents(texts: List[str]) -> List[List[float]]:
+        """Generate deterministic mock embeddings for multiple texts"""
+        return [MockEmbedding.embed_query(text) for text in texts]
+
+class OptimizedEmbeddingFunction:
+    """Optimized embedding function with caching and batching"""
+    
+    def __init__(self, original_embedding_function):
+        self.original = original_embedding_function
+        self.cache = EmbeddingCache() if CACHE_EMBEDDINGS else None
+        self.executor = ThreadPoolExecutor(max_workers=4)
+    
+    def embed_query(self, text: str) -> List[float]:
+        """Get embedding with caching"""
+        if DEVELOPMENT_MODE:
+            return MockEmbedding.embed_query(text)
+        
+        if self.cache:
+            cached = self.cache.get(text)
+            if cached is not None:
+                return cached
+        
+        # Get real embedding
+        embedding = self.original.embed_query(text)
+        
+        if self.cache:
+            self.cache.put(text, embedding)
+        
+        return embedding
+    
+    async def embed_queries_batch(self, texts: List[str]) -> List[List[float]]:
+        """Batch embedding processing"""
+        if DEVELOPMENT_MODE:
+            return MockEmbedding.embed_documents(texts)
+        
+        if not BATCH_EMBEDDINGS or len(texts) <= 3:
+            # For small batches, use individual cached calls
+            embeddings = []
+            for text in texts:
+                embeddings.append(self.embed_query(text))
+            return embeddings
+        
+        # Check cache first
+        cached_embeddings = {}
+        uncached_texts = []
+        
+        if self.cache:
+            for text in texts:
+                cached = self.cache.get(text)
+                if cached is not None:
+                    cached_embeddings[text] = cached
+                else:
+                    uncached_texts.append(text)
+        else:
+            uncached_texts = texts
+        
+        # Batch process uncached texts
+        new_embeddings = {}
+        if uncached_texts:
+            try:
+                # Use batch API if available
+                if hasattr(self.original, 'embed_documents'):
+                    batch_results = self.original.embed_documents(uncached_texts)
+                    for text, embedding in zip(uncached_texts, batch_results):
+                        new_embeddings[text] = embedding
+                        if self.cache:
+                            self.cache.put(text, embedding)
+                else:
+                    # Parallel individual calls
+                    async def embed_single(text):
+                        return text, self.original.embed_query(text)
+                    
+                    tasks = [embed_single(text) for text in uncached_texts]
+                    results = await asyncio.gather(*tasks)
+                    
+                    for text, embedding in results:
+                        new_embeddings[text] = embedding
+                        if self.cache:
+                            self.cache.put(text, embedding)
+            except Exception as e:
+                logger.warning(f"[EMBEDDING_CACHE] Batch processing failed: {e}")
+                # Fall back to individual calls
+                for text in uncached_texts:
+                    embedding = self.original.embed_query(text)
+                    new_embeddings[text] = embedding
+                    if self.cache:
+                        self.cache.put(text, embedding)
+        
+        # Combine cached and new embeddings in original order
+        result = []
+        for text in texts:
+            if text in cached_embeddings:
+                result.append(cached_embeddings[text])
+            else:
+                result.append(new_embeddings[text])
+        
+        return result
+    
+    def get_cache_stats(self) -> Dict:
+        """Get cache performance statistics"""
+        if self.cache:
+            return self.cache.stats()
+        return {"cache_disabled": True}
 
 
 class QueryPattern:
@@ -62,11 +235,12 @@ class ContentAgnosticRetriever:
     """Enhanced retriever with content-agnostic improvements"""
     
     def __init__(self, embedding_function, llm):
-        self.embedding_function = embedding_function
+        self.embedding_function = OptimizedEmbeddingFunction(embedding_function)
         self.llm = llm
         self.query_patterns = QueryPattern()
         self.entity_cache = {}
         self.concept_cache = {}
+        self._connection_pool = {}  # Connection pooling
         
     def extract_entities(self, query: str) -> List[str]:
         """Extract entities from query using simple heuristics"""
@@ -156,10 +330,31 @@ class ContentAgnosticRetriever:
     
     async def expand_query_semantically(self, query: str) -> List[str]:
         """Generate semantic alternatives for the query"""
+        # In development mode, use fast deterministic alternatives
+        if DEVELOPMENT_MODE:
+            entities = self.extract_entities(query)
+            concepts = self.extract_concepts(query)
+            
+            # Generate deterministic alternatives based on entities and concepts
+            alternatives = []
+            if entities:
+                alternatives.append(" ".join(entities))
+            if concepts and len(concepts) >= 2:
+                alternatives.append(" ".join(concepts[:2]))
+            if len(concepts) > 2:
+                alternatives.append(" ".join(concepts[2:4]))
+            
+            # Pad with variations if needed
+            while len(alternatives) < 2:
+                alternatives.append(f"professional {query}")
+            
+            logger.info(f"[ENHANCED_RETRIEVER] Generated {len(alternatives)} mock query alternatives")
+            return [query] + alternatives[:2]  # Limit to 2 for speed
+        
         try:
             expansion_prompt = f"""Given this query: "{query}"
 
-Generate 3 alternative ways to phrase this same question that might appear in documents.
+Generate 2 alternative ways to phrase this same question that might appear in documents.
 Consider different vocabulary, document structures, and professional contexts.
 Focus on how this information might be presented in resumes, documents, or professional profiles.
 
@@ -170,8 +365,8 @@ Return only the alternative phrasings, one per line, without numbers or bullets.
             response_text = response.content if hasattr(response, 'content') else str(response)
             alternatives = [line.strip() for line in response_text.strip().split('\n') if line.strip()]
             
-            # Limit to 3 alternatives to avoid overwhelming the system
-            alternatives = alternatives[:3]
+            # Limit to 2 alternatives for performance
+            alternatives = alternatives[:2]
             
             logger.info(f"[ENHANCED_RETRIEVER] Generated {len(alternatives)} query alternatives")
             return [query] + alternatives
@@ -294,83 +489,187 @@ Return only the alternative phrasings, one per line, without numbers or bullets.
         return weighted_docs
     
     async def multi_vector_search(self, query: str, vectorstore, k: int = 5) -> List[Document]:
-        """Search using multiple vector approaches"""
-        all_results = []
+        """Optimized search using multiple vector approaches with reduced API calls"""
+        # Fast path for development mode
+        if DEVELOPMENT_MODE:
+            # Just do a single search in development mode for speed
+            return vectorstore.similarity_search(query, k=k)
         
-        # 1. Original query search
-        original_results = vectorstore.similarity_search(query, k=k)
-        all_results.extend(original_results)
+        search_queries = [query]  # Start with original query
         
-        # 2. Entity-focused search
+        # 2. Entity-focused search (combine all entities into one query)
         entities = self.extract_entities(query)
         if entities:
-            entity_query = " ".join(entities)
-            entity_results = vectorstore.similarity_search(entity_query, k=k)
-            all_results.extend(entity_results)
+            entity_query = " ".join(entities[:3])  # Limit to top 3 entities for performance
+            search_queries.append(entity_query)
         
-        # 3. Concept-focused search
+        # 3. Concept-focused search (combine key concepts)
         concepts = self.extract_concepts(query)
         if concepts:
-            concept_query = " ".join(concepts)
-            concept_results = vectorstore.similarity_search(concept_query, k=k)
-            all_results.extend(concept_results)
+            concept_query = " ".join(concepts[:3])  # Limit to top 3 concepts for performance
+            search_queries.append(concept_query)
         
-        # 4. Semantic query expansion search
-        expanded_queries = await self.expand_query_semantically(query)
-        for expanded_query in expanded_queries[1:]:  # Skip original query
-            expanded_results = vectorstore.similarity_search(expanded_query, k=k//2)
-            all_results.extend(expanded_results)
+        # 4. Add ONE semantic expansion instead of multiple
+        if len(search_queries) <= 2:  # Only if we don't have many search terms already
+            expanded_queries = await self.expand_query_semantically(query)
+            if len(expanded_queries) > 1:
+                search_queries.append(expanded_queries[1])  # Add only the first alternative
         
-        # Deduplicate results while preserving order
+        # Batch execute all searches
+        all_results = []
+        try:
+            # Execute searches in parallel using asyncio.gather for better performance
+            search_tasks = []
+            for search_query in search_queries:
+                # Use smaller k per query to reduce total API calls
+                per_query_k = max(1, k // len(search_queries))
+                search_tasks.append(self._async_search(vectorstore, search_query, per_query_k))
+            
+            search_results = await asyncio.gather(*search_tasks, return_exceptions=True)
+            
+            # Collect results
+            for result in search_results:
+                if isinstance(result, list):
+                    all_results.extend(result)
+                elif isinstance(result, Exception):
+                    logger.warning(f"[ENHANCED_RETRIEVER] Search failed: {result}")
+                    
+        except Exception as e:
+            logger.warning(f"[ENHANCED_RETRIEVER] Batch search failed: {e}")
+            # Fallback to single search
+            all_results = vectorstore.similarity_search(query, k=k)
+        
+        # Fast deduplication using set comprehension
         seen = set()
         unique_results = []
         for doc in all_results:
-            doc_id = doc.page_content[:100]  # Use first 100 chars as ID
+            doc_id = doc.page_content[:50]  # Use first 50 chars for faster comparison
             if doc_id not in seen:
                 seen.add(doc_id)
                 unique_results.append(doc)
+                if len(unique_results) >= k:  # Early termination when we have enough results
+                    break
         
-        # Return top k results
         return unique_results[:k]
     
+    async def _async_search(self, vectorstore, query: str, k: int) -> List[Document]:
+        """Async wrapper for vectorstore search"""
+        try:
+            # Run in thread pool to avoid blocking
+            loop = asyncio.get_event_loop()
+            return await loop.run_in_executor(None, vectorstore.similarity_search, query, k)
+        except Exception as e:
+            logger.warning(f"[ENHANCED_RETRIEVER] Async search failed for query '{query}': {e}")
+            return []
+    
     async def hierarchical_search(self, query: str, vectorstore, k: int = 12) -> List[Document]:
-        """Hierarchical search: broad entity search then focused refinement"""
-        # Step 1: Broad entity search
+        """Optimized hierarchical search with batch processing and reduced API calls"""
+        # Fast path for development mode
+        if DEVELOPMENT_MODE:
+            # Skip complex hierarchical search in development mode
+            return vectorstore.similarity_search(query, k=k)
+        
+        # Step 1: Smart entity/concept search (combine entities and concepts for fewer API calls)
         entities = self.extract_entities(query)
+        concepts = self.extract_concepts(query)
+        
+        search_terms = []
+        
+        # Combine top entities into search terms (max 2 to limit API calls)
+        if entities:
+            search_terms.extend(entities[:2])
+        
+        # Add key concepts if we don't have enough entities
+        if len(search_terms) < 2 and concepts:
+            remaining_slots = 2 - len(search_terms)
+            search_terms.extend(concepts[:remaining_slots])
+        
+        # If still no search terms, fall back to full query
+        if not search_terms:
+            search_terms = [query]
+        
+        # Execute searches in parallel
         broad_results = []
+        try:
+            search_tasks = []
+            for term in search_terms:
+                # Use smaller k per term to balance breadth vs API cost
+                per_term_k = max(2, k // len(search_terms))
+                search_tasks.append(self._async_search(vectorstore, term, per_term_k))
+            
+            search_results = await asyncio.gather(*search_tasks, return_exceptions=True)
+            
+            for result in search_results:
+                if isinstance(result, list):
+                    broad_results.extend(result)
+                elif isinstance(result, Exception):
+                    logger.warning(f"[ENHANCED_RETRIEVER] Hierarchical search failed: {result}")
+                    
+        except Exception as e:
+            logger.warning(f"[ENHANCED_RETRIEVER] Hierarchical search batch failed: {e}")
+            # Fallback to simple search
+            return vectorstore.similarity_search(query, k=k)
         
-        for entity in entities:
-            entity_results = vectorstore.similarity_search(entity, k=k*2)
-            broad_results.extend(entity_results)
-        
-        # If no entities found, use concept search
+        # Step 2: Fast relevance filtering (batch similarity calculation)
         if not broad_results:
-            concepts = self.extract_concepts(query)
-            for concept in concepts:
-                concept_results = vectorstore.similarity_search(concept, k=k*2)
-                broad_results.extend(concept_results)
+            return []
         
-        # Step 2: Focused search within broad results
         threshold = self.get_adaptive_similarity_threshold(query)
-        focused_results = []
         
-        for result in broad_results:
-            relevance_score = self.calculate_semantic_similarity(query, result.page_content)
-            if relevance_score > threshold:
-                result.metadata['relevance_score'] = relevance_score
-                focused_results.append(result)
+        # Batch similarity calculation for better performance
+        documents_text = [doc.page_content for doc in broad_results]
+        
+        try:
+            # Batch embed all documents and the query
+            query_texts = [query] + documents_text
+            embeddings = await self.embedding_function.embed_queries_batch(query_texts)
+            
+            query_embedding = embeddings[0]
+            doc_embeddings = embeddings[1:]
+            
+            # Calculate similarities in batch
+            focused_results = []
+            for i, (doc, doc_embedding) in enumerate(zip(broad_results, doc_embeddings)):
+                try:
+                    similarity = np.dot(query_embedding, doc_embedding) / (
+                        np.linalg.norm(query_embedding) * np.linalg.norm(doc_embedding)
+                    )
+                    
+                    if similarity > threshold:
+                        doc.metadata['relevance_score'] = float(similarity)
+                        focused_results.append(doc)
+                        
+                except Exception as e:
+                    # Skip problematic documents
+                    logger.warning(f"[ENHANCED_RETRIEVER] Similarity calculation failed: {e}")
+                    continue
+            
+        except Exception as e:
+            logger.warning(f"[ENHANCED_RETRIEVER] Batch similarity calculation failed: {e}")
+            # Fallback to individual calculations (but limit to reduce cost)
+            focused_results = []
+            for doc in broad_results[:k*2]:  # Limit to avoid excessive API calls
+                try:
+                    relevance_score = self.calculate_semantic_similarity(query, doc.page_content)
+                    if relevance_score > threshold:
+                        doc.metadata['relevance_score'] = relevance_score
+                        focused_results.append(doc)
+                except Exception:
+                    continue
         
         # Sort by relevance and deduplicate
         focused_results.sort(key=lambda x: x.metadata.get('relevance_score', 0), reverse=True)
         
-        # Deduplicate
+        # Fast deduplication
         seen = set()
         unique_results = []
         for doc in focused_results:
-            doc_id = doc.page_content[:100]
+            doc_id = doc.page_content[:50]  # Shorter ID for faster comparison
             if doc_id not in seen:
                 seen.add(doc_id)
                 unique_results.append(doc)
+                if len(unique_results) >= k:  # Early termination
+                    break
         
         return unique_results[:k]
 
