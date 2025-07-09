@@ -28,8 +28,8 @@ STRICT ATTRIBUTION REQUIREMENTS:
 - Always verify which document contains the information before making attributions
 - When asked "who has [technology] experience", look for the technology in each person's individual documents
 - Do NOT cross-reference or mix information between different people's documents
-- If technology X appears in Vishal's resume, attribute it to Vishal ONLY
-- If technology Y appears in Marty's resume, attribute it to Marty ONLY
+- If technology X appears in Person A's document, attribute it to Person A ONLY
+- If technology Y appears in Person B's document, attribute it to Person B ONLY
 - NEVER say "Person A has experience with X" if X only appears in Person B's document
 
 ORGANIZATIONAL LANGUAGE INTERPRETATION:
@@ -39,10 +39,10 @@ ORGANIZATIONAL LANGUAGE INTERPRETATION:
 - Personal documents containing technology descriptions suggest hands-on experience, not just theoretical knowledge
 
 EXAMPLE OF CORRECT ATTRIBUTION:
-- If the context shows "Vishal_Ranjan_Resume.docx" contains "Mulesoft: An integration platform..."
-- And "Bremer-Resume.pdf" contains "Salesforce development experience..."
-- When asked "who has mulesoft experience", answer "Vishal Ranjan" (because Mulesoft appears in HIS resume)
-- Do NOT answer "Marty Bremer" just because his resume also appears in the context
+- If the context shows "PersonA_Resume.docx" contains "Technology1: A platform that..."
+- And "PersonB_Resume.pdf" contains "Technology2 development experience..."
+- When asked "who has Technology1 experience", answer "Person A" (because Technology1 appears in THEIR resume)
+- Do NOT answer "Person B" just because their resume also appears in the context
 - Each person should only be credited with technologies that appear in THEIR specific document
 
 CRITICAL: Format your response using clean, simple markdown syntax:
