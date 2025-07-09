@@ -96,9 +96,9 @@ class MockEmbedding:
         """Generate deterministic mock embedding"""
         # Use text hash to generate consistent mock embeddings
         text_hash = hashlib.md5(text.encode()).hexdigest()
-        # Generate 1536-dimensional embedding (OpenAI's dimension)
+        # Generate 3072-dimensional embedding (text-embedding-3-large dimension)
         np.random.seed(int(text_hash[:8], 16))  # Seed from hash for consistency
-        return np.random.normal(0, 1, 1536).tolist()
+        return np.random.normal(0, 1, 3072).tolist()
     
     @staticmethod
     def embed_documents(texts: List[str]) -> List[List[float]]:
