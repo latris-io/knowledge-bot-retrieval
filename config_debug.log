@@ -16636,3 +16636,301 @@ In the context of his work experience, Vishal has interfaced with various ERP sy
 [source: Bremer-Resume-250512-SRC.pdf#12]
 2025-07-09 13:30:50,400 — INFO — app — [STREAM] Completed streaming. Clean text for history: 665 chars
 2025-07-09 13:30:50,400 — INFO — app — [RETRIEVAL] Sources: ['Vishal_Ranjan_Resume (2).docx', 'sample_table.csv', 'sample_table.csv', 'Bremer-Resume-250512-SRC.pdf', 'April 21-25.pdf', 'April 21-25.pdf', 'School Schedule.pdf', 'Lucas Offices.xlsx'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+2025-07-09 13:31:00,244 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-09 13:31:03,685 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-09 13:33:38,258 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-09 13:33:47,331 — INFO — jwt_handler — [JWT] Successfully decoded minimal token for company_id=3, bot_id=1
+2025-07-09 13:33:47,332 — INFO — app — [API] Received question: who has mulesoft experience, company_id: 3, bot_id: 1, session_id: test-enhanced-prompt
+2025-07-09 13:33:47,332 — INFO — app — [BOT] Using mode: qa
+2025-07-09 13:33:47,333 — INFO — app — [BOT] Smart Complex Mode enabled for ALL queries
+2025-07-09 13:33:47,333 — INFO — app — [BOT] Smart Complex → Fast Comprehensive (comprehensive coverage)
+2025-07-09 13:33:47,333 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-09 13:33:47,412 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-09 13:33:47,448 — INFO — retriever — [RETRIEVER] Initialized RetrieverService with enhanced capabilities
+2025-07-09 13:33:48,117 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-07-09 13:33:48,692 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-07-09 13:33:49,192 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-07-09 13:33:49,899 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-09 13:33:50,522 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-09 13:33:50,522 — INFO — retriever — [ENHANCED_RETRIEVER] Connected to Chroma collection: global
+2025-07-09 13:33:50,523 — INFO — retriever — [ENHANCED_RETRIEVER] Using adaptive similarity threshold: 0.03
+2025-07-09 13:33:50,958 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/484fece6-2f38-4bb3-ac26-83a9f28dc9e3/get "HTTP/1.1 200 OK"
+2025-07-09 13:33:50,976 — INFO — retriever — [ENHANCED_RETRIEVER] Using hierarchical search
+2025-07-09 13:33:51,681 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-09 13:33:52,185 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/484fece6-2f38-4bb3-ac26-83a9f28dc9e3/query "HTTP/1.1 200 OK"
+2025-07-09 13:33:54,421 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-09 13:33:54,915 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/484fece6-2f38-4bb3-ac26-83a9f28dc9e3/query "HTTP/1.1 200 OK"
+2025-07-09 13:33:55,270 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-09 13:33:55,441 — INFO — retriever — [TERM_IMPORTANCE] Query: 'who has mulesoft experience' -> Importance: {'who': 0.6666666666666666, 'has': 0.6666666666666666, 'mulesoft': 1.0, 'experience': 1.0}
+2025-07-09 13:33:55,441 — INFO — retriever — [IMPORTANCE_RERANKING] Re-ranking 11 documents based on term importance
+2025-07-09 13:33:55,444 — INFO — retriever — [IMPORTANCE_RERANKING] Re-ranking results:
+2025-07-09 13:33:55,445 — INFO — retriever —   1. Bremer-Resume-250512-SRC.pdf (Score: 0.6353) (importance_boost: 2.10, matches: {'experience': 3})
+2025-07-09 13:33:55,445 — INFO — retriever —   2. Bremer-Resume-250512-SRC.pdf (Score: 0.6183) (importance_boost: 2.10, matches: {'experience': 3})
+2025-07-09 13:33:55,445 — INFO — retriever —   3. Vishal_Ranjan_Resume (2).docx (Score: 0.5955) (importance_boost: 2.10, matches: {'mulesoft': 3})
+2025-07-09 13:33:55,445 — INFO — retriever —   4. Bremer-Resume-250512-SRC.pdf (Score: 0.5094) (importance_boost: 1.00, matches: {'experience': 1})
+2025-07-09 13:33:55,445 — INFO — retriever —   5. Vishal_Ranjan_Resume (2).docx (Score: 0.2170) (no_important_terms)
+2025-07-09 13:33:55,446 — INFO — app — [BOT] Using gpt-4o-mini for Smart Complex query optimization
+2025-07-09 13:33:55,446 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-09 13:33:55,499 — INFO — app — [MEMORY] Created new history for session test-enhanced-prompt
+2025-07-09 13:33:55,576 — INFO — app — [RETRIEVAL DEBUG] Testing retrieval for query: 'who has mulesoft experience'
+2025-07-09 13:33:55,578 — INFO — app — [RETRIEVAL DEBUG] Retrieved 11 documents:
+2025-07-09 13:33:55,578 — INFO — app — [RETRIEVAL DEBUG] Doc 0: # Salesforce Development and Integration Experience
+
+## Key Responsibilities and Achievements
+
+- **Sales Cloud and Territory Management**
+  - Leverage...
+2025-07-09 13:33:55,578 — INFO — app — [RETRIEVAL DEBUG] Metadata: Bremer-Resume-250512-SRC.pdf
+2025-07-09 13:33:55,579 — INFO — app — [RETRIEVAL DEBUG] Doc 1: # Marty Bremer
+
+**Contact Information:**
+- Email: martybremer@icloud.com
+- Phone: (650) 649-9497
+
+---
+
+## Summary
+
+**Versatile Professional:**  
+Busin...
+2025-07-09 13:33:55,579 — INFO — app — [RETRIEVAL DEBUG] Metadata: Bremer-Resume-250512-SRC.pdf
+2025-07-09 13:33:55,579 — INFO — app — [RETRIEVAL DEBUG] Doc 2: # Technology Overview
+
+## Software Tools
+
+### 1. Salesforce.com (SFDC)
+- **Category**: Customer Relationship Management (CRM)
+- **Purpose**: Salesforc...
+2025-07-09 13:33:55,579 — INFO — app — [RETRIEVAL DEBUG] Metadata: Vishal_Ranjan_Resume (2).docx
+2025-07-09 13:33:56,158 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-09 13:33:58,384 — INFO — app — [RAW LLM OUTPUT] Raw response from LLM:
+'### Mulesoft Experience\n\n- **Marty Bremer** has experience with Mulesoft as indicated in the technology overview section of his resume, where Mulesoft is listed as an integration platform used to connect various applications and data sources. \n\n### Additional Information\n\nThis suggests that he is familiar with using Mulesoft to enhance operational efficiency and data accessibility in his projects.  \n[source: Bremer-Resume-250512-SRC.pdf#0]'
+2025-07-09 13:33:58,384 — INFO — app — [RAW LLM OUTPUT] Raw response formatted:
+### Mulesoft Experience
+
+- **Marty Bremer** has experience with Mulesoft as indicated in the technology overview section of his resume, where Mulesoft is listed as an integration platform used to connect various applications and data sources. 
+
+### Additional Information
+
+This suggests that he is familiar with using Mulesoft to enhance operational efficiency and data accessibility in his projects.  
+[source: Bremer-Resume-250512-SRC.pdf#0]
+2025-07-09 13:33:58,386 — INFO — app — [STREAM] Completed streaming. Clean text for history: 430 chars
+2025-07-09 13:33:58,387 — INFO — app — [RETRIEVAL] Sources: ['Bremer-Resume-250512-SRC.pdf', 'Bremer-Resume-250512-SRC.pdf', 'Vishal_Ranjan_Resume (2).docx', 'Bremer-Resume-250512-SRC.pdf', 'Vishal_Ranjan_Resume (2).docx', 'sample_list.md', 'Vishal_Ranjan_Resume (2).docx', 'Lucas Offices.xlsx', 'School Schedule.pdf', 'School Schedule.pdf', 'April 21-25.pdf'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+2025-07-09 13:34:17,747 — INFO — jwt_handler — [JWT] Successfully decoded minimal token for company_id=3, bot_id=1
+2025-07-09 13:34:17,748 — INFO — app — [API] Received question: does vishal know mulesoft, company_id: 3, bot_id: 1, session_id: test-vishal-specific
+2025-07-09 13:34:17,748 — INFO — app — [BOT] Using mode: qa
+2025-07-09 13:34:17,748 — INFO — app — [BOT] Smart Complex Mode enabled for ALL queries
+2025-07-09 13:34:17,748 — INFO — app — [BOT] Smart Complex → Fast Comprehensive (comprehensive coverage)
+2025-07-09 13:34:17,748 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-09 13:34:17,775 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-09 13:34:17,802 — INFO — retriever — [RETRIEVER] Initialized RetrieverService with enhanced capabilities
+2025-07-09 13:34:18,215 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-07-09 13:34:18,609 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-07-09 13:34:19,093 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-07-09 13:34:20,118 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-09 13:34:20,699 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-09 13:34:20,703 — INFO — retriever — [ENHANCED_RETRIEVER] Connected to Chroma collection: global
+2025-07-09 13:34:20,703 — INFO — retriever — [ENHANCED_RETRIEVER] Using adaptive similarity threshold: 0.03
+2025-07-09 13:34:21,120 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/484fece6-2f38-4bb3-ac26-83a9f28dc9e3/get "HTTP/1.1 200 OK"
+2025-07-09 13:34:21,124 — INFO — retriever — [ENHANCED_RETRIEVER] Using hierarchical search
+2025-07-09 13:34:21,504 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-09 13:34:21,601 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-09 13:34:22,105 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/484fece6-2f38-4bb3-ac26-83a9f28dc9e3/query "HTTP/1.1 200 OK"
+2025-07-09 13:34:22,216 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/484fece6-2f38-4bb3-ac26-83a9f28dc9e3/query "HTTP/1.1 200 OK"
+2025-07-09 13:34:22,611 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-09 13:34:22,739 — INFO — retriever — [TERM_IMPORTANCE] Query: 'does vishal know mulesoft' -> Importance: {'vishal': 1.0, 'know': 0.7999999999999999, 'mulesoft': 1.0}
+2025-07-09 13:34:22,739 — INFO — retriever — [IMPORTANCE_RERANKING] Re-ranking 10 documents based on term importance
+2025-07-09 13:34:22,740 — INFO — retriever — [IMPORTANCE_RERANKING] Re-ranking results:
+2025-07-09 13:34:22,740 — INFO — retriever —   1. Vishal_Ranjan_Resume (2).docx (Score: 0.6537) (importance_boost: 1.69, matches: {'vishal': 2})
+2025-07-09 13:34:22,740 — INFO — retriever —   2. Vishal_Ranjan_Resume (2).docx (Score: 0.5026) (importance_boost: 2.10, matches: {'mulesoft': 3})
+2025-07-09 13:34:22,740 — INFO — retriever —   3. Vishal_Ranjan_Resume (2).docx (Score: 0.3617) (no_important_terms)
+2025-07-09 13:34:22,740 — INFO — retriever —   4. Bremer-Resume-250512-SRC.pdf (Score: 0.2558) (no_important_terms)
+2025-07-09 13:34:22,740 — INFO — retriever —   5. Bremer-Resume-250512-SRC.pdf (Score: 0.2368) (no_important_terms)
+2025-07-09 13:34:22,740 — INFO — app — [BOT] Using gpt-4o-mini for Smart Complex query optimization
+2025-07-09 13:34:22,740 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-09 13:34:22,767 — INFO — app — [MEMORY] Created new history for session test-vishal-specific
+2025-07-09 13:34:22,767 — INFO — app — [RETRIEVAL DEBUG] Testing retrieval for query: 'does vishal know mulesoft'
+2025-07-09 13:34:22,767 — INFO — app — [RETRIEVAL DEBUG] Retrieved 10 documents:
+2025-07-09 13:34:22,767 — INFO — app — [RETRIEVAL DEBUG] Doc 0: **Contact Information:**
+
+- **Name:** Vishal Ranjan  
+- **Address:** Bhagwat Bhawan, Bagmusa, Hajipur, Bihar  
+- **Phone Number:** 9990013149  
+- **Em...
+2025-07-09 13:34:22,768 — INFO — app — [RETRIEVAL DEBUG] Metadata: Vishal_Ranjan_Resume (2).docx
+2025-07-09 13:34:22,768 — INFO — app — [RETRIEVAL DEBUG] Doc 1: # Technology Overview
+
+## Software Tools
+
+### 1. Salesforce.com (SFDC)
+- **Category**: Customer Relationship Management (CRM)
+- **Purpose**: Salesforc...
+2025-07-09 13:34:22,768 — INFO — app — [RETRIEVAL DEBUG] Metadata: Vishal_Ranjan_Resume (2).docx
+2025-07-09 13:34:22,768 — INFO — app — [RETRIEVAL DEBUG] Doc 2: Document Overview: Vishal_Ranjan_Resume_2_258e238998.docx
+Total Elements: 118
+Content Types: header, paragraph
+Sections: 5 headers/sections...
+2025-07-09 13:34:22,768 — INFO — app — [RETRIEVAL DEBUG] Metadata: Vishal_Ranjan_Resume (2).docx
+2025-07-09 13:34:23,181 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-09 13:34:24,529 — INFO — app — [RAW LLM OUTPUT] Raw response from LLM:
+'### Experience with Mulesoft\n\n- **Yes**, Vishal Ranjan has experience with Mulesoft, as it is listed in the software tools section of his resume. \n\n### Additional Information\n\nMulesoft is described as an integration platform that connects various applications and data sources, enhancing operational efficiency and data accessibility. This indicates that Vishal is familiar with its functionalities and applications in a professional context. \n\n[source: Vishal_Ranjan_Resume (2).docx#5]'
+2025-07-09 13:34:24,529 — INFO — app — [RAW LLM OUTPUT] Raw response formatted:
+### Experience with Mulesoft
+
+- **Yes**, Vishal Ranjan has experience with Mulesoft, as it is listed in the software tools section of his resume. 
+
+### Additional Information
+
+Mulesoft is described as an integration platform that connects various applications and data sources, enhancing operational efficiency and data accessibility. This indicates that Vishal is familiar with its functionalities and applications in a professional context. 
+
+[source: Vishal_Ranjan_Resume (2).docx#5]
+2025-07-09 13:34:24,529 — INFO — app — [STREAM] Completed streaming. Clean text for history: 473 chars
+2025-07-09 13:34:24,530 — INFO — app — [RETRIEVAL] Sources: ['Vishal_Ranjan_Resume (2).docx', 'Vishal_Ranjan_Resume (2).docx', 'Vishal_Ranjan_Resume (2).docx', 'Bremer-Resume-250512-SRC.pdf', 'Bremer-Resume-250512-SRC.pdf', 'Bremer-Resume-250512-SRC.pdf', 'sample_list.md', 'School Schedule.pdf', 'Vishal_Ranjan_Resume (2).docx', 'Lucas Offices.xlsx'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+2025-07-09 13:36:45,264 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-09 13:36:48,190 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-09 13:36:50,681 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-09 13:37:07,747 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-09 13:37:18,568 — INFO — jwt_handler — [JWT] Successfully decoded minimal token for company_id=3, bot_id=1
+2025-07-09 13:37:18,570 — INFO — app — [API] Received question: who has mulesoft experience, company_id: 3, bot_id: 1, session_id: test-enhanced-prompt-v2
+2025-07-09 13:37:18,570 — INFO — app — [BOT] Using mode: qa
+2025-07-09 13:37:18,570 — INFO — app — [BOT] Smart Complex Mode enabled for ALL queries
+2025-07-09 13:37:18,571 — INFO — app — [BOT] Smart Complex → Fast Comprehensive (comprehensive coverage)
+2025-07-09 13:37:18,571 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-09 13:37:18,640 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-09 13:37:18,672 — INFO — retriever — [RETRIEVER] Initialized RetrieverService with enhanced capabilities
+2025-07-09 13:37:19,526 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-07-09 13:37:20,142 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-07-09 13:37:20,610 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-07-09 13:37:21,204 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-09 13:37:21,811 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-09 13:37:21,812 — INFO — retriever — [ENHANCED_RETRIEVER] Connected to Chroma collection: global
+2025-07-09 13:37:21,813 — INFO — retriever — [ENHANCED_RETRIEVER] Using adaptive similarity threshold: 0.03
+2025-07-09 13:37:22,318 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/484fece6-2f38-4bb3-ac26-83a9f28dc9e3/get "HTTP/1.1 200 OK"
+2025-07-09 13:37:22,396 — INFO — retriever — [ENHANCED_RETRIEVER] Using hierarchical search
+2025-07-09 13:37:22,895 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-09 13:37:22,990 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-09 13:37:23,502 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/484fece6-2f38-4bb3-ac26-83a9f28dc9e3/query "HTTP/1.1 200 OK"
+2025-07-09 13:37:23,703 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/484fece6-2f38-4bb3-ac26-83a9f28dc9e3/query "HTTP/1.1 200 OK"
+2025-07-09 13:37:24,438 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-09 13:37:24,578 — INFO — retriever — [TERM_IMPORTANCE] Query: 'who has mulesoft experience' -> Importance: {'who': 0.6666666666666666, 'has': 0.6666666666666666, 'mulesoft': 1.0, 'experience': 1.0}
+2025-07-09 13:37:24,578 — INFO — retriever — [IMPORTANCE_RERANKING] Re-ranking 11 documents based on term importance
+2025-07-09 13:37:24,579 — INFO — retriever — [IMPORTANCE_RERANKING] Re-ranking results:
+2025-07-09 13:37:24,579 — INFO — retriever —   1. Bremer-Resume-250512-SRC.pdf (Score: 0.6356) (importance_boost: 2.10, matches: {'experience': 3})
+2025-07-09 13:37:24,579 — INFO — retriever —   2. Bremer-Resume-250512-SRC.pdf (Score: 0.6184) (importance_boost: 2.10, matches: {'experience': 3})
+2025-07-09 13:37:24,579 — INFO — retriever —   3. Vishal_Ranjan_Resume (2).docx (Score: 0.5956) (importance_boost: 2.10, matches: {'mulesoft': 3})
+2025-07-09 13:37:24,579 — INFO — retriever —   4. Bremer-Resume-250512-SRC.pdf (Score: 0.5083) (importance_boost: 1.00, matches: {'experience': 1})
+2025-07-09 13:37:24,580 — INFO — retriever —   5. Vishal_Ranjan_Resume (2).docx (Score: 0.2173) (no_important_terms)
+2025-07-09 13:37:24,580 — INFO — app — [BOT] Using gpt-4o-mini for Smart Complex query optimization
+2025-07-09 13:37:24,580 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-09 13:37:24,611 — INFO — app — [MEMORY] Created new history for session test-enhanced-prompt-v2
+2025-07-09 13:37:24,657 — INFO — app — [RETRIEVAL DEBUG] Testing retrieval for query: 'who has mulesoft experience'
+2025-07-09 13:37:24,658 — INFO — app — [RETRIEVAL DEBUG] Retrieved 11 documents:
+2025-07-09 13:37:24,658 — INFO — app — [RETRIEVAL DEBUG] Doc 0: # Salesforce Development and Integration Experience
+
+## Key Responsibilities and Achievements
+
+- **Sales Cloud and Territory Management**
+  - Leverage...
+2025-07-09 13:37:24,658 — INFO — app — [RETRIEVAL DEBUG] Metadata: Bremer-Resume-250512-SRC.pdf
+2025-07-09 13:37:24,658 — INFO — app — [RETRIEVAL DEBUG] Doc 1: # Marty Bremer
+
+**Contact Information:**
+- Email: martybremer@icloud.com
+- Phone: (650) 649-9497
+
+---
+
+## Summary
+
+**Versatile Professional:**  
+Busin...
+2025-07-09 13:37:24,659 — INFO — app — [RETRIEVAL DEBUG] Metadata: Bremer-Resume-250512-SRC.pdf
+2025-07-09 13:37:24,659 — INFO — app — [RETRIEVAL DEBUG] Doc 2: # Technology Overview
+
+## Software Tools
+
+### 1. Salesforce.com (SFDC)
+- **Category**: Customer Relationship Management (CRM)
+- **Purpose**: Salesforc...
+2025-07-09 13:37:24,659 — INFO — app — [RETRIEVAL DEBUG] Metadata: Vishal_Ranjan_Resume (2).docx
+2025-07-09 13:37:25,198 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-09 13:37:27,461 — INFO — app — [RAW LLM OUTPUT] Raw response from LLM:
+'### Mulesoft Experience\n\n- **Marty Bremer** has experience with Mulesoft as it is mentioned in the technology overview section of his resume, indicating familiarity with the integration platform used to connect various applications and data sources. \n\n### Additional Information\n\nMulesoft is utilized to enhance operational efficiency and data accessibility, which aligns with the responsibilities outlined in his professional experience. [source: Bremer-Resume-250512-SRC.pdf#0]'
+2025-07-09 13:37:27,462 — INFO — app — [RAW LLM OUTPUT] Raw response formatted:
+### Mulesoft Experience
+
+- **Marty Bremer** has experience with Mulesoft as it is mentioned in the technology overview section of his resume, indicating familiarity with the integration platform used to connect various applications and data sources. 
+
+### Additional Information
+
+Mulesoft is utilized to enhance operational efficiency and data accessibility, which aligns with the responsibilities outlined in his professional experience. [source: Bremer-Resume-250512-SRC.pdf#0]
+2025-07-09 13:37:27,464 — INFO — app — [STREAM] Completed streaming. Clean text for history: 468 chars
+2025-07-09 13:37:27,465 — INFO — app — [RETRIEVAL] Sources: ['Bremer-Resume-250512-SRC.pdf', 'Bremer-Resume-250512-SRC.pdf', 'Vishal_Ranjan_Resume (2).docx', 'Bremer-Resume-250512-SRC.pdf', 'Vishal_Ranjan_Resume (2).docx', 'sample_list.md', 'Vishal_Ranjan_Resume (2).docx', 'Lucas Offices.xlsx', 'School Schedule.pdf', 'School Schedule.pdf', 'April 21-25.pdf'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+2025-07-09 13:37:37,102 — INFO — jwt_handler — [JWT] Successfully decoded minimal token for company_id=3, bot_id=1
+2025-07-09 13:37:37,102 — INFO — app — [API] Received question: does vishal know mulesoft, company_id: 3, bot_id: 1, session_id: test-vishal-direct
+2025-07-09 13:37:37,103 — INFO — app — [BOT] Using mode: qa
+2025-07-09 13:37:37,103 — INFO — app — [BOT] Smart Complex Mode enabled for ALL queries
+2025-07-09 13:37:37,103 — INFO — app — [BOT] Smart Complex → Fast Comprehensive (comprehensive coverage)
+2025-07-09 13:37:37,103 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-09 13:37:37,131 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-09 13:37:37,159 — INFO — retriever — [RETRIEVER] Initialized RetrieverService with enhanced capabilities
+2025-07-09 13:37:37,567 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-07-09 13:37:37,937 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-07-09 13:37:38,357 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-07-09 13:37:39,109 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-09 13:37:40,025 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-09 13:37:40,026 — INFO — retriever — [ENHANCED_RETRIEVER] Connected to Chroma collection: global
+2025-07-09 13:37:40,026 — INFO — retriever — [ENHANCED_RETRIEVER] Using adaptive similarity threshold: 0.03
+2025-07-09 13:37:40,619 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/484fece6-2f38-4bb3-ac26-83a9f28dc9e3/get "HTTP/1.1 200 OK"
+2025-07-09 13:37:40,627 — INFO — retriever — [ENHANCED_RETRIEVER] Using hierarchical search
+2025-07-09 13:37:40,972 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-09 13:37:41,531 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/484fece6-2f38-4bb3-ac26-83a9f28dc9e3/query "HTTP/1.1 200 OK"
+2025-07-09 13:37:42,082 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-09 13:37:42,560 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/484fece6-2f38-4bb3-ac26-83a9f28dc9e3/query "HTTP/1.1 200 OK"
+2025-07-09 13:37:43,032 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-09 13:37:43,153 — INFO — retriever — [TERM_IMPORTANCE] Query: 'does vishal know mulesoft' -> Importance: {'vishal': 1.0, 'know': 0.7999999999999999, 'mulesoft': 1.0}
+2025-07-09 13:37:43,153 — INFO — retriever — [IMPORTANCE_RERANKING] Re-ranking 10 documents based on term importance
+2025-07-09 13:37:43,154 — INFO — retriever — [IMPORTANCE_RERANKING] Re-ranking results:
+2025-07-09 13:37:43,154 — INFO — retriever —   1. Vishal_Ranjan_Resume (2).docx (Score: 0.6537) (importance_boost: 1.69, matches: {'vishal': 2})
+2025-07-09 13:37:43,155 — INFO — retriever —   2. Vishal_Ranjan_Resume (2).docx (Score: 0.5025) (importance_boost: 2.10, matches: {'mulesoft': 3})
+2025-07-09 13:37:43,155 — INFO — retriever —   3. Vishal_Ranjan_Resume (2).docx (Score: 0.3617) (no_important_terms)
+2025-07-09 13:37:43,155 — INFO — retriever —   4. Bremer-Resume-250512-SRC.pdf (Score: 0.2557) (no_important_terms)
+2025-07-09 13:37:43,155 — INFO — retriever —   5. Bremer-Resume-250512-SRC.pdf (Score: 0.2369) (no_important_terms)
+2025-07-09 13:37:43,155 — INFO — app — [BOT] Using gpt-4o-mini for Smart Complex query optimization
+2025-07-09 13:37:43,156 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-09 13:37:43,184 — INFO — app — [MEMORY] Created new history for session test-vishal-direct
+2025-07-09 13:37:43,184 — INFO — app — [RETRIEVAL DEBUG] Testing retrieval for query: 'does vishal know mulesoft'
+2025-07-09 13:37:43,184 — INFO — app — [RETRIEVAL DEBUG] Retrieved 10 documents:
+2025-07-09 13:37:43,184 — INFO — app — [RETRIEVAL DEBUG] Doc 0: **Contact Information:**
+
+- **Name:** Vishal Ranjan  
+- **Address:** Bhagwat Bhawan, Bagmusa, Hajipur, Bihar  
+- **Phone Number:** 9990013149  
+- **Em...
+2025-07-09 13:37:43,185 — INFO — app — [RETRIEVAL DEBUG] Metadata: Vishal_Ranjan_Resume (2).docx
+2025-07-09 13:37:43,185 — INFO — app — [RETRIEVAL DEBUG] Doc 1: # Technology Overview
+
+## Software Tools
+
+### 1. Salesforce.com (SFDC)
+- **Category**: Customer Relationship Management (CRM)
+- **Purpose**: Salesforc...
+2025-07-09 13:37:43,185 — INFO — app — [RETRIEVAL DEBUG] Metadata: Vishal_Ranjan_Resume (2).docx
+2025-07-09 13:37:43,185 — INFO — app — [RETRIEVAL DEBUG] Doc 2: Document Overview: Vishal_Ranjan_Resume_2_258e238998.docx
+Total Elements: 118
+Content Types: header, paragraph
+Sections: 5 headers/sections...
+2025-07-09 13:37:43,185 — INFO — app — [RETRIEVAL DEBUG] Metadata: Vishal_Ranjan_Resume (2).docx
+2025-07-09 13:37:43,746 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-09 13:37:45,878 — INFO — app — [RAW LLM OUTPUT] Raw response from LLM:
+'### Mulesoft Experience\n\n- **Yes**, Vishal Ranjan has experience with Mulesoft, as it is listed in the software tools section of his resume. \n\n### Additional Information\n\nMulesoft is described as an integration tool that connects various applications and data sources, indicating that Vishal is familiar with its functionalities and uses it to enhance operational efficiency and data accessibility. [source: Vishal_Ranjan_Resume (2).docx#5]'
+2025-07-09 13:37:45,878 — INFO — app — [RAW LLM OUTPUT] Raw response formatted:
+### Mulesoft Experience
+
+- **Yes**, Vishal Ranjan has experience with Mulesoft, as it is listed in the software tools section of his resume. 
+
+### Additional Information
+
+Mulesoft is described as an integration tool that connects various applications and data sources, indicating that Vishal is familiar with its functionalities and uses it to enhance operational efficiency and data accessibility. [source: Vishal_Ranjan_Resume (2).docx#5]
+2025-07-09 13:37:45,878 — INFO — app — [STREAM] Completed streaming. Clean text for history: 429 chars
+2025-07-09 13:37:45,879 — INFO — app — [RETRIEVAL] Sources: ['Vishal_Ranjan_Resume (2).docx', 'Vishal_Ranjan_Resume (2).docx', 'Vishal_Ranjan_Resume (2).docx', 'Bremer-Resume-250512-SRC.pdf', 'Bremer-Resume-250512-SRC.pdf', 'Bremer-Resume-250512-SRC.pdf', 'sample_list.md', 'School Schedule.pdf', 'Vishal_Ranjan_Resume (2).docx', 'Lucas Offices.xlsx'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
