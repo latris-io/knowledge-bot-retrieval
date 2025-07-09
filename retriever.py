@@ -546,6 +546,8 @@ Return only the alternative phrasings, one per line, without numbers or bullets.
         scored_docs = []
         for doc in retrieved_docs:
             content_lower = doc.page_content.lower()
+            source = doc.metadata.get('file_name', '')
+            source_lower = source.lower()
             
             # Calculate importance-weighted term score
             importance_score = 0.0
@@ -561,14 +563,52 @@ Return only the alternative phrasings, one per line, without numbers or bullets.
                     importance_score += term_score
                     term_matches[term] = exact_matches
             
+            # Context inference boost for person-specific queries
+            context_boost = 0.0
+            if self.classify_query_type(query) == 'relationship':
+                # For queries like "who has X experience", apply context inference
+                query_terms = [term.lower() for term in re.findall(r'\b[a-zA-Z]+\b', query)]
+                
+                # Check if query mentions a person and a technology/skill
+                person_indicators = ['who', 'does', 'has']
+                has_person_query = any(indicator in query_terms for indicator in person_indicators)
+                
+                if has_person_query and importance_score > 0:
+                    # Boost documents where the person's name is in the filename
+                    # This helps with cases where technology is mentioned in someone's resume
+                    # but not explicitly connected to their personal experience
+                    
+                    # Check if this document is clearly from someone's resume/profile
+                    is_personal_document = any(doc_type in source_lower for doc_type in ['resume', 'cv', 'profile'])
+                    
+                    if is_personal_document:
+                        context_boost = importance_score * 0.5  # 50% boost for context inference
+                        
+                        # Additional boost for documents that mention specific technologies/skills
+                        # (not just general terms like "experience")
+                        specific_terms = [term for term, importance in term_importance.items() 
+                                        if term not in ['who', 'has', 'does', 'experience', 'skilled', 'know', 'knows']]
+                        
+                        if specific_terms and any(term in term_matches for term in specific_terms):
+                            # Extra boost for documents that mention specific technologies/skills
+                            tech_boost = importance_score * 0.3  # Additional 30% for specific tech mentions
+                            context_boost += tech_boost
+                            logger.info(f"[CONTEXT_INFERENCE] Applied tech-specific boost {tech_boost:.2f} to {source}")
+                        
+                        logger.info(f"[CONTEXT_INFERENCE] Applied context boost {context_boost:.2f} to {source}")
+            
             # Get original relevance score
             original_score = doc.metadata.get('relevance_score', 1.0)
             
             # Combine scores: boost documents with high-importance terms
-            if importance_score > 0:
-                # Boost proportional to importance score
-                final_score = original_score * (1.0 + importance_score * 0.3)
-                boost_info = f" (importance_boost: {importance_score:.2f}, matches: {term_matches})"
+            total_boost = importance_score + context_boost
+            if total_boost > 0:
+                # Boost proportional to total score
+                final_score = original_score * (1.0 + total_boost * 0.3)
+                boost_info = f" (importance_boost: {importance_score:.2f}"
+                if context_boost > 0:
+                    boost_info += f", context_boost: {context_boost:.2f}"
+                boost_info += f", matches: {term_matches})"
             else:
                 # Small penalty for documents without important terms
                 final_score = original_score * 0.9
@@ -576,6 +616,7 @@ Return only the alternative phrasings, one per line, without numbers or bullets.
             
             doc.metadata['final_relevance_score'] = final_score
             doc.metadata['importance_score'] = importance_score
+            doc.metadata['context_boost'] = context_boost
             scored_docs.append((doc, final_score, boost_info))
         
         # Sort by final relevance score (descending)
