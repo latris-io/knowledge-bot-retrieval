@@ -297,6 +297,7 @@ The issue was identified through testing where:
 - **Content-Agnostic Term Importance Analysis**: Analyzes query terms based on universal linguistic patterns
 - **Intelligent Re-ranking**: Boosts documents containing high-importance terms from the query
 - **No Hardcoded Patterns**: Works with any content domain without technology-specific rules
+- **Removed Context Inference**: Eliminated hardcoded patterns for resume/CV/profile documents to maintain true content-agnostic behavior
 
 #### Technical Implementation
 ```python

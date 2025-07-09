@@ -267,6 +267,32 @@ async def ask_question(
         # Use comprehensive prompt template for Smart Complex mode
         prompt = get_prompt_template(mode)
 
+        # Enhanced document prompt with person context - creates clear ownership indicators
+        document_prompt_template = """{% if 'vishal' in file_name.lower() %}FROM VISHAL'S DOCUMENT: {% elif 'bremer' in file_name.lower() or 'marty' in file_name.lower() %}FROM MARTY'S DOCUMENT: {% elif 'resume' in file_name.lower() or 'cv' in file_name.lower() %}FROM PERSONAL RESUME: {% endif %}{page_content}
+[source: {file_name}#{chunk_index}]"""
+        
+        # Create enhanced document prompt with conditional formatting
+        def create_enhanced_document_prompt():
+            def format_document(page_content, file_name, chunk_index):
+                # Extract person name from filename for better context
+                person_context = ""
+                filename_lower = file_name.lower()
+                if 'vishal' in filename_lower:
+                    person_context = "FROM VISHAL'S DOCUMENT: "
+                elif 'bremer' in filename_lower or 'marty' in filename_lower:
+                    person_context = "FROM MARTY'S DOCUMENT: "
+                elif 'resume' in filename_lower or 'cv' in filename_lower:
+                    person_context = "FROM PERSONAL RESUME: "
+                
+                source_ref = f"{file_name}#{chunk_index}" if chunk_index else file_name
+                return f"{person_context}{page_content}\n[source: {source_ref}]"
+            
+            return PromptTemplate(
+                input_variables=["page_content", "file_name", "chunk_index"],
+                template="{person_context}{page_content}\n[source: {file_name}#{chunk_index}]"
+            )
+        
+        # Use standard document prompt but with enhanced context in the main prompt
         document_prompt = PromptTemplate.from_template(
             "{page_content}\n[source: {file_name}#{chunk_index}]"
         )

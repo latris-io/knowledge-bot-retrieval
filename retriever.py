@@ -569,33 +569,9 @@ Return only the alternative phrasings, one per line, without numbers or bullets.
                 # For queries like "who has X experience", apply context inference
                 query_terms = [term.lower() for term in re.findall(r'\b[a-zA-Z]+\b', query)]
                 
-                # Check if query mentions a person and a technology/skill
-                person_indicators = ['who', 'does', 'has']
-                has_person_query = any(indicator in query_terms for indicator in person_indicators)
-                
-                if has_person_query and importance_score > 0:
-                    # Boost documents where the person's name is in the filename
-                    # This helps with cases where technology is mentioned in someone's resume
-                    # but not explicitly connected to their personal experience
-                    
-                    # Check if this document is clearly from someone's resume/profile
-                    is_personal_document = any(doc_type in source_lower for doc_type in ['resume', 'cv', 'profile'])
-                    
-                    if is_personal_document:
-                        context_boost = importance_score * 0.5  # 50% boost for context inference
-                        
-                        # Additional boost for documents that mention specific technologies/skills
-                        # (not just general terms like "experience")
-                        specific_terms = [term for term, importance in term_importance.items() 
-                                        if term not in ['who', 'has', 'does', 'experience', 'skilled', 'know', 'knows']]
-                        
-                        if specific_terms and any(term in term_matches for term in specific_terms):
-                            # Extra boost for documents that mention specific technologies/skills
-                            tech_boost = importance_score * 0.3  # Additional 30% for specific tech mentions
-                            context_boost += tech_boost
-                            logger.info(f"[CONTEXT_INFERENCE] Applied tech-specific boost {tech_boost:.2f} to {source}")
-                        
-                        logger.info(f"[CONTEXT_INFERENCE] Applied context boost {context_boost:.2f} to {source}")
+                # No hardcoded patterns - keeping it truly content-agnostic
+                # Only use universal linguistic patterns for term importance analysis
+                context_boost = 0.0
             
             # Get original relevance score
             original_score = doc.metadata.get('relevance_score', 1.0)

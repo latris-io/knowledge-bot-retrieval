@@ -11,6 +11,13 @@ IMPORTANT: When interpreting questions, consider semantic variations and synonym
 - Information may be presented in various formats (tables, lists, paragraphs, structured data)
 - Location or entity names may be referenced in different ways (full names, abbreviations, alternate terms)
 
+CONTEXT INFERENCE: When information appears in personal documents (resumes, profiles, CVs):
+- Technology sections typically indicate the person's familiarity or experience with those tools
+- Skills lists and software tools sections suggest the person has knowledge or experience
+- If a technology/tool is mentioned in someone's personal document, it's reasonable to infer they have experience with it
+- Make logical connections between document ownership and content relevance
+- Consider the document source when interpreting the relationship between people and information
+
 CRITICAL: Format your response using clean, simple markdown syntax:
 - Use headers with ### for main sections  
 - Add blank lines between different elements (headers, paragraphs, lists)
@@ -23,7 +30,7 @@ CRITICAL: Format your response using clean, simple markdown syntax:
 
 Reference the source documents using the format already embedded in the context: [source: filename#chunk_index].
 
-Only use the provided context. If the answer is not present, say "I'm not sure."
+Use the provided context and make reasonable inferences based on document context and ownership. Only say "I'm not sure" if no relevant information can be found or reasonably inferred.
 
 Context:
 {context}
