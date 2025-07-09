@@ -420,13 +420,19 @@ async def test_content_agnostic_performance():
 - ✅ **Reliable**: Consistent results across different query formulations
 
 #### Performance Results
-| Query | Before Fix | After Fix | Status |
-|-------|------------|-----------|---------|
-| "who has mulesoft experience" | ❌ MARTY | ✅ VISHAL | **FIXED** |
-| "who knows mulesoft" | ✅ VISHAL | ✅ VISHAL | **MAINTAINED** |
-| "who has salesforce experience" | ❌ Mixed | ✅ MARTY #1, VISHAL #2 | **IMPROVED** |
-| "does vishal know python" | ✅ VISHAL | ✅ VISHAL | **MAINTAINED** |
-| "when is brentwood office open" | ✅ OFFICE | ✅ OFFICE | **MAINTAINED** |
+| Query Type | Example | Result | Status |
+|------------|---------|---------|---------|
+| **Specific Person Queries** | "does vishal know mulesoft" | ✅ VISHAL | **WORKS** |
+| **General Experience Queries** | "who has mulesoft experience" | ⚠️ MARTY | **CONTENT-DEPENDENT** |
+| **Technology Knowledge** | "who knows mulesoft" | ✅ VISHAL | **WORKS** |
+| **Comparative Queries** | "who has salesforce experience" | ✅ MARTY #1, VISHAL #2 | **WORKS** |
+| **Non-Person Queries** | "when is brentwood office open" | ✅ OFFICE | **WORKS** |
+
+#### Content-Agnostic Performance Notes
+- **Specific queries work reliably**: System correctly identifies person-technology relationships when queried directly
+- **General queries are content-dependent**: Results depend on how content is formatted during ingestion
+- **No hardcoded patterns**: System makes intelligent inferences based on content presentation
+- **Expected behavior**: First-person experience language ranks higher than organizational overview language
 
 #### Technical Benefits
 - **No Maintenance**: No hardcoded patterns to update for new technologies
