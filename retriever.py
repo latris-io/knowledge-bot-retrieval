@@ -488,12 +488,115 @@ Return only the alternative phrasings, one per line, without numbers or bullets.
         
         return weighted_docs
     
+    def analyze_query_term_importance(self, query: str, vectorstore) -> Dict[str, float]:
+        """Content-agnostic analysis of query term importance based on corpus statistics"""
+        # Extract meaningful terms from query
+        terms = re.findall(r'\b[a-zA-Z]+\b', query.lower())
+        
+        # Remove very common stop words
+        stop_words = {'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'cannot'}
+        meaningful_terms = [term for term in terms if term not in stop_words and len(term) > 2]
+        
+        term_importance = {}
+        
+        # Use simple heuristics for term importance (content-agnostic)
+        for term in meaningful_terms:
+            importance = 1.0
+            
+            # 1. Length-based importance (longer terms are often more specific)
+            if len(term) >= 6:
+                importance *= 1.5
+            elif len(term) >= 4:
+                importance *= 1.2
+            
+            # 2. Capitalization in original query suggests proper nouns/specificity
+            if term.title() in query or term.upper() in query:
+                importance *= 1.4
+            
+            # 3. Position-based importance (terms at start/end often more important)
+            term_positions = [i for i, t in enumerate(terms) if t == term]
+            if any(pos <= 1 or pos >= len(terms) - 2 for pos in term_positions):
+                importance *= 1.1
+            
+            # 4. Frequency in query (repeated terms are important)
+            term_frequency = terms.count(term)
+            if term_frequency > 1:
+                importance *= (1.0 + (term_frequency - 1) * 0.3)
+            
+            term_importance[term] = importance
+        
+        # Normalize importance scores
+        if term_importance:
+            max_importance = max(term_importance.values())
+            for term in term_importance:
+                term_importance[term] /= max_importance
+        
+        logger.info(f"[TERM_IMPORTANCE] Query: '{query}' -> Importance: {term_importance}")
+        return term_importance
+    
+    def rerank_by_term_importance(self, query: str, retrieved_docs: List[Document], vectorstore) -> List[Document]:
+        """Content-agnostic re-ranking based on term importance and document term density"""
+        term_importance = self.analyze_query_term_importance(query, vectorstore)
+        
+        if not term_importance:
+            return retrieved_docs
+        
+        logger.info(f"[IMPORTANCE_RERANKING] Re-ranking {len(retrieved_docs)} documents based on term importance")
+        
+        scored_docs = []
+        for doc in retrieved_docs:
+            content_lower = doc.page_content.lower()
+            
+            # Calculate importance-weighted term score
+            importance_score = 0.0
+            term_matches = {}
+            
+            for term, importance in term_importance.items():
+                # Count exact word matches (word boundaries)
+                exact_matches = len(re.findall(rf'\b{re.escape(term)}\b', content_lower))
+                
+                if exact_matches > 0:
+                    # Score = (importance * matches) with diminishing returns
+                    term_score = importance * (1.0 + np.log(exact_matches))
+                    importance_score += term_score
+                    term_matches[term] = exact_matches
+            
+            # Get original relevance score
+            original_score = doc.metadata.get('relevance_score', 1.0)
+            
+            # Combine scores: boost documents with high-importance terms
+            if importance_score > 0:
+                # Boost proportional to importance score
+                final_score = original_score * (1.0 + importance_score * 0.3)
+                boost_info = f" (importance_boost: {importance_score:.2f}, matches: {term_matches})"
+            else:
+                # Small penalty for documents without important terms
+                final_score = original_score * 0.9
+                boost_info = " (no_important_terms)"
+            
+            doc.metadata['final_relevance_score'] = final_score
+            doc.metadata['importance_score'] = importance_score
+            scored_docs.append((doc, final_score, boost_info))
+        
+        # Sort by final relevance score (descending)
+        scored_docs.sort(key=lambda x: x[1], reverse=True)
+        
+        # Log the re-ranking results for debugging
+        logger.info(f"[IMPORTANCE_RERANKING] Re-ranking results:")
+        for i, (doc, score, boost_info) in enumerate(scored_docs[:5]):  # Log top 5
+            source = doc.metadata.get('file_name', 'Unknown')
+            logger.info(f"  {i+1}. {source} (Score: {score:.4f}){boost_info}")
+        
+        return [doc for doc, _, _ in scored_docs]
+    
     async def multi_vector_search(self, query: str, vectorstore, k: int = 5) -> List[Document]:
         """Optimized search using multiple vector approaches with reduced API calls"""
         # Fast path for development mode
         if DEVELOPMENT_MODE:
             # Just do a single search in development mode for speed
-            return vectorstore.similarity_search(query, k=k)
+            results = vectorstore.similarity_search(query, k=k)
+            # Still apply content-agnostic re-ranking in development mode
+            return self.rerank_by_term_importance(query, results, vectorstore)
         
         search_queries = [query]  # Start with original query
         
@@ -550,7 +653,10 @@ Return only the alternative phrasings, one per line, without numbers or bullets.
                 if len(unique_results) >= k:  # Early termination when we have enough results
                     break
         
-        return unique_results[:k]
+        # Apply content-agnostic term importance re-ranking to final results
+        reranked_results = self.rerank_by_term_importance(query, unique_results[:k], vectorstore)
+        
+        return reranked_results
     
     async def _async_search(self, vectorstore, query: str, k: int) -> List[Document]:
         """Async wrapper for vectorstore search"""
@@ -671,7 +777,10 @@ Return only the alternative phrasings, one per line, without numbers or bullets.
                 if len(unique_results) >= k:  # Early termination
                     break
         
-        return unique_results[:k]
+        # Apply content-agnostic term importance re-ranking to final results
+        reranked_results = self.rerank_by_term_importance(query, unique_results[:k], vectorstore)
+        
+        return reranked_results
 
 
 class EnhancedCustomRetriever(BaseRetriever):
