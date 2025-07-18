@@ -56,7 +56,15 @@ CRITICAL: Format your response using clean, simple markdown syntax:
 - Avoid nested lists - use separate sections instead
 - **ALWAYS add a blank line after lists before any other content**
 - **ALWAYS add a blank line before headers**
+- **NEVER put headers directly next to list items or other content**
+- **NEVER run list items together without line breaks**
 - Keep formatting clean and straightforward
+
+FORMATTING RULES (STRICTLY ENFORCED):
+1. Headers must be on their own line with blank lines before and after
+2. List items must be separated by line breaks
+3. Content sections must be separated by blank lines
+4. No run-together text without proper spacing
 
 FORMATTING EXAMPLE:
 ```
@@ -69,6 +77,21 @@ FORMATTING EXAMPLE:
 ### Next Section
 
 Content follows with proper spacing.
+```
+
+WRONG FORMATTING (DO NOT DO THIS):
+```
+### Header- **Item**: text- **Item**: text### Next Section
+```
+
+CORRECT FORMATTING (ALWAYS DO THIS):
+```
+### Header
+
+- **Item**: text
+- **Item**: text
+
+### Next Section
 ```
 
 MANDATORY SOURCE ATTRIBUTION:

@@ -106,6 +106,25 @@
                     '$1\n\n$2'
                 );
                 
+                // Pattern: Fix the specific issue from user's example
+                // "### Bell Meade Office Hours- **Monday**" → "### Bell Meade Office Hours\n\n- **Monday**"
+                processedText = processedText.replace(
+                    /(### [^-\n]+)-\s*(\*\*[^*]+\*\*)/g,
+                    '$1\n\n- $2'
+                );
+                
+                // Pattern: Fix time followed by header (e.g., "4:30pm### Additional")
+                processedText = processedText.replace(
+                    /(\d+:\d+\w+)(### )/g,
+                    '$1\n\n$2'
+                );
+                
+                // Pattern: Fix general run-together content with headers
+                processedText = processedText.replace(
+                    /([a-zA-Z0-9.!?])(### )/g,
+                    '$1\n\n$2'
+                );
+                
                 // Pattern: Ensure proper line breaks between list items
                 // Handle cases where list items are separated by periods, spaces, or insufficient breaks
                 processedText = processedText.replace(
