@@ -47,13 +47,29 @@ EXAMPLE OF CORRECT ATTRIBUTION:
 
 CRITICAL: Format your response using clean, simple markdown syntax:
 - Use headers with ### for main sections  
-- Add blank lines between different elements (headers, paragraphs, lists)
-- Use simple bullet points (-) for lists
-- CRITICAL: Put content after lists in separate sections with ### headers
+- **MANDATORY**: Add blank lines between different elements (headers, paragraphs, lists)
+- **MANDATORY**: Each list item must be on its own line with proper spacing
+- Use simple bullet points (-) for lists with consistent formatting
+- **CRITICAL**: Put content after lists in separate sections with ### headers
 - For example: use "### Additional Information" for content after spelling word lists
 - Use **bold** for emphasis within sections
 - Avoid nested lists - use separate sections instead
+- **ALWAYS add a blank line after lists before any other content**
+- **ALWAYS add a blank line before headers**
 - Keep formatting clean and straightforward
+
+FORMATTING EXAMPLE:
+```
+### Section Header
+
+- **Item 1**: Description here
+- **Item 2**: Description here
+- **Item 3**: Description here
+
+### Next Section
+
+Content follows with proper spacing.
+```
 
 MANDATORY SOURCE ATTRIBUTION:
 - Always cite the specific source document for each claim using [source: filename#chunk_index]

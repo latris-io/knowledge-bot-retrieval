@@ -88,6 +88,24 @@
                     '$1\n\n$2'
                 );
                 
+                // Pattern: Fix header directly followed by dashes (no line break)
+                processedText = processedText.replace(
+                    /(### [^\n]+)-\s*\*\*/g,
+                    '$1\n\n- **'
+                );
+                
+                // Pattern: Fix run-together list items (dash followed by bold item)
+                processedText = processedText.replace(
+                    /(\*\*[^*]+\*\*[^-\n]*)-\s*\*\*/g,
+                    '$1\n- **'
+                );
+                
+                // Pattern: Fix headers immediately following content (no line break)
+                processedText = processedText.replace(
+                    /([^.\n])(### )/g,
+                    '$1\n\n$2'
+                );
+                
                 // Pattern: Ensure proper line breaks between list items
                 // Handle cases where list items are separated by periods, spaces, or insufficient breaks
                 processedText = processedText.replace(
