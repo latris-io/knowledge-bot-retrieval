@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Streaming Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        .test-area { 
+            border: 1px solid #ccc; 
+            padding: 15px; 
+            margin: 10px 0; 
+            background: #f9f9f9; 
+        }
+        .output { 
+            background: white; 
+            border: 1px solid #ddd; 
+            padding: 10px; 
+            margin: 10px 0; 
+            white-space: pre-wrap; 
+            font-family: monospace; 
+            min-height: 100px;
+        }
+        .controls button { 
+            padding: 8px 16px; 
+            margin: 5px; 
+            cursor: pointer; 
+        }
+        .chunk-info {
+            background: #e8f4fd;
+            border-left: 4px solid #007acc;
+            padding: 8px;
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #007acc;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Smart Streaming Test</h1>
+    
+    <div class="test-area">
+        <h3>New JSON Chunk Format</h3>
+        <div class="controls">
+            <button onclick="testSmartStream()">Test Smart Streaming</button>
+            <button onclick="testActualAsk()">Test Real /ask Endpoint</button>
+            <button onclick="clearOutput()">Clear</button>
+        </div>
+        
+        <div id="status" style="margin: 10px 0; color: #666;">Ready</div>
+        <div id="chunkInfo" class="chunk-info" style="display: none;"></div>
+        <div id="output" class="output">Click a test button to start streaming...</div>
+    </div>
+    
+    <div class="test-area">
+        <h3>Features Demonstrated</h3>
+        <ul>
+            <li><strong>Word Boundary Streaming</strong>: Tokens are buffered until natural word/sentence boundaries</li>
+            <li><strong>JSON Chunk Format</strong>: Each chunk has proper structure with metadata</li>
+            <li><strong>Content Type Detection</strong>: Headers, lists, sources are automatically identified</li>
+            <li><strong>Better Error Handling</strong>: Structured error messages with context</li>
+            <li><strong>Stream State Management</strong>: Clear start/content/end phases</li>
+        </ul>
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+        const chunkInfo = document.getElementById('chunkInfo');
+        
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb21wYW55X2lkIjozLCJib3RfaWQiOjF9.ytHVcMRM99aAkFMg_U1I4VZbz3mYxskzzxSUORe3ico";
+
+        function clearOutput() {
+            output.innerHTML = "Ready for next test...";
+            status.innerHTML = "Ready";
+            chunkInfo.style.display = "none";
+        }
+
+        function setStatus(message, isLoading = false) {
+            if (isLoading) {
+                status.innerHTML = `<span class="spinner"></span>${message}`;
+            } else {
+                status.innerHTML = message;
+            }
+        }
+
+        function showChunkInfo(chunk) {
+            chunkInfo.style.display = "block";
+            chunkInfo.innerHTML = `
+                <strong>Chunk #${chunk.id}</strong> | 
+                Type: <code>${chunk.type}</code> | 
+                Content Type: <code>${chunk.content_type || 'N/A'}</code> | 
+                Length: ${chunk.content?.length || 0} chars |
+                Final: ${chunk.final}
+            `;
+        }
+
+        async function testSmartStream() {
+            clearOutput();
+            setStatus("Testing smart streaming format...", true);
+            
+            try {
+                const response = await fetch('/test-smart-stream');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let accumulatedContent = "";
+                let chunkCount = 0;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (!data.trim()) continue;
+                            
+                            try {
+                                const chunkData = JSON.parse(data);
+                                chunkCount++;
+                                
+                                console.log('Chunk:', chunkData);
+                                showChunkInfo(chunkData);
+                                
+                                if (chunkData.type === 'start') {
+                                    setStatus("Stream started", true);
+                                    output.innerHTML = "🌊 Stream starting...\n";
+                                } else if (chunkData.type === 'content') {
+                                    accumulatedContent += chunkData.content;
+                                    output.innerHTML = accumulatedContent + "\n\n📊 Processing...";
+                                    setStatus(`Received ${chunkCount} chunks`, true);
+                                } else if (chunkData.type === 'end') {
+                                    setStatus(`✅ Stream completed! ${chunkCount} chunks processed`);
+                                    output.innerHTML = accumulatedContent;
+                                } else if (chunkData.type === 'error') {
+                                    throw new Error(chunkData.error);
+                                }
+                            } catch (parseError) {
+                                console.error('Parse error:', parseError);
+                                output.innerHTML += `\n❌ Parse Error: ${parseError.message}`;
+                            }
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.error('Test error:', error);
+                setStatus(`❌ Error: ${error.message}`);
+                output.innerHTML = `Error: ${error.message}`;
+            }
+        }
+
+        async function testActualAsk() {
+            clearOutput();
+            setStatus("Testing real /ask endpoint...", true);
+            
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        question: "What are the key features of smart streaming?",
+                        session_id: "smart_stream_test",
+                        k: 8
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let accumulatedContent = "";
+                let chunkCount = 0;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (!data.trim()) continue;
+                            
+                            try {
+                                const chunkData = JSON.parse(data);
+                                chunkCount++;
+                                
+                                console.log('Real chunk:', chunkData);
+                                showChunkInfo(chunkData);
+                                
+                                if (chunkData.type === 'start') {
+                                    setStatus("LLM stream started", true);
+                                    output.innerHTML = "🤖 LLM responding...\n";
+                                } else if (chunkData.type === 'content') {
+                                    accumulatedContent += chunkData.content;
+                                    // Remove sources for display
+                                    const cleanContent = accumulatedContent.replace(/\[source: .+?\]/g, "");
+                                    output.innerHTML = cleanContent + "\n\n📊 Streaming...";
+                                    setStatus(`Received ${chunkCount} chunks (${accumulatedContent.length} chars)`, true);
+                                } else if (chunkData.type === 'end') {
+                                    const cleanContent = accumulatedContent.replace(/\[source: .+?\]/g, "");
+                                    setStatus(`✅ LLM response completed! ${chunkCount} chunks, ${accumulatedContent.length} chars`);
+                                    output.innerHTML = cleanContent;
+                                } else if (chunkData.type === 'error') {
+                                    throw new Error(chunkData.error);
+                                }
+                            } catch (parseError) {
+                                // Fallback for backward compatibility
+                                console.warn('Fallback to raw text:', data);
+                                accumulatedContent += data;
+                                const cleanContent = accumulatedContent.replace(/\[source: .+?\]/g, "");
+                                output.innerHTML = cleanContent;
+                                setStatus(`Streaming (fallback mode)...`, true);
+                            }
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.error('Test error:', error);
+                setStatus(`❌ Error: ${error.message}`);
+                output.innerHTML = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html> 

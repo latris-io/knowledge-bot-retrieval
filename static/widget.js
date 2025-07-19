@@ -557,50 +557,110 @@
             for (const line of lines) {
               if (line.startsWith('data: ')) {
                 const data = line.slice(6); // Remove 'data: ' prefix
-                if (data === '[DONE]') continue;
+                if (data === '[DONE]' || !data.trim()) continue;
                 
-                if (data.startsWith('[ERROR]')) {
-                  throw new Error(data.replace('[ERROR] ', ''));
-                }
-                
-                // Preserve empty chunks as line breaks, regular chunks as content
-                accumulatedText += data === '' ? '\n' : data;
-                
-                // Check if we have actual response content (not just loading message)
-                const cleanForCheck = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
-                const hasActualContent = cleanForCheck.length > 0 && !cleanForCheck.startsWith("Getting your response");
-                
-                if (!responseStarted && hasActualContent) {
-                  responseStarted = true;
-                  console.log(`[Widget] Response content detected, hiding Thinking spinner`);
-                }
-                
-                // Extract and deduplicate sources
-                const sourceMatches = [...accumulatedText.matchAll(/\[source: (.+?)\]/g)];
-                const allSources = sourceMatches.map(match => match[1]);
-                const uniqueSources = [...new Set(allSources)]; // Deduplicate
-                
-                // Remove [source: ...] from main text for display
-                const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
-                
-                if (responseStarted) {
-                  // Show actual content, removing any loading messages - preserve line breaks!
-                  const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "");
+                try {
+                  // Parse JSON chunk
+                  const chunkData = JSON.parse(data);
+                  console.log(`[Widget] Parsed chunk:`, chunkData);
                   
-                  // Show raw text while streaming (no markdown parsing yet)
-                  const sourcesHtml = uniqueSources.length
-                    ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
-                    : "";
+                  // Handle different chunk types
+                  switch (chunkData.type) {
+                    case 'start':
+                      console.log(`[Widget] Stream started`);
+                      // Keep showing "Thinking..." until we get actual content
+                      break;
+                      
+                    case 'content':
+                      if (chunkData.content) {
+                        accumulatedText += chunkData.content;
+                        
+                        // Check if we have actual response content
+                        const cleanForCheck = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
+                        const hasActualContent = cleanForCheck.length > 0 && !cleanForCheck.startsWith("Getting your response");
+                        
+                        if (!responseStarted && hasActualContent) {
+                          responseStarted = true;
+                          console.log(`[Widget] Response content detected (chunk type: ${chunkData.content_type}), hiding Thinking spinner`);
+                        }
+                        
+                        // Extract and deduplicate sources
+                        const sourceMatches = [...accumulatedText.matchAll(/\[source: (.+?)\]/g)];
+                        const allSources = sourceMatches.map(match => match[1]);
+                        const uniqueSources = [...new Set(allSources)];
+                        
+                        // Remove [source: ...] from main text for display
+                        const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
+                        
+                        if (responseStarted) {
+                          // Show actual content, removing any loading messages
+                          const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "");
+                          
+                          // Show raw text while streaming (no markdown parsing yet)
+                          const sourcesHtml = uniqueSources.length
+                            ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
+                            : "";
+                          
+                          // Use pre tag to preserve formatting while streaming
+                          answerBox.innerHTML = `<pre style="white-space: pre-wrap; font-family: inherit; margin: 0;">${contentText}</pre>${sourcesHtml}`;
+                        } else {
+                          // Still in loading phase, show Thinking with spinner
+                          answerBox.innerHTML = `
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                              <div class="kb-spinner"></div>
+                              <span>Thinking...</span>
+                            </div>
+                          `;
+                        }
+                      }
+                      break;
+                      
+                    case 'error':
+                      console.error(`[Widget] Stream error:`, chunkData.error);
+                      throw new Error(chunkData.error || 'Unknown streaming error');
+                      
+                    case 'end':
+                      console.log(`[Widget] Stream ended`);
+                      // Final processing happens after the stream loop
+                      break;
+                      
+                    default:
+                      console.warn(`[Widget] Unknown chunk type: ${chunkData.type}`, chunkData);
+                  }
                   
-                  answerBox.innerHTML = `<pre style="white-space: pre-wrap; font-family: inherit; margin: 0;">${contentText}</pre>${sourcesHtml}`;
-                } else {
-                  // Still in loading phase, show Thinking with spinner
-                  answerBox.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                      <div class="kb-spinner"></div>
-                      <span>Thinking...</span>
-                    </div>
-                  `;
+                } catch (parseError) {
+                  // Fallback: treat as raw text (backward compatibility)
+                  console.warn(`[Widget] Failed to parse JSON chunk, treating as raw text:`, parseError);
+                  console.log(`[Widget] Raw data:`, data);
+                  
+                  if (data.startsWith('[ERROR]')) {
+                    throw new Error(data.replace('[ERROR] ', ''));
+                  }
+                  
+                  // Handle as before for backward compatibility
+                  accumulatedText += data === '' ? '\n' : data;
+                  
+                  const cleanForCheck = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
+                  const hasActualContent = cleanForCheck.length > 0 && !cleanForCheck.startsWith("Getting your response");
+                  
+                  if (!responseStarted && hasActualContent) {
+                    responseStarted = true;
+                    console.log(`[Widget] Response content detected (fallback mode), hiding Thinking spinner`);
+                  }
+                  
+                  if (responseStarted) {
+                    const sourceMatches = [...accumulatedText.matchAll(/\[source: (.+?)\]/g)];
+                    const allSources = sourceMatches.map(match => match[1]);
+                    const uniqueSources = [...new Set(allSources)];
+                    const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
+                    const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "");
+                    
+                    const sourcesHtml = uniqueSources.length
+                      ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
+                      : "";
+                    
+                    answerBox.innerHTML = `<pre style="white-space: pre-wrap; font-family: inherit; margin: 0;">${contentText}</pre>${sourcesHtml}`;
+                  }
                 }
                 
                 // Auto-scroll to bottom of answer box

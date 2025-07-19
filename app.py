@@ -167,24 +167,58 @@ class AskRequest(BaseModel):
     similarity_threshold: Optional[float] = None
     session_id: Optional[str] = None
 
-class EventStreamHandler(BaseCallbackHandler):
+class SmartEventStreamHandler(BaseCallbackHandler):
     def __init__(self):
         self.queue = asyncio.Queue()
         self._loop = None
         self.accumulated_text = ""  # Track full response for conversation history
         self.processed_text = ""    # Clean version for history
+        self.token_buffer = ""      # Buffer for intelligent boundary streaming
+        self.chunk_id = 0          # Unique chunk identifier
+        self.streaming_started = False
 
     async def astream(self):
         while True:
             try:
-                token = await self.queue.get()
-                if token is None:
+                chunk_data = await self.queue.get()
+                if chunk_data is None:
+                    # Send final end-of-stream marker
+                    yield f"data: {self._format_json_chunk('', 'end', final=True)}\n\n"
                     break
-                yield f"data: {token}\n\n"
+                yield f"data: {chunk_data}\n\n"
             except Exception as e:
-                logger.error(f"[STREAM] Error streaming token: {e}")
-                yield f"data: [ERROR] {str(e)}\n\n"
+                logger.error(f"[STREAM] Error streaming chunk: {e}")
+                yield f"data: {self._format_json_chunk('', 'error', error=str(e))}\n\n"
                 break
+
+    def _format_json_chunk(self, content: str, chunk_type: str = 'content', 
+                          final: bool = False, error: str = None) -> str:
+        """Format chunk as proper JSON structure"""
+        import json
+        
+        self.chunk_id += 1
+        chunk_data = {
+            "id": self.chunk_id,
+            "type": chunk_type,
+            "content": content,
+            "final": final
+        }
+        
+        if error:
+            chunk_data["error"] = error
+            
+        if chunk_type == 'content' and content:
+            # Analyze content type for better client handling
+            if content.strip().startswith(('#', '##', '###')):
+                chunk_data["content_type"] = "header"
+            elif content.strip().startswith(('-', '*', '+')):
+                chunk_data["content_type"] = "list_item"
+            elif '[source:' in content:
+                chunk_data["content_type"] = "source"
+            else:
+                chunk_data["content_type"] = "text"
+        
+        return json.dumps(chunk_data, ensure_ascii=False)
 
     def _put_nowait_safe(self, item):
         try:
@@ -192,13 +226,67 @@ class EventStreamHandler(BaseCallbackHandler):
         except Exception as e:
             logger.error(f"[STREAM] Error putting item in queue: {e}")
 
+    def _should_flush_buffer(self, new_token: str) -> bool:
+        """Determine if we should flush the current buffer"""
+        combined = self.token_buffer + new_token
+        
+        # Flush on sentence boundaries
+        if new_token in '.!?':
+            return True
+            
+        # Flush on word boundaries (space after word)
+        if new_token == ' ' and len(self.token_buffer.strip()) > 0:
+            return True
+            
+        # Flush on line breaks (important for markdown)
+        if '\n' in new_token:
+            return True
+            
+        # Flush on markdown patterns
+        if combined.strip().endswith('**') or combined.strip().endswith('###'):
+            return True
+            
+        # Flush if buffer gets too long (prevent hanging)
+        if len(self.token_buffer) > 50:
+            return True
+            
+        return False
+
+    def on_llm_start(self, serialized, prompts, **kwargs):
+        """Called when LLM starts generating"""
+        if not self.streaming_started:
+            self.streaming_started = True
+            # Send start marker
+            start_chunk = self._format_json_chunk('', 'start')
+            self._put_nowait_safe(start_chunk)
+
     def on_llm_new_token(self, token: str, **kwargs):
         self.accumulated_text += token
+        self.token_buffer += token
         
-        # Stream the raw token directly - no HTML processing
-        self._put_nowait_safe(token)
+        # Check if we should flush the buffer
+        if self._should_flush_buffer(token):
+            if self.token_buffer.strip():  # Only send non-empty content
+                content_chunk = self._format_json_chunk(self.token_buffer, 'content')
+                self._put_nowait_safe(content_chunk)
+                logger.debug(f"[STREAM] Sent chunk: '{self.token_buffer.strip()[:50]}'...")
+            self.token_buffer = ""
+        
+        # For very short tokens, send immediately to maintain responsiveness
+        elif len(token) == 1 and token in '.,!?;:':
+            if self.token_buffer.strip():
+                content_chunk = self._format_json_chunk(self.token_buffer, 'content')
+                self._put_nowait_safe(content_chunk)
+                logger.debug(f"[STREAM] Sent punctuation chunk: '{self.token_buffer.strip()}'")
+            self.token_buffer = ""
 
     def on_llm_end(self, response: LLMResult, **kwargs):
+        # Flush any remaining buffer
+        if self.token_buffer.strip():
+            content_chunk = self._format_json_chunk(self.token_buffer, 'content')
+            self._put_nowait_safe(content_chunk)
+            logger.debug(f"[STREAM] Sent final buffer: '{self.token_buffer.strip()[:50]}'...")
+        
         # Log the raw LLM output for debugging
         logger.info(f"[RAW LLM OUTPUT] Raw response from LLM:\n{repr(self.accumulated_text)}")
         logger.info(f"[RAW LLM OUTPUT] Raw response formatted:\n{self.accumulated_text}")
@@ -207,10 +295,14 @@ class EventStreamHandler(BaseCallbackHandler):
         self.processed_text = process_markdown_to_clean_text(self.accumulated_text)
         
         logger.info(f"[STREAM] Completed streaming. Clean text for history: {len(self.processed_text)} chars")
+        logger.info(f"[STREAM] Total chunks sent: {self.chunk_id}")
+        
+        # Send end marker
         self._put_nowait_safe(None)
 
     def on_llm_error(self, error: Exception, **kwargs):
-        self._put_nowait_safe(f"[ERROR] LLM failed: {str(error)}")
+        error_chunk = self._format_json_chunk('', 'error', error=str(error))
+        self._put_nowait_safe(error_chunk)
 
 @sleep_and_retry
 @limits(calls=100, period=60)
@@ -220,7 +312,7 @@ async def ask_question(
     bot_id: int,
     session_id: str,
     streaming: bool = False,
-    stream_handler: Optional[EventStreamHandler] = None,
+    stream_handler: Optional[SmartEventStreamHandler] = None,
     k: Optional[int] = None,
     similarity_threshold: Optional[float] = None,
     use_multi_query: bool = False,
@@ -418,7 +510,7 @@ async def ask_api(request: AskRequest, jwt_claims: dict = Depends(extract_jwt_cl
         try:
             
             # Set up real streaming handler
-            stream_handler = EventStreamHandler()
+            stream_handler = SmartEventStreamHandler()
             
             # Start LLM processing in background (this will feed the stream_handler)
             async def run_llm_chain():
@@ -492,3 +584,70 @@ async def get_complexity_stats():
             "topic_change_detection": "Semantic similarity-based topic change detection (content-agnostic)"
         }
     }
+
+@app.get("/test-smart-stream")
+async def test_smart_stream():
+    """Test endpoint for the new smart streaming format"""
+    
+    async def generate_test_stream():
+        # Simulate the new smart streaming format
+        import json
+        import asyncio
+        
+        # Start chunk
+        start_chunk = {
+            "id": 1,
+            "type": "start",
+            "content": "",
+            "final": False
+        }
+        yield f"data: {json.dumps(start_chunk)}\n\n"
+        await asyncio.sleep(0.5)
+        
+        # Content chunks with different types
+        chunks = [
+            ("### Smart Streaming Demo", "header"),
+            ("\n\nThis is a test of the new ", "text"),
+            ("**smart streaming**", "text"),
+            (" implementation with ", "text"),
+            ("word-boundary buffering", "text"),
+            (" and proper JSON structure.", "text"),
+            ("\n\n- **Feature 1**: Token boundary detection", "list_item"),
+            ("\n- **Feature 2**: JSON chunk format", "list_item"), 
+            ("\n- **Feature 3**: Metadata support", "list_item"),
+            ("\n\n### Additional Information", "header"),
+            ("\n\nThis demonstrates improved streaming quality ", "text"),
+            ("and better user experience.", "text"),
+            ("\n\n[source: test.pdf#1]", "source")
+        ]
+        
+        chunk_id = 1
+        for content, content_type in chunks:
+            chunk_id += 1
+            chunk_data = {
+                "id": chunk_id,
+                "type": "content",
+                "content": content,
+                "content_type": content_type,
+                "final": False
+            }
+            yield f"data: {json.dumps(chunk_data, ensure_ascii=False)}\n\n"
+            await asyncio.sleep(0.2)  # Simulate streaming delay
+        
+        # End chunk
+        end_chunk = {
+            "id": chunk_id + 1,
+            "type": "end",
+            "content": "",
+            "final": True
+        }
+        yield f"data: {json.dumps(end_chunk)}\n\n"
+    
+    return StreamingResponse(
+        generate_test_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive"
+        }
+    )
