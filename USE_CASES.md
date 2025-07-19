@@ -18,11 +18,15 @@ This document outlines the 8 **Foundation Improvements (FI)** implemented in the
 - **Hybrid Retrieval Strategy**: Intelligent switching between vector-only and hybrid modes
 
 ### Test Cases
+**Integration Tests**: `tests/foundation/test_production_integration.py::test_fi_01_enhanced_retrieval_performance`
+**Unit Tests**: `tests/foundation/test_enhanced_retrieval_system.py`
+
 ```python
-# Performance validation
-GET /ask?question="What companies are in the database?"
-# Expected: Fast response (<6s) with comprehensive company list
-# Validates: Enhanced BM25 weighting, improved retrieval speed
+# Production Integration Test (NO MOCKING)
+def test_fi_01_enhanced_retrieval_performance():
+    result = _make_request("What companies are in the database?")
+    # Validates: Real enhanced BM25 weighting, actual retrieval performance
+    # Expected: <10s response with 2+ companies found
 ```
 
 ### Success Metrics
@@ -44,11 +48,14 @@ GET /ask?question="What companies are in the database?"
 - **Context Management**: Clears context when topic changes detected to prevent contamination
 
 ### Test Cases
+**Integration Tests**: `tests/foundation/test_production_integration.py::test_fi_02_semantic_topic_change_detection`
+
 ```python
-# Topic change detection
-POST /ask {"question": "What are office hours?"}  # After asking about companies
-# Expected: New context, topic change detected
-# Validates: Context switching, topic boundary detection  
+# Production Integration Test (NO MOCKING)
+def test_fi_02_semantic_topic_change_detection():
+    _make_request("What companies are in the database?")  # First topic
+    result = _make_request("What are the office hours?")   # Topic change
+    # Validates: Real topic change detection, context switching
 ```
 
 ### Success Metrics
@@ -70,11 +77,14 @@ POST /ask {"question": "What are office hours?"}  # After asking about companies
 - **Client-Side Enhancement**: Progressive markdown parsing with preprocessing patterns
 
 ### Test Cases
+**Integration Tests**: `tests/foundation/test_production_integration.py::test_fi_03_production_markdown_processing`
+
 ```python
-# Markdown formatting validation
-POST /ask {"question": "List all industries with details"}
-# Expected: Clean headers (###), proper lists (-), structured formatting
-# Validates: Header separation, list structure, markdown quality
+# Production Integration Test (NO MOCKING)
+def test_fi_03_production_markdown_processing():
+    result = _make_request("List all industries with detailed information")
+    # Validates: Real markdown headers, proper list formatting, no broken structure
+    # Expected: ### headers, proper separation, structured output
 ```
 
 ### Success Metrics  
@@ -98,11 +108,15 @@ POST /ask {"question": "List all industries with details"}
 - **Deduplication**: Smart document deduplication across query variants
 
 ### Test Cases
+**Integration Tests**: `tests/foundation/test_production_integration.py::test_fi_04_enhanced_retrieval_system`
+**Unit Tests**: `tests/foundation/test_enhanced_retrieval_system.py`
+
 ```python
-# Enhanced retrieval validation
-POST /ask {"question": "Who has experience with technology systems?"}
-# Expected: Expanded queries, multi-vector search, comprehensive results
-# Validates: Query expansion, alternative formulations, search diversity
+# Production Integration Test (NO MOCKING)
+def test_fi_04_enhanced_retrieval_system():
+    result = _make_request("Who has experience with technology systems integration?")
+    # Validates: Real query expansion, multi-vector search, actual retrieval improvements
+    # Expected: Enhanced results for complex queries, 2+ relevant tech terms found
 ```
 
 ### Success Metrics
@@ -126,11 +140,15 @@ POST /ask {"question": "Who has experience with technology systems?"}
 - **Normalized Scoring**: Length-normalized importance scores prevent document length bias
 
 ### Test Cases
+**Integration Tests**: `tests/foundation/test_production_integration.py::test_fi_05_semantic_bias_fix`
+**Unit Tests**: `tests/foundation/test_semantic_bias_fix.py`
+
 ```python
-# Semantic bias correction
-POST /ask {"question": "Which company specializes in healthcare technology?"}  
-# Expected: Correct attribution based on term importance, no cross-contamination
-# Validates: Term importance analysis, bias correction
+# Production Integration Test (NO MOCKING)
+def test_fi_05_semantic_bias_fix():
+    result = _make_request("Which company specializes in healthcare technology?")
+    # Validates: Real term importance analysis, actual bias correction
+    # Expected: Proper attribution or safety response, no cross-contamination
 ```
 
 ### Success Metrics
@@ -154,11 +172,14 @@ POST /ask {"question": "Which company specializes in healthcare technology?"}
 - **Fallback Responses**: Clear "I'm not sure" responses when information unavailable
 
 ### Test Cases
+**Integration Tests**: `tests/foundation/test_production_integration.py::test_fi_06_hallucination_prevention`
+
 ```python
-# Hallucination prevention
-POST /ask {"question": "What is the future of artificial intelligence?"}
-# Expected: "I'm not sure" or "I don't have access to that information"  
-# Validates: Hallucination guards, safety responses
+# Production Integration Test (NO MOCKING)
+def test_fi_06_hallucination_prevention():
+    result = _make_request("What is the future of artificial intelligence?")
+    # Validates: Real hallucination prevention, actual safety responses
+    # Expected: Safety response or short answer, no fabricated information
 ```
 
 ### Success Metrics
@@ -182,11 +203,14 @@ POST /ask {"question": "What is the future of artificial intelligence?"}
 - **Stream Parsing**: Enhanced client-side processing of streaming data
 
 ### Test Cases
+**Integration Tests**: `tests/foundation/test_production_integration.py::test_fi_07_smart_streaming_enhancement`
+
 ```python
-# Smart streaming validation  
-POST /ask {"question": "Describe the different companies and their sectors"}
-# Expected: Clean word boundaries, structured JSON chunks, no broken words
-# Validates: Word boundary streaming, JSON chunks, structured data
+# Production Integration Test (NO MOCKING)
+def test_fi_07_smart_streaming_enhancement():
+    response = requests.post("/ask", json={'question': 'Describe companies...'})
+    # Validates: Real streaming chunks, actual word boundary detection
+    # Expected: 5+ streaming chunks, <30% broken words, proper JSON format
 ```
 
 ### Success Metrics
@@ -210,11 +234,15 @@ POST /ask {"question": "Describe the different companies and their sectors"}
 - **Quality Pipeline**: Sequential filtering → deduplication → re-ranking
 
 ### Test Cases
+**Integration Tests**: `tests/foundation/test_production_integration.py::test_fi_08_quality_improvements`
+**Unit Tests**: `tests/foundation/test_quality_improvements.py`
+
 ```python
-# Quality enhancement validation
-POST /ask {"question": "What information is available about TechCorp?"}
-# Expected: High-quality documents, deduplicated results, enhanced relevance
-# Validates: Quality filtering, Shannon entropy, deduplication
+# Production Integration Test (NO MOCKING)
+def test_fi_08_quality_improvements():
+    result = _make_request("What detailed information is available about TechCorp?")
+    # Validates: Real quality filtering, actual Shannon entropy, production deduplication  
+    # Expected: High-quality structured response with proper source attribution
 ```
 
 ### Success Metrics

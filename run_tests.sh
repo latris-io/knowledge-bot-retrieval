@@ -67,7 +67,9 @@ declare -A TEST_CATEGORIES=(
     ["hallucination"]="FI-06: LLM Hallucination Prevention"
     ["streaming"]="FI-07: Smart Streaming Enhancement"
     ["quality_improvements"]="FI-08: Enhanced Retrieval Quality Improvements"
-    ["integration"]="Integration Tests"
+    ["integration"]="Production Integration Tests (NO MOCKING - requires server)"
+    ["unit"]="Unit Tests (with mocking for isolated testing)"
+    ["production"]="Production Integration Tests (same as integration)"
     ["performance"]="Performance Tests"
 )
 
@@ -206,8 +208,18 @@ case "${1:-all}" in
     "fi-08"|"quality_improvements")
         run_test_category "quality_improvements"
         ;;
-    "integration")
-        run_test_category "integration"
+    "integration"|"production")
+        print_status "warning" "Production integration tests require running server on localhost:8000"
+        read -p "Is the server running? (y/N): " -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            run_test_category "integration"
+        else
+            print_status "error" "Please start server with: uvicorn app:app --host 0.0.0.0 --port 8000"
+            exit 1
+        fi
+        ;;
+    "unit")
+        run_test_category "unit"
         ;;
     "help")
         echo "Foundation Improvements Test Runner"
@@ -230,8 +242,10 @@ case "${1:-all}" in
         echo "  fi-07              FI-07: Smart Streaming Enhancement"
         echo "  fi-08              FI-08: Enhanced Retrieval Quality Improvements"
         echo
-        echo "Other:"
-        echo "  integration        Integration tests"
+        echo "Test Types:"
+        echo "  integration        Production Integration Tests (NO MOCKING - requires server)"
+        echo "  unit              Unit Tests (with mocking for isolated testing)"
+        echo "  performance        Performance tests"
         echo "  help               Show this help message"
         echo
         ;;
