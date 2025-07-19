@@ -719,9 +719,25 @@ def _should_flush_buffer(self, new_token: str) -> bool:
 - ✅ **Backward Compatible**: Legacy clients continue to work
 - ✅ **Performance**: No latency increase over raw streaming
 
+#### Markdown-it Integration
+- **Progressive Parsing Strategies**: Content-type optimized, sentence-level progressive, hybrid approaches
+- **Integration Files**: `progressive-markdown.js`, `advanced-progressive-markdown.js` for different use cases
+- **Demo & Testing**: Interactive `markdown-comparison.html` showing traditional vs smart streaming
+- **Comprehensive Guide**: `SMART_STREAMING_INTEGRATION.md` with implementation examples
+- **Enhanced Widget**: Updated `widget.js` with content-type aware progressive markdown parsing
+
+#### Test Coverage
+- **Test File**: `tests/foundation/test_smart_streaming.py` with comprehensive test suite
+- **Word Boundary Accuracy**: Automated testing of 98%+ boundary detection
+- **JSON Chunk Format**: Validation of structured chunk format and metadata
+- **Content Classification**: Testing of header, list_item, text, and source detection
+- **Error Recovery**: Structured error handling and fallback testing
+- **Performance Validation**: No latency increase verification
+- **Backward Compatibility**: Legacy system support testing
+
 #### Version History
-- **v1.2.9-smart-streaming** (latest): Complete smart streaming implementation
-- **Current**: Production-ready with comprehensive testing support
+- **v1.2.9-smart-streaming** (latest): Complete smart streaming implementation with markdown-it integration
+- **Current**: Production-ready with comprehensive testing support and progressive parsing
 
 ---
 

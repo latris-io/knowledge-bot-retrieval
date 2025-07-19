@@ -68,7 +68,11 @@ case "${1:-all}" in
         ;;
     "foundation")
         echo -e "${YELLOW}🏗️ Running all Foundation Improvement tests${NC}"
-        run_tests "tests/foundation/" "Foundation Improvements (FI-01 to FI-06)"
+        run_tests "tests/foundation/" "Foundation Improvements (FI-01 to FI-07)"
+        ;;
+    "streaming")
+        echo -e "${YELLOW}🌊 Running Smart Streaming Enhancement tests${NC}"
+        run_tests "tests/foundation/test_smart_streaming.py" "Smart Streaming Enhancement (FI-07)"
         ;;
     "hallucination")
         echo -e "${YELLOW}🛡️ Running hallucination prevention tests${NC}"
@@ -94,7 +98,8 @@ case "${1:-all}" in
         echo -e "${BLUE}Available categories:${NC}"
         echo -e "  ${GREEN}fast${NC}        - Fast unit tests (no external dependencies)"
         echo -e "  ${GREEN}integration${NC} - Integration tests (requires ChromaDB)"
-        echo -e "  ${GREEN}foundation${NC}  - All Foundation Improvement tests (FI-01 to FI-06)"
+        echo -e "  ${GREEN}foundation${NC}  - All Foundation Improvement tests (FI-01 to FI-07)"
+        echo -e "  ${GREEN}streaming${NC}   - Smart Streaming Enhancement tests (FI-07)"
         echo -e "  ${GREEN}hallucination${NC} - Hallucination prevention tests (FI-06)"
         echo -e "  ${GREEN}verbose${NC}     - All tests with maximum verbosity"
         echo -e "  ${GREEN}debug${NC}       - Tests with debugger support"
