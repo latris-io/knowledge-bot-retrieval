@@ -13827,3 +13827,270 @@ These companies span various industries, including technology, healthcare, finan
 These companies span various industries, including technology, healthcare, finance, manufacturing, and retail, with differing annual revenues and contract values. [source: sample_excel.xlsx#3]
 2025-07-19 18:32:28,839 — INFO — app — [STREAM] Completed streaming. Clean text for history: 309 chars
 2025-07-19 18:32:28,841 — INFO — app — [RETRIEVAL] Sources: ['sample_excel.xlsx', 'sample_mixed.html', 'Lucas Offices.pdf', 'sample_mixed.html', 'Lucas Offices.pdf', 'School Schedule.pdf', 'sample_pdf.pdf', 'sample_mixed.html', 'School Schedule.pdf', 'sample_powerpoint.pptx'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+2025-07-19 18:34:38,135 — INFO — jwt_handler — [JWT] Successfully decoded minimal token for company_id=3, bot_id=1
+2025-07-19 18:34:38,137 — INFO — app — [API] Received question: What companies are in the database?, company_id: 3, bot_id: 1, session_id: 5f28568d-3f24-448d-b0b1-314800ef5e52
+2025-07-19 18:34:38,138 — INFO — app — [BOT] Using mode: qa
+2025-07-19 18:34:38,139 — INFO — app — [BOT] Smart Complex Mode enabled for ALL queries
+2025-07-19 18:34:38,139 — INFO — app — [BOT] Smart Complex → Fast Comprehensive (comprehensive coverage)
+2025-07-19 18:34:38,140 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-19 18:34:38,210 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-07-19 18:34:38,943 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-07-19 18:34:39,409 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-07-19 18:34:39,701 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-07-19 18:34:40,212 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-19 18:34:40,849 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-19 18:34:40,851 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-19 18:34:40,853 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-19 18:34:41,318 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-19 18:34:41,501 — INFO — retriever — [RETRIEVER] Initialized BM25 with 362 documents
+2025-07-19 18:34:41,501 — INFO — retriever — [RETRIEVER] Fast comprehensive hybrid retriever — k=8 (BM25+Vector)
+2025-07-19 18:34:41,502 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "content_type": "unstructured_text",
+  "preservation_reason": "structured_data_integrity",
+  "chunk_type": "direct_extraction",
+  "structural_density": 0.508,
+  "llm_enrichment": "disabled",
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "created_time": 1752893064.69696,
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "chunk_index": 0,
+  "source_page": 1,
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "structure_type": "sheet_header",
+  "file_size": 9767,
+  "total_elements": 1,
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "modified_time": 1752893064.69696,
+  "company_id": 3,
+  "bot_id": 1,
+  "event_id": 693,
+  "file_name": "Lucas Offices.xlsx",
+  "llm_enrichment_mode": "disabled",
+  "element_types": "sheet_header",
+  "mime_type": "application/octet-stream",
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "processing_strategy": "direct_extraction",
+  "source_type": "xlsx",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx"
+}
+2025-07-19 18:34:41,504 — INFO — app — [BOT] Using gpt-4o-mini for Smart Complex query optimization
+2025-07-19 18:34:41,505 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-19 18:34:41,589 — INFO — app — [MEMORY] Created new history for session 5f28568d-3f24-448d-b0b1-314800ef5e52
+2025-07-19 18:34:42,639 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-19 18:34:43,146 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-19 18:34:43,778 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-19 18:34:44,697 — INFO — app — [RAW LLM OUTPUT] Raw response from LLM:
+'### Companies in the Database\n\n- **TechCorp**\n- **DataSys**\n- **CloudCo**\n- **InnovateLab**\n- **DigitalPro**\n\n### Additional Information\n\nThese companies span various industries, including technology, healthcare, finance, manufacturing, and retail, with differing annual revenues and contract values. [source: sample_excel.xlsx#3]'
+2025-07-19 18:34:44,698 — INFO — app — [RAW LLM OUTPUT] Raw response formatted:
+### Companies in the Database
+
+- **TechCorp**
+- **DataSys**
+- **CloudCo**
+- **InnovateLab**
+- **DigitalPro**
+
+### Additional Information
+
+These companies span various industries, including technology, healthcare, finance, manufacturing, and retail, with differing annual revenues and contract values. [source: sample_excel.xlsx#3]
+2025-07-19 18:34:44,698 — INFO — app — [STREAM] Completed streaming. Clean text for history: 309 chars
+2025-07-19 18:34:44,699 — INFO — app — [RETRIEVAL] Sources: ['sample_excel.xlsx', 'sample_mixed.html', 'Lucas Offices.pdf', 'sample_mixed.html', 'Lucas Offices.pdf', 'School Schedule.pdf', 'sample_pdf.pdf', 'sample_mixed.html', 'School Schedule.pdf', 'sample_powerpoint.pptx'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+2025-07-19 18:34:44,715 — INFO — jwt_handler — [JWT] Successfully decoded minimal token for company_id=3, bot_id=1
+2025-07-19 18:34:44,716 — INFO — app — [API] Received question: TechCorp industry and revenue information, company_id: 3, bot_id: 1, session_id: 8cf65715-6f5f-42f0-a3b8-51547bb06fe4
+2025-07-19 18:34:44,717 — INFO — app — [BOT] Using mode: qa
+2025-07-19 18:34:44,717 — INFO — app — [BOT] Smart Complex Mode enabled for ALL queries
+2025-07-19 18:34:44,718 — INFO — app — [BOT] Smart Complex → Fast Comprehensive (comprehensive coverage)
+2025-07-19 18:34:44,718 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-19 18:34:44,795 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-07-19 18:34:45,214 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-07-19 18:34:45,640 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-07-19 18:34:45,977 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-07-19 18:34:46,748 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-19 18:34:47,249 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-19 18:34:47,251 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-19 18:34:47,251 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-19 18:34:47,668 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-19 18:34:47,748 — INFO — retriever — [RETRIEVER] Initialized BM25 with 362 documents
+2025-07-19 18:34:47,748 — INFO — retriever — [RETRIEVER] Fast comprehensive hybrid retriever — k=8 (BM25+Vector)
+2025-07-19 18:34:47,748 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "source_type": "xlsx",
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "company_id": 3,
+  "bot_id": 1,
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "total_elements": 1,
+  "structure_type": "sheet_header",
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "file_size": 9767,
+  "mime_type": "application/octet-stream",
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "llm_enrichment": "disabled",
+  "file_name": "Lucas Offices.xlsx",
+  "source_page": 1,
+  "modified_time": 1752893064.69696,
+  "chunk_type": "direct_extraction",
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "content_type": "unstructured_text",
+  "llm_enrichment_mode": "disabled",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "preservation_reason": "structured_data_integrity",
+  "event_id": 693,
+  "chunk_index": 0,
+  "element_types": "sheet_header",
+  "structural_density": 0.508,
+  "processing_strategy": "direct_extraction",
+  "created_time": 1752893064.69696
+}
+2025-07-19 18:34:47,749 — INFO — app — [BOT] Using gpt-4o-mini for Smart Complex query optimization
+2025-07-19 18:34:47,750 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-19 18:34:47,832 — INFO — app — [MEMORY] Created new history for session 8cf65715-6f5f-42f0-a3b8-51547bb06fe4
+2025-07-19 18:34:48,334 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-19 18:34:48,855 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-19 18:34:49,234 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-19 18:34:50,029 — INFO — app — [RAW LLM OUTPUT] Raw response from LLM:
+'### TechCorp Industry and Revenue Information\n\n- **Industry**: Technology  \n- **Annual Revenue**: $5,000,000  \n\n### Additional Information\n\nTechCorp is identified as a company in the technology sector with an annual revenue of five million dollars. [source: sample_excel.xlsx#3]'
+2025-07-19 18:34:50,029 — INFO — app — [RAW LLM OUTPUT] Raw response formatted:
+### TechCorp Industry and Revenue Information
+
+- **Industry**: Technology  
+- **Annual Revenue**: $5,000,000  
+
+### Additional Information
+
+TechCorp is identified as a company in the technology sector with an annual revenue of five million dollars. [source: sample_excel.xlsx#3]
+2025-07-19 18:34:50,030 — INFO — app — [STREAM] Completed streaming. Clean text for history: 262 chars
+2025-07-19 18:34:50,032 — INFO — app — [RETRIEVAL] Sources: ['sample_excel.xlsx', 'sample_excel.xlsx', 'sample_powerpoint.pptx', 'sample_powerpoint.pptx'], Scores: ['N/A', 'N/A', 'N/A', 'N/A']
+2025-07-19 18:34:50,051 — INFO — jwt_handler — [JWT] Successfully decoded minimal token for company_id=3, bot_id=1
+2025-07-19 18:34:50,053 — INFO — app — [API] Received question: What is the history of quantum computing?, company_id: 3, bot_id: 1, session_id: c5f5ff0b-27fb-41f2-aad6-814c30233c54
+2025-07-19 18:34:50,055 — INFO — app — [BOT] Using mode: qa
+2025-07-19 18:34:50,055 — INFO — app — [BOT] Smart Complex Mode enabled for ALL queries
+2025-07-19 18:34:50,056 — INFO — app — [BOT] Smart Complex → Fast Comprehensive (comprehensive coverage)
+2025-07-19 18:34:50,057 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-19 18:34:50,143 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-07-19 18:34:50,575 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-07-19 18:34:51,127 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-07-19 18:34:51,565 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-07-19 18:34:52,171 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-19 18:34:52,742 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-19 18:34:52,746 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-19 18:34:52,747 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-19 18:34:53,220 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-19 18:34:53,311 — INFO — retriever — [RETRIEVER] Initialized BM25 with 362 documents
+2025-07-19 18:34:53,312 — INFO — retriever — [RETRIEVER] Fast comprehensive hybrid retriever — k=8 (BM25+Vector)
+2025-07-19 18:34:53,313 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "content_type": "unstructured_text",
+  "chunk_type": "direct_extraction",
+  "structure_type": "sheet_header",
+  "preservation_reason": "structured_data_integrity",
+  "created_time": 1752893064.69696,
+  "llm_enrichment": "disabled",
+  "llm_enrichment_mode": "disabled",
+  "event_id": 693,
+  "source_type": "xlsx",
+  "company_id": 3,
+  "element_types": "sheet_header",
+  "file_size": 9767,
+  "processing_strategy": "direct_extraction",
+  "modified_time": 1752893064.69696,
+  "chunk_index": 0,
+  "bot_id": 1,
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "structural_density": 0.508,
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "source_page": 1,
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "mime_type": "application/octet-stream",
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "file_name": "Lucas Offices.xlsx",
+  "total_elements": 1
+}
+2025-07-19 18:34:53,316 — INFO — app — [BOT] Using gpt-4o-mini for Smart Complex query optimization
+2025-07-19 18:34:53,316 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-19 18:34:53,397 — INFO — app — [MEMORY] Created new history for session c5f5ff0b-27fb-41f2-aad6-814c30233c54
+2025-07-19 18:34:53,709 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-19 18:34:54,430 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-19 18:34:54,927 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-19 18:34:54,993 — INFO — app — [RAW LLM OUTPUT] Raw response from LLM:
+"I'm not sure."
+2025-07-19 18:34:54,993 — INFO — app — [RAW LLM OUTPUT] Raw response formatted:
+I'm not sure.
+2025-07-19 18:34:54,994 — INFO — app — [STREAM] Completed streaming. Clean text for history: 13 chars
+2025-07-19 18:34:54,996 — INFO — app — [RETRIEVAL] Sources: ['Adobe Scan Jun 11, 2025.pdf', 'School Schedule.pdf', 'School Schedule.pdf', 'School Schedule.pdf', 'School Schedule.pdf', 'School Schedule.pdf', 'School Schedule.pdf', 'School Schedule.pdf', 'School Schedule.pdf', 'sample_mixed.html', 'sample_mixed.html'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+2025-07-19 18:34:55,007 — INFO — jwt_handler — [JWT] Successfully decoded minimal token for company_id=3, bot_id=1
+2025-07-19 18:34:55,007 — INFO — app — [API] Received question: List all industries in the database, company_id: 3, bot_id: 1, session_id: f9e29f09-bb87-438b-8350-4ab2b1d3def1
+2025-07-19 18:34:55,008 — INFO — app — [BOT] Using mode: qa
+2025-07-19 18:34:55,008 — INFO — app — [BOT] Smart Complex Mode enabled for ALL queries
+2025-07-19 18:34:55,008 — INFO — app — [BOT] Smart Complex → Fast Comprehensive (comprehensive coverage)
+2025-07-19 18:34:55,009 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-19 18:34:55,079 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-07-19 18:34:55,504 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-07-19 18:34:55,939 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-07-19 18:34:56,256 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-07-19 18:34:56,947 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-19 18:34:57,552 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-19 18:34:57,553 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-19 18:34:57,554 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-19 18:34:57,951 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-19 18:34:58,042 — INFO — retriever — [RETRIEVER] Initialized BM25 with 362 documents
+2025-07-19 18:34:58,043 — INFO — retriever — [RETRIEVER] Fast comprehensive hybrid retriever — k=8 (BM25+Vector)
+2025-07-19 18:34:58,043 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "file_size": 9767,
+  "mime_type": "application/octet-stream",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "modified_time": 1752893064.69696,
+  "llm_enrichment": "disabled",
+  "total_elements": 1,
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "preservation_reason": "structured_data_integrity",
+  "processing_strategy": "direct_extraction",
+  "created_time": 1752893064.69696,
+  "element_types": "sheet_header",
+  "structure_type": "sheet_header",
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "llm_enrichment_mode": "disabled",
+  "structural_density": 0.508,
+  "bot_id": 1,
+  "event_id": 693,
+  "source_type": "xlsx",
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "content_type": "unstructured_text",
+  "source_page": 1,
+  "chunk_index": 0,
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "chunk_type": "direct_extraction",
+  "company_id": 3,
+  "file_name": "Lucas Offices.xlsx"
+}
+2025-07-19 18:34:58,047 — INFO — app — [BOT] Using gpt-4o-mini for Smart Complex query optimization
+2025-07-19 18:34:58,047 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-19 18:34:58,119 — INFO — app — [MEMORY] Created new history for session f9e29f09-bb87-438b-8350-4ab2b1d3def1
+2025-07-19 18:34:58,515 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-19 18:34:59,040 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-19 18:34:59,439 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-19 18:35:00,014 — INFO — app — [RAW LLM OUTPUT] Raw response from LLM:
+'### Industries in the Database\n\n- Technology\n- Healthcare\n- Finance\n- Manufacturing\n- Retail\n\n### Additional Information\n\nThese industries are associated with the respective companies listed in the customer data. Each industry reflects the primary business focus of the companies. [source: sample_excel.xlsx#3]'
+2025-07-19 18:35:00,014 — INFO — app — [RAW LLM OUTPUT] Raw response formatted:
+### Industries in the Database
+
+- Technology
+- Healthcare
+- Finance
+- Manufacturing
+- Retail
+
+### Additional Information
+
+These industries are associated with the respective companies listed in the customer data. Each industry reflects the primary business focus of the companies. [source: sample_excel.xlsx#3]
+2025-07-19 18:35:00,015 — INFO — app — [STREAM] Completed streaming. Clean text for history: 304 chars
+2025-07-19 18:35:00,017 — INFO — app — [RETRIEVAL] Sources: ['sample_excel.xlsx', 'sample_text.txt', 'sample_table.csv', 'School Schedule.pdf', 'School Schedule.pdf'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A']
