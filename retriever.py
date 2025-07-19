@@ -21,7 +21,7 @@ from ratelimit import limits, sleep_and_retry
 logger = logging.getLogger(__name__)
 
 DEFAULT_K = int(os.getenv("RETRIEVER_K", 12))
-DEFAULT_SIMILARITY_THRESHOLD = float(os.getenv("RETRIEVER_SIMILARITY_THRESHOLD", 0.1))
+DEFAULT_SIMILARITY_THRESHOLD = float(os.getenv("RETRIEVER_SIMILARITY_THRESHOLD", 0.05))  # FI-01: Lowered from 0.1 to 0.05 for broader matching
 
 
 class RetrieverService:
@@ -142,10 +142,10 @@ Alternative queries:"""
 
             # For maximum speed in direct mode, skip redundant embedding compression
             if use_multi_query:
-                # Full hybrid with compression for comprehensive queries
+                # Full hybrid with compression for comprehensive queries - FI-01: Enhanced BM25 weighting
                 hybrid = EnsembleRetriever(
                     retrievers=[vector_component, bm25],
-                    weights=[0.8, 0.2]
+                    weights=[0.6, 0.4]  # FI-01: Enhanced BM25 weight (0.6/0.4) for better keyword matching
                 )
 
                 # Use relaxed threshold for complex queries to speed up filtering
@@ -168,10 +168,10 @@ Alternative queries:"""
             else:
                 # Adaptive direct mode: vector-only for simple/medium, hybrid for complex
                 if k >= 8:
-                    # High-k complex queries: use BM25+Vector hybrid for comprehensive coverage
+                    # High-k complex queries: use BM25+Vector hybrid for comprehensive coverage - FI-01: Enhanced weighting
                     hybrid = EnsembleRetriever(
                         retrievers=[vector_component, bm25],
-                        weights=[0.7, 0.3]  # Favor vector but include BM25 for keyword coverage
+                        weights=[0.6, 0.4]  # FI-01: Enhanced BM25 weight for better keyword matching
                     )
                     logger.info(f"[RETRIEVER] Fast comprehensive hybrid retriever — k={k} (BM25+Vector)")
                     final_retriever = hybrid

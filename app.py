@@ -26,6 +26,53 @@ import uuid
 
 load_dotenv()
 
+# FI-02: Semantic Topic Change Detection
+async def detect_topic_change_semantic(current_question: str, chat_history: InMemoryChatMessageHistory, embedding_function) -> bool:
+    """
+    FI-02: Content-agnostic semantic similarity-based topic change detection.
+    Uses text-embedding-3-large for topic comparison with 0.7 threshold.
+    """
+    if not chat_history.messages:
+        return False
+    
+    # Get the last user message
+    user_messages = [msg for msg in chat_history.messages if isinstance(msg, HumanMessage)]
+    if not user_messages:
+        return False
+    
+    last_user_message = user_messages[-1].content
+    
+    try:
+        # Generate embeddings for current and previous questions
+        current_embedding = await asyncio.to_thread(
+            embedding_function.embed_query, 
+            current_question
+        )
+        previous_embedding = await asyncio.to_thread(
+            embedding_function.embed_query, 
+            last_user_message
+        )
+        
+        # Calculate cosine similarity
+        import numpy as np
+        current_embedding = np.array(current_embedding)
+        previous_embedding = np.array(previous_embedding)
+        
+        similarity = np.dot(current_embedding, previous_embedding) / (
+            np.linalg.norm(current_embedding) * np.linalg.norm(previous_embedding)
+        )
+        
+        # Return True if topics are different (low similarity)
+        topic_changed = similarity < 0.7
+        if topic_changed:
+            logger.info(f"[FI-02] Topic change detected: similarity={similarity:.3f} < 0.7")
+        
+        return topic_changed
+        
+    except Exception as e:
+        logger.error(f"[FI-02] Error in topic change detection: {e}")
+        return False
+
 app = FastAPI()
 
 # Mount static files for widget.js
@@ -209,10 +256,20 @@ async def ask_question(
 
         # Get conversation history for this session - Smart Complex mode
         chat_history = get_session_history(session_id)
-        conversation_context = format_chat_history(chat_history, 'complex')
         
-        # Enhanced prompt with conversation context - comprehensive mode
-        max_context = 1200  # Full context for Smart Complex mode
+        # FI-02: Semantic topic change detection - reduce context when topic changes
+        embedding_function = retriever_service.embedding_function
+        topic_changed = await detect_topic_change_semantic(question, chat_history, embedding_function)
+        
+        if topic_changed:
+            # Reduce conversation history when topic change detected
+            conversation_context = format_chat_history(chat_history, 'simple')  # Use simple context for topic changes
+            max_context = 400  # Reduced context for topic changes
+            logger.info("[FI-02] Topic change detected - using reduced context")
+        else:
+            conversation_context = format_chat_history(chat_history, 'complex')
+            max_context = 1200  # Full context for Smart Complex mode
+        
         if len(conversation_context) > max_context:
             conversation_context = conversation_context[:max_context] + "...\n\n"
         
