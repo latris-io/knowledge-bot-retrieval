@@ -102,6 +102,10 @@ MANDATORY SOURCE ATTRIBUTION:
 
 Use the provided context and make reasonable inferences based on document context and ownership. Only say "I'm not sure" if no relevant information can be found or reasonably inferred from the correct source documents.
 
+**CRITICAL: If no context is provided or the context is empty, you MUST respond with "I don't have access to that information in my knowledge base. Please ensure the relevant documents have been uploaded and indexed."**
+
+**DO NOT generate responses based on general knowledge when no specific context is provided.**
+
 Context:
 {context}
 
