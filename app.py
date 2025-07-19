@@ -20,6 +20,7 @@ from langchain.schema import LLMResult
 from ratelimit import limits, sleep_and_retry
 from jwt_handler import extract_jwt_claims
 import asyncio
+import json
 import logging
 import os
 import uuid
@@ -147,17 +148,54 @@ class EventStreamHandler(BaseCallbackHandler):
         self._loop = None
         self.accumulated_text = ""  # Track full response for conversation history
         self.processed_text = ""    # Clean version for history
+        # FI-07: Smart Streaming Enhancement
+        self.token_buffer = ""      # Buffer for word boundary detection
+        self.chunk_id = 0          # Incremental chunk ID
+        self.stream_started = False
 
     async def astream(self):
+        # FI-07: Send start marker
+        if not self.stream_started:
+            start_chunk = {
+                "id": 0,
+                "type": "start",
+                "content": "",
+                "content_type": "start",
+                "final": False
+            }
+            yield f"data: {json.dumps(start_chunk)}\n\n"
+            self.stream_started = True
+            
         while True:
             try:
-                token = await self.queue.get()
-                if token is None:
+                item = await self.queue.get()
+                if item is None:
+                    # FI-07: Send end marker
+                    end_chunk = {
+                        "id": self.chunk_id + 1,
+                        "type": "end", 
+                        "content": "",
+                        "content_type": "end",
+                        "final": True
+                    }
+                    yield f"data: {json.dumps(end_chunk)}\n\n"
                     break
-                yield f"data: {token}\n\n"
+                elif isinstance(item, dict):
+                    # FI-07: Structured chunk
+                    yield f"data: {json.dumps(item)}\n\n"
+                else:
+                    # Legacy token support
+                    yield f"data: {item}\n\n"
             except Exception as e:
                 logger.error(f"[STREAM] Error streaming token: {e}")
-                yield f"data: [ERROR] {str(e)}\n\n"
+                error_chunk = {
+                    "id": self.chunk_id + 1,
+                    "type": "error",
+                    "content": f"Stream error: {str(e)}",
+                    "content_type": "error", 
+                    "final": True
+                }
+                yield f"data: {json.dumps(error_chunk)}\n\n"
                 break
 
     def _put_nowait_safe(self, item):
@@ -166,13 +204,81 @@ class EventStreamHandler(BaseCallbackHandler):
         except Exception as e:
             logger.error(f"[STREAM] Error putting item in queue: {e}")
 
+    def _should_flush_buffer(self, new_token: str) -> bool:
+        """FI-07: Determine if token buffer should be flushed at word boundaries"""
+        combined = self.token_buffer + new_token
+        
+        # Flush on sentence boundaries
+        if new_token in '.!?':
+            return True
+            
+        # Flush on word boundaries (space after word)
+        if new_token == ' ' and len(self.token_buffer.strip()) > 0:
+            return True
+            
+        # Flush on line breaks (important for markdown)
+        if '\n' in new_token:
+            return True
+            
+        # Flush on markdown patterns
+        if combined.strip().endswith('**') or combined.strip().endswith('###'):
+            return True
+            
+        # Prevent hanging (max 50 chars)
+        if len(self.token_buffer) > 50:
+            return True
+            
+        return False
+
+    def _classify_content_type(self, content: str) -> str:
+        """FI-07: Classify content type for better client processing"""
+        content_strip = content.strip()
+        
+        if content_strip.startswith('###') or content_strip.startswith('##') or content_strip.startswith('#'):
+            return "header"
+        elif content_strip.startswith('- ') or content_strip.startswith('* '):
+            return "list_item" 
+        elif '[source:' in content_strip:
+            return "source"
+        else:
+            return "text"
+
     def on_llm_new_token(self, token: str, **kwargs):
         self.accumulated_text += token
         
-        # Stream the raw token directly - no HTML processing
-        self._put_nowait_safe(token)
+        # FI-07: Smart word boundary buffering
+        if self._should_flush_buffer(token):
+            # Flush current buffer plus new token
+            content = self.token_buffer + token
+            if content.strip():  # Only send non-empty content
+                self.chunk_id += 1
+                chunk = {
+                    "id": self.chunk_id,
+                    "type": "content",
+                    "content": content,
+                    "content_type": self._classify_content_type(content),
+                    "final": False
+                }
+                logger.debug(f"[FI-07] Sending chunk {self.chunk_id}: {content[:50]}...")
+                self._put_nowait_safe(chunk)
+            self.token_buffer = ""
+        else:
+            # Add to buffer
+            self.token_buffer += token
 
     def on_llm_end(self, response: LLMResult, **kwargs):
+        # FI-07: Flush any remaining buffer
+        if self.token_buffer.strip():
+            self.chunk_id += 1
+            final_chunk = {
+                "id": self.chunk_id,
+                "type": "content", 
+                "content": self.token_buffer,
+                "content_type": self._classify_content_type(self.token_buffer),
+                "final": False
+            }
+            self._put_nowait_safe(final_chunk)
+        
         # Log the raw LLM output for debugging
         logger.info(f"[RAW LLM OUTPUT] Raw response from LLM:\n{repr(self.accumulated_text)}")
         logger.info(f"[RAW LLM OUTPUT] Raw response formatted:\n{self.accumulated_text}")
@@ -180,11 +286,19 @@ class EventStreamHandler(BaseCallbackHandler):
         # Create clean text for conversation history (remove markdown artifacts)
         self.processed_text = process_markdown_to_clean_text(self.accumulated_text)
         
+        logger.info(f"[FI-07] Smart streaming completed. Chunks sent: {self.chunk_id}")
         logger.info(f"[STREAM] Completed streaming. Clean text for history: {len(self.processed_text)} chars")
         self._put_nowait_safe(None)
 
     def on_llm_error(self, error: Exception, **kwargs):
-        self._put_nowait_safe(f"[ERROR] LLM failed: {str(error)}")
+        error_chunk = {
+            "id": self.chunk_id + 1,
+            "type": "error",
+            "content": f"LLM error: {str(error)}",
+            "content_type": "error",
+            "final": True
+        }
+        self._put_nowait_safe(error_chunk)
 
 @sleep_and_retry
 @limits(calls=100, period=60)
