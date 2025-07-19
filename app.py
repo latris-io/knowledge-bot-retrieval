@@ -44,10 +44,6 @@ logger = logging.getLogger(__name__)
 
 session_histories = {}
 
-# Smart Complex Mode - All queries use intelligent routing
-
-# Smart Complex Mode is now hardcoded for all queries
-
 def get_session_history(session_id: str) -> InMemoryChatMessageHistory:
     if session_id not in session_histories:
         session_histories[session_id] = InMemoryChatMessageHistory()

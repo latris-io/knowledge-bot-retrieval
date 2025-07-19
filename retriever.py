@@ -30,9 +30,17 @@ class RetrieverService:
             model="text-embedding-3-large",
             openai_api_key=get_openai_api_key()
         )
+        # Cache expensive objects
+        self._vectorstore_cache = {}
+        self._bm25_cache = {}
         logger.info("[RETRIEVER] Initialized RetrieverService")
 
     def get_chroma_vectorstore(self, collection_name: str):
+        # Cache vectorstore to avoid recreating ChromaDB connections
+        if collection_name in self._vectorstore_cache:
+            logger.info(f"[RETRIEVER] Using cached vectorstore for {collection_name}")
+            return self._vectorstore_cache[collection_name]
+            
         chroma_url = os.getenv("CHROMA_URL")
         if not chroma_url:
             raise ValueError("CHROMA_URL must be set in environment")
@@ -47,11 +55,13 @@ class RetrieverService:
 
         collection = client.get_or_create_collection(name=collection_name)
 
-        return Chroma(
+        vectorstore = Chroma(
             collection_name=collection_name,
             client=client,
             embedding_function=self.embedding_function
         )
+        self._vectorstore_cache[collection_name] = vectorstore
+        return vectorstore
 
     @sleep_and_retry
     @limits(calls=100, period=60)
@@ -114,13 +124,21 @@ Alternative queries:"""
                 logger.info(f"[RETRIEVER] Using direct vector retriever for maximum speed")
                 vector_component = vector_retriever
 
-            docs = vectorstore.get(include=["documents", "metadatas"], where=base_filter)
-            texts = docs["documents"]
-            metadatas = docs["metadatas"]
-
-            bm25 = BM25Retriever.from_texts(texts, metadatas=metadatas)
-            bm25.k = k
-            logger.info(f"[RETRIEVER] Initialized BM25 with {len(texts)} documents")
+            # Cache BM25 retriever to avoid expensive document fetching and rebuilding
+            cache_key = f"{company_id}_{bot_id}"
+            if cache_key in self._bm25_cache:
+                bm25 = self._bm25_cache[cache_key]
+                bm25.k = k  # Update k for this request
+                logger.info(f"[RETRIEVER] Using cached BM25 with {len(bm25.docs)} documents")
+            else:
+                docs = vectorstore.get(include=["documents", "metadatas"], where=base_filter)
+                texts = docs["documents"]
+                metadatas = docs["metadatas"]
+                
+                bm25 = BM25Retriever.from_texts(texts, metadatas=metadatas)
+                bm25.k = k
+                self._bm25_cache[cache_key] = bm25
+                logger.info(f"[RETRIEVER] Initialized BM25 with {len(texts)} documents")
 
             # For maximum speed in direct mode, skip redundant embedding compression
             if use_multi_query:
