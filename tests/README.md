@@ -91,9 +91,17 @@ pytest tests/foundation/test_enhanced_retrieval.py::test_semantic_query_expansio
 - Full system validation
 
 #### **Foundation Tests** (`./run_tests.sh foundation`)
-- All Foundation Improvement tests (FI-01 to FI-04)
+- All Foundation Improvement tests (FI-01 to FI-06)
 - Comprehensive coverage
 - Both unit and integration tests
+- Includes critical hallucination prevention tests
+
+#### **Hallucination Prevention Tests** (`./run_tests.sh hallucination`)
+- FI-06: LLM Hallucination Prevention tests
+- Critical data integrity validation
+- Tests empty database scenarios
+- Prevents fabricated business information
+- Ensures proper error responses
 
 #### **Verbose Tests** (`./run_tests.sh verbose`)
 - Maximum detail output
@@ -123,6 +131,39 @@ pytest tests/foundation/test_enhanced_retrieval.py::test_semantic_query_expansio
 - ❌ **FAILED**: Test failed
 - 💥 **ERROR**: Critical system error
 - 🚨 **EXCEPTION**: Unexpected exception
+
+## 📁 Test Files Overview
+
+### Foundation Improvement Tests (`tests/foundation/`)
+
+#### **`test_enhanced_retrieval.py`**
+- **Coverage**: FI-01 to FI-05 (Enhanced Retrieval, Topic Detection, Markdown Processing, Semantic Bias Fix)
+- **Key Tests**:
+  - `test_semantic_query_expansion` - Query expansion functionality
+  - `test_multi_vector_search` - Multi-vector search coverage
+  - `test_adaptive_similarity_thresholds` - Dynamic threshold adjustment
+  - `test_query_classification` - Query type classification
+  - `test_entity_concept_extraction` - Entity and concept extraction
+  - `test_enhanced_vs_original_retrieval` - Performance comparison
+  - `test_learning_system` - Pattern learning integration
+
+#### **`test_hallucination_prevention.py`** ⚠️ **NEW**
+- **Coverage**: FI-06 (Critical LLM Hallucination Prevention)
+- **Key Tests**:
+  - `test_empty_database_response` - Handles empty ChromaDB scenarios
+  - `test_prevent_specific_business_hallucination` - Prevents fake business info
+  - `test_valid_response_with_real_documents` - Proper responses with real data
+  - `test_partial_context_handling` - Irrelevant document handling
+  - `test_zero_documents_vs_irrelevant_documents` - Response pattern distinction
+- **Critical for**: Data integrity, preventing misinformation, empty database safety
+
+#### **`test_problematic_queries.py`**
+- **Coverage**: Edge cases and previously failing queries
+- **Key Tests**: Specific query patterns that were causing issues
+
+#### **`test_retrieval_performance.py`**
+- **Coverage**: Performance benchmarking and latency testing
+- **Key Tests**: Response time validation and throughput testing
 
 ### 🔍 Debugging Tips
 
