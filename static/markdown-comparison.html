@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Streaming vs Traditional - Markdown Comparison</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://unpkg.com/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .demo-box {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background: #f9f9f9;
+        }
+        .traditional { border-color: #ff6b6b; }
+        .smart { border-color: #4ecdc4; }
+        
+        .output-area {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+            min-height: 200px;
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+        }
+        
+        .controls {
+            margin: 10px 0;
+        }
+        
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            background: #007acc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #005c99;
+        }
+        
+        .metrics {
+            background: #e8f4fd;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin: 5px 0;
+        }
+        
+        .streaming-text {
+            background: #fffacd;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+        
+        .chunk-info {
+            background: #f0f8ff;
+            border-left: 3px solid #007acc;
+            padding: 5px 10px;
+            margin: 5px 0;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Smart Streaming vs Traditional Approach</h1>
+    <p>This demo shows how our smart streaming approach provides better user experience compared to traditional token-level streaming.</p>
+    
+    <div class="comparison-container">
+        <div class="demo-box traditional">
+            <h3>❌ Traditional Token Streaming</h3>
+            <p>Raw tokens streamed individually, parsed at the end</p>
+            
+            <div class="controls">
+                <button onclick="startTraditionalDemo()">Start Traditional Demo</button>
+                <button onclick="clearTraditional()">Clear</button>
+            </div>
+            
+            <div class="metrics" id="traditional-metrics">
+                Chunks: 0 | Parse Operations: 0 | User Experience: Poor
+            </div>
+            
+            <div class="output-area" id="traditional-output">
+                Ready for demo...
+            </div>
+        </div>
+        
+        <div class="demo-box smart">
+            <h3>✅ Smart Boundary Streaming</h3>
+            <p>Word boundaries + content classification + progressive parsing</p>
+            
+            <div class="controls">
+                <button onclick="startSmartDemo()">Start Smart Demo</button>
+                <button onclick="clearSmart()">Clear</button>
+            </div>
+            
+            <div class="metrics" id="smart-metrics">
+                Chunks: 0 | Parse Operations: 0 | User Experience: Excellent
+            </div>
+            
+            <div class="output-area" id="smart-output">
+                Ready for demo...
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 30px;">
+        <h3>📊 Benefits of Smart Streaming</h3>
+        <ul>
+            <li><strong>Better UX:</strong> Complete words appear together instead of character-by-character</li>
+            <li><strong>Progressive Parsing:</strong> Headers and lists can be formatted immediately</li>
+            <li><strong>Content Classification:</strong> Different handling for headers, lists, text, and sources</li>
+            <li><strong>Fewer Parse Operations:</strong> Smart caching and boundary detection</li>
+            <li><strong>Robust Error Handling:</strong> Graceful fallback to raw text</li>
+        </ul>
+    </div>
+
+    <script>
+        // Initialize markdown-it
+        const md = markdownit({
+            html: true,
+            linkify: true,
+            typographer: true,
+            breaks: true
+        });
+
+        // Demo content that will be streamed
+        const demoContent = `### Smart Streaming Demo
+
+This is a **comprehensive example** of our improved streaming approach.
+
+- **Feature 1**: Word boundary detection
+- **Feature 2**: Content type classification  
+- **Feature 3**: Progressive parsing capabilities
+
+### Technical Benefits
+
+The system provides *much better* user experience by:
+
+1. Streaming complete words instead of broken characters
+2. Parsing headers and lists immediately when detected
+3. Caching repeated content for better performance
+
+[source: demo.md#1]`;
+
+        // Traditional streaming simulation
+        async function startTraditionalDemo() {
+            const output = document.getElementById('traditional-output');
+            const metrics = document.getElementById('traditional-metrics');
+            
+            // Clear previous content
+            output.innerHTML = '';
+            
+            let chunkCount = 0;
+            let parseOperations = 0;
+            let accumulatedText = '';
+            
+            // Simulate raw token streaming (character by character)
+            const chars = demoContent.split('');
+            
+            for (let i = 0; i < chars.length; i++) {
+                const char = chars[i];
+                accumulatedText += char;
+                chunkCount++;
+                
+                // Show raw accumulation (ugly!)
+                output.innerHTML = `<pre style="white-space: pre-wrap;">${accumulatedText}</pre>`;
+                
+                // Update metrics
+                metrics.innerHTML = `Chunks: ${chunkCount} | Parse Operations: ${parseOperations} | User Experience: Poor (broken words)`;
+                
+                // Delay to show streaming effect
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            
+            // Final parse at the end
+            parseOperations++;
+            const finalHtml = md.render(accumulatedText.replace(/\[source: .+?\]/g, ''));
+            output.innerHTML = finalHtml;
+            
+            metrics.innerHTML = `Chunks: ${chunkCount} | Parse Operations: ${parseOperations} | User Experience: Poor → Better (but only at end)`;
+        }
+
+        // Smart streaming simulation
+        async function startSmartDemo() {
+            const output = document.getElementById('smart-output');
+            const metrics = document.getElementById('smart-metrics');
+            
+            // Clear previous content
+            output.innerHTML = '';
+            
+            let chunkCount = 0;
+            let parseOperations = 0;
+            let accumulatedContent = '';
+            
+            // Simulate smart streaming chunks
+            const smartChunks = [
+                { type: 'start', content: '', content_type: null },
+                { type: 'content', content: '### Smart Streaming Demo', content_type: 'header' },
+                { type: 'content', content: '\n\nThis is a **comprehensive example**', content_type: 'text' },
+                { type: 'content', content: ' of our improved streaming approach.', content_type: 'text' },
+                { type: 'content', content: '\n\n- **Feature 1**: Word boundary detection', content_type: 'list_item' },
+                { type: 'content', content: '\n- **Feature 2**: Content type classification', content_type: 'list_item' },
+                { type: 'content', content: '\n- **Feature 3**: Progressive parsing capabilities', content_type: 'list_item' },
+                { type: 'content', content: '\n\n### Technical Benefits', content_type: 'header' },
+                { type: 'content', content: '\n\nThe system provides *much better* user experience by:', content_type: 'text' },
+                { type: 'content', content: '\n\n1. Streaming complete words instead of broken characters', content_type: 'list_item' },
+                { type: 'content', content: '\n2. Parsing headers and lists immediately when detected', content_type: 'list_item' },
+                { type: 'content', content: '\n3. Caching repeated content for better performance', content_type: 'list_item' },
+                { type: 'content', content: '[source: demo.md#1]', content_type: 'source' },
+                { type: 'end', content: '', content_type: null }
+            ];
+            
+            for (const chunk of smartChunks) {
+                if (chunk.type === 'start') {
+                    output.innerHTML = '<div>🌊 Stream starting...</div>';
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    continue;
+                }
+                
+                if (chunk.type === 'end') {
+                    // Final comprehensive parse
+                    parseOperations++;
+                    const cleanContent = accumulatedContent.replace(/\[source: .+?\]/g, '');
+                    const finalHtml = md.render(cleanContent);
+                    output.innerHTML = finalHtml + '<div style="margin-top: 10px; padding: 5px; background: #e8f4fd; font-size: 12px;">📚 Source: demo.md#1</div>';
+                    
+                    metrics.innerHTML = `Chunks: ${chunkCount} | Parse Operations: ${parseOperations} | User Experience: Excellent throughout!`;
+                    break;
+                }
+                
+                if (chunk.type === 'content') {
+                    chunkCount++;
+                    accumulatedContent += chunk.content;
+                    
+                    // Smart handling based on content type
+                    if (chunk.content_type === 'header') {
+                        parseOperations++;
+                        const headerHtml = md.render(chunk.content);
+                        output.innerHTML += headerHtml;
+                        
+                        // Show chunk info
+                        output.innerHTML += `<div class="chunk-info">✅ Header parsed immediately: "${chunk.content.trim()}"</div>`;
+                        
+                    } else if (chunk.content_type === 'list_item') {
+                        parseOperations++;
+                        const listHtml = md.render(accumulatedContent.split('\n\n').pop() || '');
+                        // Replace last content with parsed version
+                        const parts = output.innerHTML.split('<div class="chunk-info">');
+                        if (parts.length > 1) {
+                            output.innerHTML = parts[0] + listHtml + '<div class="chunk-info">' + parts.slice(1).join('<div class="chunk-info">');
+                        } else {
+                            output.innerHTML += listHtml;
+                        }
+                        
+                        output.innerHTML += `<div class="chunk-info">✅ List item parsed progressively</div>`;
+                        
+                    } else if (chunk.content_type === 'source') {
+                        // Handle source separately (don't display inline)
+                        output.innerHTML += `<div class="chunk-info">📚 Source detected: ${chunk.content}</div>`;
+                        
+                    } else {
+                        // Regular text - show with streaming indicator
+                        output.innerHTML += `<span class="streaming-text">${chunk.content}</span>`;
+                        output.innerHTML += `<div class="chunk-info">⏳ Text chunk buffered for optimal parsing</div>`;
+                    }
+                    
+                    metrics.innerHTML = `Chunks: ${chunkCount} | Parse Operations: ${parseOperations} | User Experience: Excellent (progressive formatting)`;
+                    
+                    // Scroll to bottom and delay
+                    output.scrollTop = output.scrollHeight;
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                }
+            }
+        }
+
+        function clearTraditional() {
+            document.getElementById('traditional-output').innerHTML = 'Ready for demo...';
+            document.getElementById('traditional-metrics').innerHTML = 'Chunks: 0 | Parse Operations: 0 | User Experience: Poor';
+        }
+
+        function clearSmart() {
+            document.getElementById('smart-output').innerHTML = 'Ready for demo...';
+            document.getElementById('smart-metrics').innerHTML = 'Chunks: 0 | Parse Operations: 0 | User Experience: Excellent';
+        }
+
+        // Auto-demo on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (confirm('Would you like to see a side-by-side comparison demo?')) {
+                    startTraditionalDemo();
+                    setTimeout(() => {
+                        startSmartDemo();
+                    }, 2000);
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

@@ -520,24 +520,25 @@
               
                               // Stream complete - now parse final markdown
                 if (accumulatedText) {
-                  console.log('[Widget] Stream complete, parsing final markdown');
+                  console.log('[Widget] Stream complete, performing final markdown parsing with full content');
                   const sourceMatches = [...accumulatedText.matchAll(/\[source: (.+?)\]/g)];
                   const allSources = sourceMatches.map(match => match[1]);
                   const uniqueSources = [...new Set(allSources)];
+                  
                   // Remove sources but preserve line breaks - don't trim!
                   const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "");
                   // Remove loading message but preserve line breaks - don't trim!
                   const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "");
                 
-                console.log('[Widget] Content for markdown parsing:', contentText);
+                console.log('[Widget] Content for final markdown parsing:', contentText);
                 
-                // Now parse the complete markdown
+                // Now parse the complete markdown for final display
                 const mainHtml = parseMarkdown(contentText);
                 const sourcesHtml = uniqueSources.length
                   ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
                   : "";
                 
-                console.log('[Widget] Final HTML after parsing:', mainHtml);
+                console.log('[Widget] Final HTML after complete parsing:', mainHtml);
                 
                 answerBox.innerHTML = window.DOMPurify
                   ? DOMPurify.sanitize(mainHtml + sourcesHtml)
@@ -560,11 +561,11 @@
                 if (data === '[DONE]' || !data.trim()) continue;
                 
                 try {
-                  // Parse JSON chunk
+                  // Parse JSON chunk using our smart streaming format
                   const chunkData = JSON.parse(data);
                   console.log(`[Widget] Parsed chunk:`, chunkData);
                   
-                  // Handle different chunk types
+                  // Handle different chunk types with smart markdown parsing
                   switch (chunkData.type) {
                     case 'start':
                       console.log(`[Widget] Stream started`);
@@ -593,16 +594,36 @@
                         const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "").trim();
                         
                         if (responseStarted) {
-                          // Show actual content, removing any loading messages
+                          // Smart markdown processing based on content type
                           const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "");
                           
-                          // Show raw text while streaming (no markdown parsing yet)
+                          // Progressive markdown parsing based on chunk content type
+                          let displayHtml;
+                          if (chunkData.content_type === 'header') {
+                            // Headers can be parsed immediately
+                            const headerMatch = contentText.match(/(###?\s+.*?)(?=\n|$)/);
+                            if (headerMatch) {
+                              displayHtml = parseMarkdown(contentText);
+                            } else {
+                              displayHtml = `<pre style="white-space: pre-wrap; font-family: inherit; margin: 0;">${contentText}</pre>`;
+                            }
+                          } else if (chunkData.content_type === 'list_item') {
+                            // List items can often be parsed progressively
+                            if (contentText.includes('\n-') || contentText.includes('\n*') || contentText.includes('\n1.')) {
+                              displayHtml = parseMarkdown(contentText);
+                            } else {
+                              displayHtml = `<pre style="white-space: pre-wrap; font-family: inherit; margin: 0;">${contentText}</pre>`;
+                            }
+                          } else {
+                            // For regular text, show as preformatted while streaming
+                            displayHtml = `<pre style="white-space: pre-wrap; font-family: inherit; margin: 0;">${contentText}</pre>`;
+                          }
+                          
                           const sourcesHtml = uniqueSources.length
                             ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
                             : "";
                           
-                          // Use pre tag to preserve formatting while streaming
-                          answerBox.innerHTML = `<pre style="white-space: pre-wrap; font-family: inherit; margin: 0;">${contentText}</pre>${sourcesHtml}`;
+                          answerBox.innerHTML = displayHtml + sourcesHtml;
                         } else {
                           // Still in loading phase, show Thinking with spinner
                           answerBox.innerHTML = `
@@ -620,7 +641,7 @@
                       throw new Error(chunkData.error || 'Unknown streaming error');
                       
                     case 'end':
-                      console.log(`[Widget] Stream ended`);
+                      console.log(`[Widget] Stream ended - performing final markdown parsing`);
                       // Final processing happens after the stream loop
                       break;
                       
@@ -667,6 +688,35 @@
                 answerBox.scrollTop = answerBox.scrollHeight;
               }
             }
+          }
+          
+          // After stream completion - perform final markdown parsing with full content
+          if (accumulatedText) {
+            console.log('[Widget] Stream complete, performing final markdown parsing with full content');
+            const sourceMatches = [...accumulatedText.matchAll(/\[source: (.+?)\]/g)];
+            const allSources = sourceMatches.map(match => match[1]);
+            const uniqueSources = [...new Set(allSources)];
+            
+            // Remove sources but preserve line breaks - don't trim!
+            const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "");
+            // Remove loading message but preserve line breaks - don't trim!
+            const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "");
+          
+            console.log('[Widget] Content for final markdown parsing:', contentText);
+            
+            // Now parse the complete markdown for final display
+            const mainHtml = parseMarkdown(contentText);
+            const sourcesHtml = uniqueSources.length
+              ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
+              : "";
+            
+            console.log('[Widget] Final HTML after complete parsing:', mainHtml);
+            
+            answerBox.innerHTML = window.DOMPurify
+              ? DOMPurify.sanitize(mainHtml + sourcesHtml)
+              : (mainHtml + sourcesHtml);
+          } else {
+            console.log('[Widget] No accumulated text to parse');
           }
         }
       } catch (err) {
