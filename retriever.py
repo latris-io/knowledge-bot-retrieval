@@ -345,19 +345,22 @@ Alternative:"""
                 if len(content) < 20:
                     continue
                 
-                # HOTFIX: Reduce quality thresholds for structured data
-                # Check if this is structured data (CSV, Excel, tables)
-                metadata = doc.metadata
-                file_name = metadata.get('file_name', '').lower()
-                is_structured_data = any(ext in file_name for ext in ['.csv', '.xlsx', '.xls']) or \
-                                   'table' in file_name or 'spreadsheet' in file_name or \
-                                   any(indicator in content.lower() for indicator in ['|', '\t', 'price:', 'customer:', 'product:'])
+                # FI-08: Content-agnostic quality thresholds using universal principles
+                # Use information theory to detect data characteristics, not hardcoded patterns
                 
-                if is_structured_data:
-                    # Relaxed thresholds for structured data to prevent over-filtering
-                    min_entropy = 2.0  # Reduced from 3.5
-                    min_density = 0.15  # Reduced from 0.4
-                    logger.info(f"[FI-08] Using relaxed quality thresholds for structured data: entropy≥{min_entropy}, density≥{min_density}")
+                # Universal structured content detection via information theory
+                tabular_density = self.detect_tabular_structure(content)
+                data_repetition = self.calculate_data_repetition(content)
+                
+                # Adaptive thresholds based on universal content characteristics
+                if tabular_density > 0.3 or data_repetition > 0.4:
+                    # Content appears to have tabular/repetitive structure - use relaxed thresholds
+                    min_entropy = 2.5  # Slightly reduced for data-heavy content
+                    min_density = 0.25  # Reduced for structured content patterns
+                    logger.info(f"[FI-08] Detected tabular content patterns, using adaptive thresholds: entropy≥{min_entropy}, density≥{min_density}")
+                else:
+                    # Standard content - use normal thresholds
+                    logger.debug(f"[FI-08] Standard content detected, using normal thresholds")
                 
                 # Calculate quality metrics
                 entropy = self.calculate_shannon_entropy(content)
@@ -378,7 +381,8 @@ Alternative:"""
                 doc.metadata['information_density'] = density
                 doc.metadata['quality_score'] = (entropy / 6.0) * 0.6 + density * 0.4
                 doc.metadata['passes_quality'] = passes_entropy and passes_density and passes_length and passes_uniqueness
-                doc.metadata['is_structured_data'] = is_structured_data
+                doc.metadata['tabular_density'] = tabular_density
+                doc.metadata['data_repetition'] = data_repetition
                 
                 # Apply quality checks
                 if passes_entropy and passes_density and passes_length and passes_uniqueness:
@@ -464,6 +468,79 @@ Alternative:"""
         except Exception as e:
             logger.error(f"[FI-08] Quality enhancements failed: {e}")
             return documents  # Fallback to original
+    
+    def detect_tabular_structure(self, text: str) -> float:
+        """Content-agnostic tabular structure detection using universal patterns"""
+        if not text or len(text) < 10:
+            return 0.0
+            
+        # Universal tabular indicators (no domain-specific patterns)
+        lines = text.split('\n')
+        if len(lines) < 2:
+            return 0.0
+            
+        # Look for consistent column patterns across lines
+        separator_chars = [',', '\t', '|', ';', ':']
+        max_consistency = 0.0
+        
+        for sep in separator_chars:
+            if sep in text:
+                # Count separators per line
+                separator_counts = [line.count(sep) for line in lines if line.strip()]
+                if len(separator_counts) < 2:
+                    continue
+                    
+                # Calculate consistency (how many lines have same separator count)
+                most_common_count = max(set(separator_counts), key=separator_counts.count)
+                consistent_lines = sum(1 for count in separator_counts if count == most_common_count)
+                consistency = consistent_lines / len(separator_counts)
+                max_consistency = max(max_consistency, consistency)
+        
+        return max_consistency
+    
+    def calculate_data_repetition(self, text: str) -> float:
+        """Content-agnostic data repetition detection using universal patterns"""
+        if not text or len(text) < 20:
+            return 0.0
+            
+        lines = text.split('\n')
+        if len(lines) < 3:
+            return 0.0
+            
+        # Look for repeated structural patterns (universal approach)
+        line_structures = []
+        for line in lines[:20]:  # Sample first 20 lines for efficiency
+            if not line.strip():
+                continue
+                
+            # Analyze structural patterns (not content-specific)
+            structure = []
+            words = line.split()
+            for word in words[:10]:  # Analyze first 10 words per line
+                if word.isdigit():
+                    structure.append('NUM')
+                elif any(c.isdigit() for c in word) and any(c.isalpha() for c in word):
+                    structure.append('MIXED')
+                elif word.isalpha():
+                    structure.append('TEXT')
+                else:
+                    structure.append('SPECIAL')
+                    
+            line_structures.append(tuple(structure))
+        
+        if len(line_structures) < 2:
+            return 0.0
+            
+        # Calculate structural repetition
+        structure_counts = {}
+        for structure in line_structures:
+            structure_counts[structure] = structure_counts.get(structure, 0) + 1
+            
+        # Find most common structure
+        max_count = max(structure_counts.values())
+        repetition_ratio = max_count / len(line_structures)
+        
+        return repetition_ratio
 
     @sleep_and_retry
     @limits(calls=100, period=60)

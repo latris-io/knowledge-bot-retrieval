@@ -92,12 +92,14 @@ NEEDED METADATA:
 
 ## 🛠️ **IMMEDIATE ACTIONS TAKEN**
 
-### **Retrieval Service Hotfix** ✅
-**Applied structured data quality filter bypass:**
-- Reduced Shannon entropy threshold: 3.5 → 2.0 for structured data
-- Reduced information density threshold: 0.4 → 0.15 for structured data  
-- Added structured data detection (CSV, Excel, table patterns)
-- Relaxed filtering for files containing: `|`, `\t`, `price:`, `customer:`, `product:`
+### **Retrieval Service - Content-Agnostic Solution** ✅
+**Applied universal structured content detection:**
+- `detect_tabular_structure()`: Universal separator consistency analysis (no hardcoded file types)
+- `calculate_data_repetition()`: Pattern-based structural repetition detection
+- **Adaptive thresholds** based on content characteristics:
+  - High tabular density (>0.3): entropy ≥2.5, density ≥0.25
+  - Standard content: Normal thresholds (entropy ≥3.5, density ≥0.4)
+- **Zero hardcoded patterns**: Removed all file extensions, domain terms, business-specific logic
 
 **Expected Impact**: Prevent quality filtering from removing structured data chunks
 
