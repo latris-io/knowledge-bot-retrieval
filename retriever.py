@@ -2,7 +2,7 @@ import os
 import logging
 import json
 import urllib.parse
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 import asyncio
 
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
@@ -12,6 +12,8 @@ from langchain_community.retrievers import BM25Retriever
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import DocumentCompressorPipeline, EmbeddingsFilter
 from langchain_community.vectorstores import Chroma
+from langchain_core.retrievers import BaseRetriever
+from langchain_core.documents import Document
 
 from chromadb import HttpClient
 from chromadb.config import Settings
@@ -80,16 +82,14 @@ class RetrieverService:
             )
             
             # Content-agnostic query expansion prompt
-            expansion_prompt = f"""Generate 2 alternative search queries that would help find the same information as: "{query}"
+            expansion_prompt = f"""Generate 1 alternative search query that would help find the same information as: "{query}"
 
 Focus on:
 - Different vocabulary and phrasings
-- Various ways to ask the same question  
 - Alternative technical terms or synonyms
 
 Original: {query}
-Alternative 1:
-Alternative 2:"""
+Alternative:"""
 
             response = llm.invoke(expansion_prompt)
             lines = response.content.split('\n')
@@ -98,7 +98,7 @@ Alternative 2:"""
             for line in lines:
                 line = line.strip()
                 if line and not line.startswith('Original:'):
-                    # Extract actual query from "Alternative X: query" format
+                    # Extract actual query from "Alternative: query" format
                     if line.startswith('Alternative'):
                         if ':' in line:
                             query_part = line.split(':', 1)[1].strip()
@@ -107,8 +107,8 @@ Alternative 2:"""
                     elif line and len(line) > 5:  # Other non-empty lines
                         alternatives.append(line)
             
-            # Always include original query
-            expanded_queries = [query] + [alt for alt in alternatives if alt and len(alt) > 5][:2]
+            # Always include original query - optimized for 2 total queries
+            expanded_queries = [query] + [alt for alt in alternatives if alt and len(alt) > 5][:1]
             
             self._query_cache[query] = expanded_queries
             logger.info(f"[FI-04] Expanded query into {len(expanded_queries)} variations")
@@ -127,19 +127,16 @@ Alternative 2:"""
             all_results = []
             seen_docs = set()
             
-            # Search with each query variation
+            # Search with each query variation - optimized for 2 variants
             for i, variant_query in enumerate(expanded_queries):
                 try:
-                    # Different search approaches for each variant
+                    # Optimized search distribution for 2 variants
                     if i == 0:
-                        # Original query - standard search
-                        results = vectorstore.similarity_search(variant_query, k=k//2)
-                    elif i == 1:
-                        # First alternative - entity focused
-                        results = vectorstore.similarity_search(variant_query, k=k//3)
+                        # Original query - gets majority of k
+                        results = vectorstore.similarity_search(variant_query, k=int(k*0.7))
                     else:
-                        # Additional alternatives - concept focused
-                        results = vectorstore.similarity_search(variant_query, k=k//4)
+                        # Alternative query - gets remaining k
+                        results = vectorstore.similarity_search(variant_query, k=int(k*0.3))
                     
                     # Deduplicate while preserving order
                     for doc in results:
@@ -147,7 +144,7 @@ Alternative 2:"""
                         if doc_key not in seen_docs:
                             seen_docs.add(doc_key)
                             doc.metadata['query_variant'] = i
-                            doc.metadata['search_approach'] = ['original', 'entity_focused', 'concept_focused'][min(i, 2)]
+                            doc.metadata['search_approach'] = ['original', 'alternative'][min(i, 1)]
                             all_results.append(doc)
                     
                 except Exception as e:
@@ -188,11 +185,11 @@ Alternative 2:"""
             
             # FI-05: Universal importance heuristics (no domain-specific patterns)
             
-            # Length-based scoring - longer terms often more specific
-            if len(term) >= 6:
-                importance *= 1.5
-            elif len(term) >= 4:
-                importance *= 1.2
+            # Length-based scoring - progressive scoring for longer terms
+            # Longer terms are more specific and should score progressively higher
+            length_multiplier = 1.0 + (len(term) - 3) * 0.1  # +0.1 for each character beyond 3
+            if length_multiplier > 1.0:
+                importance *= min(length_multiplier, 2.0)  # Cap at 2.0x
                 
             # Capitalization detection in original query - proper nouns important
             if term.title() in query or term.upper() in query:
@@ -333,7 +330,7 @@ Alternative 2:"""
             logger.error(f"[FI-08] Information density calculation failed: {e}")
             return 0.0
 
-    def filter_by_quality(self, documents: list, min_entropy: float = 3.0, min_density: float = 0.3) -> list:
+    def filter_by_quality(self, documents: list, min_entropy: float = 3.5, min_density: float = 0.4) -> list:
         """FI-08: Filter documents based on information quality"""
         if not documents:
             return documents
@@ -357,16 +354,21 @@ Alternative 2:"""
                 passes_density = density >= min_density
                 passes_length = len(content.split()) >= 5  # Minimum word count
                 
+                # Additional check for excessive repetition (catches patterns like "word word word")
+                words = content.lower().split()
+                unique_ratio = len(set(words)) / len(words) if words else 0
+                passes_uniqueness = unique_ratio >= 0.3  # At least 30% unique words
+                
                 # Store quality metrics in metadata
                 doc.metadata['shannon_entropy'] = entropy
                 doc.metadata['information_density'] = density
                 doc.metadata['quality_score'] = (entropy / 6.0) * 0.6 + density * 0.4  # Normalize and combine
                 
                 # Apply quality filters
-                if passes_entropy and passes_density and passes_length:
+                if passes_entropy and passes_density and passes_length and passes_uniqueness:
                     quality_docs.append(doc)
                 else:
-                    logger.debug(f"[FI-08] Filtered low-quality doc: entropy={entropy:.2f}, density={density:.2f}")
+                    logger.debug(f"[FI-08] Filtered low-quality doc: entropy={entropy:.2f}, density={density:.2f}, uniqueness={unique_ratio:.2f}")
             
             logger.info(f"[FI-08] Quality filter: {len(documents)} → {len(quality_docs)} docs")
             return quality_docs
@@ -507,10 +509,19 @@ Alternative queries:"""
 
             # Cache BM25 retriever to avoid expensive document fetching and rebuilding
             cache_key = f"{company_id}_{bot_id}"
+            metadatas = None  # Initialize to avoid variable scoping issues
+            
             if cache_key in self._bm25_cache:
                 bm25 = self._bm25_cache[cache_key]
                 bm25.k = k  # Update k for this request
                 logger.info(f"[RETRIEVER] Using cached BM25 with {len(bm25.docs)} documents")
+                # Get sample metadata for debug logging
+                try:
+                    docs = vectorstore.get(include=["metadatas"], where=base_filter, limit=1)
+                    if docs["metadatas"]:
+                        metadatas = docs["metadatas"]
+                except:
+                    pass
             else:
                 docs = vectorstore.get(include=["documents", "metadatas"], where=base_filter)
                 texts = docs["documents"]
@@ -530,20 +541,25 @@ Alternative queries:"""
                 )
 
                 # FI-04: Enhanced multi-vector search integration  
-                class EnhancedRetriever:
-                    def __init__(self, base_retriever, service, query):
+                class EnhancedRetriever(BaseRetriever):
+                    base_retriever: object = None
+                    service: object = None
+                    query: str = ""
+                    
+                    class Config:
+                        arbitrary_types_allowed = True
+                    
+                    def __init__(self, base_retriever, service, query, **kwargs):
+                        super().__init__(**kwargs)
                         self.base_retriever = base_retriever
                         self.service = service
                         self.query = query
                     
-                    def get_relevant_documents(self, query_text):
+                    def _get_relevant_documents(self, query_text: str, *, run_manager=None) -> List[Document]:
                         # Use FI-04 multi-vector search
-                        return self.service.multi_vector_search(query_text, vectorstore, k)
-                    
-                    def invoke(self, input_text):
-                        docs = self.get_relevant_documents(input_text)
+                        docs = self.service.multi_vector_search(query_text, vectorstore, k)
                         # Apply FI-08 quality enhancements
-                        enhanced_docs = self.service.apply_quality_enhancements(input_text, docs)
+                        enhanced_docs = self.service.apply_quality_enhancements(query_text, docs)
                         return enhanced_docs
 
                 # Create enhanced retriever with all improvements
@@ -553,13 +569,21 @@ Alternative queries:"""
             else:
                 # Adaptive direct mode: vector-only for simple/medium, hybrid for complex
                 # FI-04, FI-05, FI-08: Enhanced retrieval for all queries
-                class StandardEnhancedRetriever:
-                    def __init__(self, base_retriever, service, use_hybrid):
+                class StandardEnhancedRetriever(BaseRetriever):
+                    base_retriever: object = None
+                    service: object = None
+                    use_hybrid: bool = False
+                    
+                    class Config:
+                        arbitrary_types_allowed = True
+                    
+                    def __init__(self, base_retriever, service, use_hybrid, **kwargs):
+                        super().__init__(**kwargs)
                         self.base_retriever = base_retriever
                         self.service = service
                         self.use_hybrid = use_hybrid
                     
-                    def get_relevant_documents(self, query_text):
+                    def _get_relevant_documents(self, query_text: str, *, run_manager=None) -> List[Document]:
                         if self.use_hybrid:
                             # Use FI-04 multi-vector search
                             return self.service.multi_vector_search(query_text, vectorstore, k)
@@ -567,9 +591,6 @@ Alternative queries:"""
                             # Standard vector search with enhancements
                             docs = vectorstore.similarity_search(query_text, k=k)
                             return self.service.apply_quality_enhancements(query_text, docs)
-                    
-                    def invoke(self, input_text):
-                        return self.get_relevant_documents(input_text)
 
                 if k >= 8:
                     # High-k complex queries: use enhanced hybrid
@@ -635,15 +656,23 @@ Alternative queries:"""
             logger.info("[ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing")
             
             # Enhanced retriever with all Foundation Improvements
-            class EnhancedRetrieverWrapper:
+            class EnhancedRetrieverWrapper(BaseRetriever):
                 """Wrapper that applies all Foundation Improvements to retrieval"""
                 
-                def __init__(self, base_retriever, retriever_service, query):
+                base_retriever: object = None
+                retriever_service: object = None
+                query: str = ""
+                
+                class Config:
+                    arbitrary_types_allowed = True
+                
+                def __init__(self, base_retriever, retriever_service, query, **kwargs):
+                    super().__init__(**kwargs)
                     self.base_retriever = base_retriever
                     self.retriever_service = retriever_service
                     self.query = query
                     
-                def get_relevant_documents(self, query_text):
+                def _get_relevant_documents(self, query_text: str, *, run_manager=None) -> List[Document]:
                     """Enhanced document retrieval with FI-04, FI-05, FI-08"""
                     
                     # Step 1: FI-04 - Use real multi-vector search with query expansion

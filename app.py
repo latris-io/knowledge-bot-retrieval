@@ -381,17 +381,17 @@ async def ask_question(
         # Smart Complex Mode for ALL queries - maximum performance and coverage
         logger.info("[BOT] Smart Complex Mode enabled for ALL queries")
         
-        # Smart Complex Mode: Use MultiQuery for comparative/analytical queries, Fast for others
+        # Smart Complex Mode: Optimized for 5-6 second responses with maximum quality
         comparative_indicators = {'compare', 'versus', 'vs', 'difference between', 'analyze', 'contrast'}
         is_comparative = any(indicator in question.lower() for indicator in comparative_indicators)
         
         if is_comparative:
             logger.info("[BOT] Smart Complex → MultiQuery (comparative analysis detected)")
-            k = 8  # Increased from 6 for better coverage
+            k = 6  # Optimized: reduced from 8 for speed while maintaining coverage
             use_multi_query = True
         else:
             logger.info("[BOT] Smart Complex → Fast Comprehensive (comprehensive coverage)")
-            k = 12  # Increased from 8 for better coverage
+            k = 8  # Optimized: reduced from 12 for 5-6s responses while maintaining quality
             use_multi_query = False
 
         retriever_service = RetrieverService()
