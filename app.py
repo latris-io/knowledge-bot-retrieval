@@ -98,6 +98,61 @@ def get_session_history(session_id: str) -> InMemoryChatMessageHistory:
         logger.info(f"[MEMORY] Created new history for session {session_id}")
     return session_histories[session_id]
 
+async def format_chat_history_smart(
+    chat_history: InMemoryChatMessageHistory, 
+    current_question: str, 
+    embedding_function, 
+    complexity: str = 'complex'
+) -> str:
+    """
+    Smart chat history formatting with semantic topic analysis.
+    Provides enhanced context management based on topic continuity.
+    """
+    if not chat_history.messages:
+        return ""
+    
+    # Check for topic change to optimize context
+    topic_changed = await detect_topic_change_semantic(current_question, chat_history, embedding_function)
+    
+    if topic_changed:
+        # Reduced context for topic changes to avoid contamination  
+        context_limits = {'simple': 1, 'medium': 2, 'complex': 2}  # Q&A pairs * 2
+        truncate_limits = {'simple': 100, 'medium': 150, 'complex': 200}
+        logger.info("[SMART-HISTORY] Topic change detected - using reduced context")
+    else:
+        # Full context for topic continuity
+        context_limits = {'simple': 2, 'medium': 4, 'complex': 6}  # Q&A pairs * 2  
+        truncate_limits = {'simple': 150, 'medium': 250, 'complex': 400}
+        logger.info("[SMART-HISTORY] Topic continuity - using full context")
+    
+    context_limit = context_limits.get(complexity, 4)
+    truncate_limit = truncate_limits.get(complexity, 300)
+    
+    formatted = []
+    for message in chat_history.messages[-context_limit:]:
+        if isinstance(message, HumanMessage):
+            formatted.append(f"Human: {message.content}")
+        elif isinstance(message, AIMessage):
+            # Smart truncation preserves key information  
+            content = message.content
+            if len(content) > truncate_limit:
+                # Try to truncate at sentence boundaries for better context
+                sentences = content.split('. ')
+                if len(sentences) > 1:
+                    truncated = '. '.join(sentences[:2]) + '.'
+                    if len(truncated) <= truncate_limit:
+                        content = truncated
+                    else:
+                        content = content[:truncate_limit] + "..."
+                else:
+                    content = content[:truncate_limit] + "..."
+            formatted.append(f"Assistant: {content}")
+    
+    if formatted:
+        context_type = "reduced" if topic_changed else "full"
+        return f"Previous conversation ({context_type} context):\n" + "\n".join(formatted) + "\n\n"
+    return ""
+
 def format_chat_history(chat_history: InMemoryChatMessageHistory, complexity: str = 'simple') -> str:
     """Format chat history for inclusion in prompt based on query complexity"""
     if not chat_history.messages:
@@ -332,25 +387,100 @@ async def ask_question(
         
         if is_comparative:
             logger.info("[BOT] Smart Complex → MultiQuery (comparative analysis detected)")
-            k = 6
+            k = 8  # Increased from 6 for better coverage
             use_multi_query = True
         else:
             logger.info("[BOT] Smart Complex → Fast Comprehensive (comprehensive coverage)")
-            k = 8
+            k = 12  # Increased from 8 for better coverage
             use_multi_query = False
 
         retriever_service = RetrieverService()
-        retriever = retriever_service.build_retriever(
+        
+        # Use enhanced retriever with query-adaptive processing and all Foundation Improvements
+        retriever = await retriever_service.build_enhanced_retriever(
             company_id=company_id,
             bot_id=bot_id,
+            query=question,  # Pass query for adaptive processing
             k=k,
             similarity_threshold=similarity_threshold,
-            use_multi_query=use_multi_query
+            use_multi_query=use_multi_query,
+            use_enhanced_search=True  # Enable enhanced search by default
         )
+        
+        # Enhanced Retrieval Debug System - Test retrieval quality and coverage
+        if verbose:
+            try:
+                logger.info(f"[RETRIEVAL DEBUG] Testing enhanced retrieval for query: '{question}'")
+                test_docs = retriever.get_relevant_documents(question)
+                logger.info(f"[RETRIEVAL DEBUG] Retrieved {len(test_docs)} documents")
+                
+                # Show top 3 documents with metadata
+                for i, doc in enumerate(test_docs[:3]):
+                    content_preview = doc.page_content[:150].replace('\n', ' ')
+                    logger.info(f"[RETRIEVAL DEBUG] Doc {i+1}: {content_preview}...")
+                    
+                    metadata = doc.metadata
+                    file_info = {
+                        'file_name': metadata.get('file_name', 'Unknown'),
+                        'chunk_index': metadata.get('chunk_index', 'N/A'),
+                        'source_type': metadata.get('source_type', 'Unknown')
+                    }
+                    logger.info(f"[RETRIEVAL DEBUG] Metadata: {file_info}")
+                
+                # Log document source diversity
+                sources = [doc.metadata.get('file_name', 'Unknown') for doc in test_docs]
+                unique_sources = list(set(sources))
+                logger.info(f"[RETRIEVAL DEBUG] Source diversity: {len(unique_sources)} unique sources from {len(test_docs)} documents")
+                
+            except Exception as e:
+                logger.error(f"[RETRIEVAL DEBUG] Error testing retrieval: {e}")
 
         # Use comprehensive prompt template for Smart Complex mode
         prompt = get_prompt_template(mode)
 
+        # Enhanced document prompt with person context for better attribution
+        def create_enhanced_document_prompt():
+            def format_document(doc):
+                page_content = doc.page_content
+                file_name = doc.metadata.get('file_name', 'Unknown')
+                chunk_index = doc.metadata.get('chunk_index', '')
+                
+                # Extract person context from filename for better attribution
+                person_context = ""
+                filename_lower = file_name.lower()
+                
+                # Content-agnostic person detection (avoiding hardcoded names)
+                if any(keyword in filename_lower for keyword in ['resume', 'cv']):
+                    person_context = "FROM PERSONAL RESUME: "
+                elif len(filename_lower.split()) > 1:
+                    # Check if filename contains typical personal document patterns  
+                    personal_indicators = ['personal', 'profile', 'bio', 'portfolio']
+                    if any(indicator in filename_lower for indicator in personal_indicators):
+                        person_context = "FROM PERSONAL DOCUMENT: "
+                
+                source_ref = f"{file_name}#{chunk_index}" if chunk_index else file_name
+                return f"{person_context}{page_content}\n[source: {source_ref}]"
+            
+            # Custom document prompt that processes each document with person context
+            class EnhancedDocumentPrompt:
+                def format(self, **kwargs):
+                    docs = kwargs.get('summaries', [])
+                    if not docs:
+                        return ""
+                    
+                    formatted_docs = []
+                    for doc in docs:
+                        if hasattr(doc, 'page_content'):
+                            formatted_docs.append(format_document(doc))
+                        else:
+                            # Fallback for string documents
+                            formatted_docs.append(str(doc))
+                    
+                    return "\n\n".join(formatted_docs)
+            
+            return EnhancedDocumentPrompt()
+        
+        # Use enhanced document prompt for better source attribution
         document_prompt = PromptTemplate.from_template(
             "{page_content}\n[source: {file_name}#{chunk_index}]"
         )
@@ -368,22 +498,17 @@ async def ask_question(
             openai_api_key=get_openai_api_key()
         )
 
-        # Get conversation history for this session - Smart Complex mode
+        # Get conversation history for this session - Smart Complex mode with enhanced context
         chat_history = get_session_history(session_id)
         
-        # FI-02: Semantic topic change detection - reduce context when topic changes
+        # Smart conversation context with semantic topic change detection
         embedding_function = retriever_service.embedding_function
-        topic_changed = await detect_topic_change_semantic(question, chat_history, embedding_function)
+        conversation_context = await format_chat_history_smart(
+            chat_history, question, embedding_function, 'complex'
+        )
         
-        if topic_changed:
-            # Reduce conversation history when topic change detected
-            conversation_context = format_chat_history(chat_history, 'simple')  # Use simple context for topic changes
-            max_context = 400  # Reduced context for topic changes
-            logger.info("[FI-02] Topic change detected - using reduced context")
-        else:
-            conversation_context = format_chat_history(chat_history, 'complex')
-            max_context = 1200  # Full context for Smart Complex mode
-        
+        # Apply maximum context limits for Smart Complex mode
+        max_context = 1200  # Full context for Smart Complex mode
         if len(conversation_context) > max_context:
             conversation_context = conversation_context[:max_context] + "...\n\n"
         
@@ -533,13 +658,13 @@ async def serve_widget():
 async def get_complexity_stats():
     """Get Smart Complex mode statistics for performance monitoring"""
     return {
-        "message": "Smart Complex Mode is hardcoded for ALL queries",
-        "mode": "Smart Complex",
+        "message": "Smart Complex Mode is hardcoded for ALL queries with enhanced coverage",
+        "mode": "Smart Complex Enhanced",
         "routing": {
-            "comparative_queries": "MultiQuery (k=6) for enhanced analysis",
-            "standard_queries": "Fast Complex (k=8) for comprehensive coverage"
+            "comparative_queries": "MultiQuery (k=8) for enhanced analysis",
+            "standard_queries": "Fast Complex (k=12) for comprehensive coverage"
         },
         "triggers": ["compare", "versus", "vs", "difference between", "analyze", "contrast"],
         "performance": "3-5 second streaming start with comprehensive coverage",
-        "coverage": "8+ sources for standard queries, 6+ sources for comparative queries"
+        "coverage": "12+ sources for standard queries, 8+ sources for comparative queries"
     }

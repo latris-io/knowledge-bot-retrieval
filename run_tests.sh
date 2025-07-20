@@ -71,6 +71,13 @@ declare -A TEST_CATEGORIES=(
     ["unit"]="Unit Tests (with mocking for isolated testing)"
     ["production"]="Production Integration Tests (same as integration)"
     ["performance"]="Performance Tests"
+    ["enhanced_integration"]="Enhanced Integration Features (EI-01 through EI-05)"
+    ["ei_01"]="EI-01: Query-Adaptive Enhanced Retriever"
+    ["ei_02"]="EI-02: Enhanced Coverage with Increased K-Values"
+    ["ei_03"]="EI-03: Smart Chat History with Semantic Topic Detection"
+    ["ei_04"]="EI-04: Enhanced Retrieval Debug System"
+    ["ei_05"]="EI-05: Person Context Enhancement"
+    ["integration_comprehensive"]="Comprehensive Enhanced Integration Tests"
 )
 
 # Function to run specific test category

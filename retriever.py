@@ -548,3 +548,117 @@ Alternative queries:"""
         except Exception as e:
             logger.error(f"[RETRIEVER] Error building retriever: {e}", exc_info=True)
             raise
+            
+    async def build_enhanced_retriever(
+        self,
+        company_id: int,
+        bot_id: int,
+        query: str,
+        filters: Optional[Dict] = None,
+        k: Optional[int] = None,
+        similarity_threshold: Optional[float] = None,
+        use_multi_query: bool = False,
+        use_enhanced_search: bool = True
+    ):
+        """
+        Enhanced retriever with query-adaptive processing and all Foundation Improvements.
+        
+        Args:
+            company_id: Company ID for filtering
+            bot_id: Bot ID for filtering  
+            query: The search query for adaptive processing
+            filters: Additional metadata filters
+            k: Number of documents to retrieve
+            similarity_threshold: Similarity threshold for filtering
+            use_multi_query: Whether to use MultiQueryRetriever
+            use_enhanced_search: Enable enhanced search with FI-04, FI-05, FI-08
+        """
+        try:
+            # Start with base retriever
+            base_retriever = self.build_retriever(
+                company_id=company_id,
+                bot_id=bot_id,
+                filters=filters,
+                k=k,
+                similarity_threshold=similarity_threshold,
+                use_multi_query=use_multi_query
+            )
+            
+            # If enhanced search is disabled, return base retriever
+            if not use_enhanced_search:
+                logger.info("[ENHANCED-RETRIEVER] Enhanced search disabled, using base retriever")
+                return base_retriever
+            
+            logger.info("[ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing")
+            
+            # Enhanced retriever with all Foundation Improvements
+            class EnhancedRetrieverWrapper:
+                """Wrapper that applies all Foundation Improvements to retrieval"""
+                
+                def __init__(self, base_retriever, retriever_service, query):
+                    self.base_retriever = base_retriever
+                    self.retriever_service = retriever_service
+                    self.query = query
+                    
+                def get_relevant_documents(self, query_text):
+                    """Enhanced document retrieval with FI-04, FI-05, FI-08"""
+                    
+                    # Step 1: FI-04 - Content-Agnostic Enhanced Retrieval System
+                    expanded_queries = []
+                    if hasattr(self.retriever_service, 'expand_query'):
+                        # Use existing query expansion if available
+                        expanded_queries = self.retriever_service.expand_query(query_text)
+                    else:
+                        # Simple query expansion as fallback
+                        expanded_queries = [query_text]
+                        # Add basic query variations
+                        words = query_text.lower().split()
+                        if len(words) > 1:
+                            # Create entity-focused query
+                            entities = [w for w in words if len(w) > 3 and w.isalpha()]
+                            if entities:
+                                expanded_queries.append(" ".join(entities))
+                    
+                    # Retrieve documents for each query variant
+                    all_documents = []
+                    for expanded_query in expanded_queries:
+                        try:
+                            docs = self.base_retriever.get_relevant_documents(expanded_query)
+                            all_documents.extend(docs)
+                        except Exception as e:
+                            logger.warning(f"[FI-04] Query expansion failed for '{expanded_query}': {e}")
+                    
+                    # Fall back to original query if no expansion results
+                    if not all_documents:
+                        all_documents = self.base_retriever.get_relevant_documents(query_text)
+                    
+                    # Step 2: FI-05 - Content-Agnostic Semantic Bias Fix
+                    if hasattr(self.retriever_service, 'apply_semantic_bias_fix'):
+                        all_documents = self.retriever_service.apply_semantic_bias_fix(
+                            all_documents, query_text
+                        )
+                    
+                    # Step 3: FI-08 - Enhanced Retrieval Quality Improvements  
+                    if hasattr(self.retriever_service, 'apply_quality_enhancements'):
+                        all_documents = self.retriever_service.apply_quality_enhancements(
+                            all_documents, query_text
+                        )
+                    
+                    return all_documents
+            
+            enhanced_retriever = EnhancedRetrieverWrapper(base_retriever, self, query)
+            
+            logger.info("[ENHANCED-RETRIEVER] Enhanced retriever built with FI-04, FI-05, FI-08 integration")
+            return enhanced_retriever
+            
+        except Exception as e:
+            logger.error(f"[ENHANCED-RETRIEVER] Error building enhanced retriever: {e}")
+            # Fallback to base retriever on error
+            return self.build_retriever(
+                company_id=company_id,
+                bot_id=bot_id,
+                filters=filters,
+                k=k,
+                similarity_threshold=similarity_threshold,
+                use_multi_query=use_multi_query
+            )
