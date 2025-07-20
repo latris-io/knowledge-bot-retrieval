@@ -520,9 +520,23 @@
             for (const line of lines) {
               if (line.trim() === '') continue; // Skip empty lines
               
+              let dataContent = null;
+              
+              // First, extract the data part (handle SSE format)
+              if (line.startsWith('data: ')) {
+                dataContent = line.slice(6); // Remove 'data: ' prefix
+                if (dataContent === '[DONE]') continue;
+                if (dataContent.startsWith('[ERROR]')) {
+                  throw new Error(dataContent.replace('[ERROR] ', ''));
+                }
+              } else {
+                // Direct content without SSE prefix
+                dataContent = line;
+              }
+              
+              // Now try to parse as JSON chunk
               try {
-                // Parse each line as JSON chunk
-                const jsonChunk = JSON.parse(line);
+                const jsonChunk = JSON.parse(dataContent);
                 console.log(`[Widget] Parsed JSON chunk:`, jsonChunk);
                 
                 // Handle different chunk types
@@ -542,21 +556,9 @@
                 }
               } catch (parseError) {
                 // Fallback: treat as plain text if JSON parsing fails
-                console.log(`[Widget] Non-JSON chunk, treating as text: "${line}"`);
-                if (line.startsWith('data: ')) {
-                  const data = line.slice(6); // Remove 'data: ' prefix
-                  if (data === '[DONE]') continue;
-                  
-                  if (data.startsWith('[ERROR]')) {
-                    throw new Error(data.replace('[ERROR] ', ''));
-                  }
-                  
-                  // Preserve empty chunks as line breaks, regular chunks as content
-                  accumulatedText += data === '' ? '\n' : data;
-                } else {
-                  // Direct text content
-                  accumulatedText += line;
-                }
+                console.log(`[Widget] Non-JSON data, treating as text: "${dataContent}"`);
+                // Handle legacy plain text format or malformed JSON
+                accumulatedText += dataContent === '' ? '\n' : dataContent;
               }
               
               // Check if we have actual response content (not just loading message)
