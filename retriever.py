@@ -345,6 +345,20 @@ Alternative:"""
                 if len(content) < 20:
                     continue
                 
+                # HOTFIX: Reduce quality thresholds for structured data
+                # Check if this is structured data (CSV, Excel, tables)
+                metadata = doc.metadata
+                file_name = metadata.get('file_name', '').lower()
+                is_structured_data = any(ext in file_name for ext in ['.csv', '.xlsx', '.xls']) or \
+                                   'table' in file_name or 'spreadsheet' in file_name or \
+                                   any(indicator in content.lower() for indicator in ['|', '\t', 'price:', 'customer:', 'product:'])
+                
+                if is_structured_data:
+                    # Relaxed thresholds for structured data to prevent over-filtering
+                    min_entropy = 2.0  # Reduced from 3.5
+                    min_density = 0.15  # Reduced from 0.4
+                    logger.info(f"[FI-08] Using relaxed quality thresholds for structured data: entropy≥{min_entropy}, density≥{min_density}")
+                
                 # Calculate quality metrics
                 entropy = self.calculate_shannon_entropy(content)
                 density = self.calculate_information_density(content)
@@ -362,13 +376,18 @@ Alternative:"""
                 # Store quality metrics in metadata
                 doc.metadata['shannon_entropy'] = entropy
                 doc.metadata['information_density'] = density
-                doc.metadata['quality_score'] = (entropy / 6.0) * 0.6 + density * 0.4  # Normalize and combine
+                doc.metadata['quality_score'] = (entropy / 6.0) * 0.6 + density * 0.4
+                doc.metadata['passes_quality'] = passes_entropy and passes_density and passes_length and passes_uniqueness
+                doc.metadata['is_structured_data'] = is_structured_data
                 
-                # Apply quality filters
+                # Apply quality checks
                 if passes_entropy and passes_density and passes_length and passes_uniqueness:
                     quality_docs.append(doc)
-                else:
-                    logger.debug(f"[FI-08] Filtered low-quality doc: entropy={entropy:.2f}, density={density:.2f}, uniqueness={unique_ratio:.2f}")
+                elif is_structured_data:
+                    # For structured data, be more lenient - just require basic coherence
+                    if entropy >= 1.5 and len(content.split()) >= 3:
+                        logger.info(f"[FI-08] Allowing structured data with relaxed quality: entropy={entropy:.2f}, density={density:.2f}")
+                        quality_docs.append(doc)
             
             logger.info(f"[FI-08] Quality filter: {len(documents)} → {len(quality_docs)} docs")
             return quality_docs

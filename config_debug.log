@@ -32953,3 +32953,692 @@ This list appears consistent across multiple mentions, emphasizing the importanc
 I'm not sure.
 2025-07-19 20:42:28,391 — INFO — app — [STREAM] Completed streaming. Clean text for history: 13 chars
 2025-07-19 20:42:28,393 — INFO — app — [RETRIEVAL] Sources: ['sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_word.docx', 'sample_mixed.html', 'sample_mixed.html'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+2025-07-20 13:35:44,544 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-20 13:35:50,214 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-20 13:40:22,387 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-20 13:51:30,106 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-20 13:54:00,134 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-20 14:05:08,966 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-20 14:29:53,917 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-20 14:29:53,931 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-20 14:29:54,127 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-07-20 14:29:55,071 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-07-20 14:29:55,553 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-07-20 14:29:55,879 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-07-20 14:29:56,727 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-20 14:29:57,319 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-20 14:29:57,914 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-20 14:29:58,353 — INFO — retriever — [RETRIEVER] Using cached vectorstore for global
+2025-07-20 14:29:58,354 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-20 14:29:58,354 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-20 14:29:58,830 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-20 14:29:58,956 — INFO — retriever — [RETRIEVER] Initialized BM25 with 566 documents
+2025-07-20 14:29:58,962 — INFO — retriever — [RETRIEVER] Enhanced hybrid retriever (FI-04, FI-05, FI-08) — k=12
+2025-07-20 14:29:58,963 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "preservation_reason": "structured_data_integrity",
+  "event_id": 693,
+  "llm_enrichment_mode": "disabled",
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "source_type": "xlsx",
+  "chunk_type": "direct_extraction",
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "element_types": "sheet_header",
+  "structural_density": 0.508,
+  "chunk_index": 0,
+  "file_size": 9767,
+  "file_name": "Lucas Offices.xlsx",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "mime_type": "application/octet-stream",
+  "processing_strategy": "direct_extraction",
+  "created_time": 1752893064.69696,
+  "source_page": 1,
+  "content_type": "unstructured_text",
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "company_id": 3,
+  "total_elements": 1,
+  "bot_id": 1,
+  "structure_type": "sheet_header",
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "modified_time": 1752893064.69696,
+  "llm_enrichment": "disabled"
+}
+2025-07-20 14:29:58,964 — INFO — retriever — [ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing
+2025-07-20 14:29:58,974 — INFO — retriever — [ENHANCED-RETRIEVER] Enhanced retriever built with FI-04, FI-05, FI-08 integration
+2025-07-20 14:29:58,996 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-20 14:29:59,948 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-20 14:30:00,024 — INFO — retriever — [FI-04] Expanded query into 2 variations
+2025-07-20 14:30:01,570 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:02,118 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:02,435 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:03,014 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:03,016 — INFO — retriever — [FI-04] Multi-vector search: 2 queries → 2 results
+2025-07-20 14:30:03,018 — INFO — retriever — [FI-05] Re-ranked 2 docs by term importance
+2025-07-20 14:30:03,018 — INFO — retriever — [FI-08] Applying quality enhancements to 2 documents
+2025-07-20 14:30:03,020 — INFO — retriever — [FI-08] Quality filter: 2 → 0 docs
+2025-07-20 14:30:03,020 — INFO — retriever — [FI-08] Quality enhancements complete: 2 → 0 docs
+2025-07-20 14:30:03,021 — INFO — retriever — [RETRIEVER] Using cached vectorstore for global
+2025-07-20 14:30:03,021 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-20 14:30:03,021 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-20 14:30:03,022 — INFO — retriever — [RETRIEVER] Using cached BM25 with 566 documents
+2025-07-20 14:30:03,393 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-20 14:30:03,401 — INFO — retriever — [RETRIEVER] Enhanced hybrid retriever (FI-04, FI-05, FI-08) — k=12
+2025-07-20 14:30:03,401 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "chunk_index": 0,
+  "company_id": 3,
+  "event_id": 693,
+  "modified_time": 1752893064.69696,
+  "llm_enrichment": "disabled",
+  "total_elements": 1,
+  "element_types": "sheet_header",
+  "bot_id": 1,
+  "file_size": 9767,
+  "created_time": 1752893064.69696,
+  "source_type": "xlsx",
+  "mime_type": "application/octet-stream",
+  "file_name": "Lucas Offices.xlsx",
+  "source_page": 1,
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "chunk_type": "direct_extraction",
+  "llm_enrichment_mode": "disabled",
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "structure_type": "sheet_header",
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "content_type": "unstructured_text",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "processing_strategy": "direct_extraction",
+  "preservation_reason": "structured_data_integrity",
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "structural_density": 0.508
+}
+2025-07-20 14:30:03,402 — INFO — retriever — [ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing
+2025-07-20 14:30:03,406 — INFO — retriever — [ENHANCED-RETRIEVER] Enhanced retriever built with FI-04, FI-05, FI-08 integration
+2025-07-20 14:30:03,408 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-20 14:30:04,003 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-20 14:30:04,007 — INFO — retriever — [FI-04] Expanded query into 2 variations
+2025-07-20 14:30:04,271 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:04,712 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:05,124 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:05,728 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:05,731 — INFO — retriever — [FI-04] Multi-vector search: 2 queries → 1 results
+2025-07-20 14:30:05,731 — INFO — retriever — [FI-05] Re-ranked 1 docs by term importance
+2025-07-20 14:30:05,731 — INFO — retriever — [FI-08] Applying quality enhancements to 1 documents
+2025-07-20 14:30:05,732 — INFO — retriever — [FI-08] Quality filter: 1 → 0 docs
+2025-07-20 14:30:05,732 — INFO — retriever — [FI-08] Quality enhancements complete: 1 → 0 docs
+2025-07-20 14:30:05,733 — INFO — retriever — [RETRIEVER] Using cached vectorstore for global
+2025-07-20 14:30:05,733 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-20 14:30:05,733 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-20 14:30:05,733 — INFO — retriever — [RETRIEVER] Using cached BM25 with 566 documents
+2025-07-20 14:30:06,248 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-20 14:30:06,255 — INFO — retriever — [RETRIEVER] Enhanced hybrid retriever (FI-04, FI-05, FI-08) — k=12
+2025-07-20 14:30:06,255 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "chunk_type": "direct_extraction",
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "total_elements": 1,
+  "element_types": "sheet_header",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "preservation_reason": "structured_data_integrity",
+  "file_size": 9767,
+  "modified_time": 1752893064.69696,
+  "chunk_index": 0,
+  "processing_strategy": "direct_extraction",
+  "event_id": 693,
+  "company_id": 3,
+  "mime_type": "application/octet-stream",
+  "structural_density": 0.508,
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "created_time": 1752893064.69696,
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "bot_id": 1,
+  "structure_type": "sheet_header",
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "llm_enrichment_mode": "disabled",
+  "source_type": "xlsx",
+  "llm_enrichment": "disabled",
+  "file_name": "Lucas Offices.xlsx",
+  "source_page": 1,
+  "content_type": "unstructured_text"
+}
+2025-07-20 14:30:06,256 — INFO — retriever — [ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing
+2025-07-20 14:30:06,260 — INFO — retriever — [ENHANCED-RETRIEVER] Enhanced retriever built with FI-04, FI-05, FI-08 integration
+2025-07-20 14:30:06,261 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-20 14:30:06,925 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-20 14:30:06,929 — INFO — retriever — [FI-04] Expanded query into 2 variations
+2025-07-20 14:30:07,780 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:08,248 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:08,581 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:09,013 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:09,016 — INFO — retriever — [FI-04] Multi-vector search: 2 queries → 3 results
+2025-07-20 14:30:09,017 — INFO — retriever — [FI-05] Re-ranked 3 docs by term importance
+2025-07-20 14:30:09,018 — INFO — retriever — [FI-08] Applying quality enhancements to 3 documents
+2025-07-20 14:30:09,019 — INFO — retriever — [FI-08] Quality filter: 3 → 2 docs
+2025-07-20 14:30:09,035 — INFO — retriever — [FI-08] Smart deduplication: 2 → 2 docs
+2025-07-20 14:30:09,036 — INFO — retriever — [FI-05] Re-ranked 2 docs by term importance
+2025-07-20 14:30:09,039 — INFO — retriever — [FI-08] Quality enhancements complete: 3 → 2 docs
+2025-07-20 14:30:09,040 — INFO — retriever — [RETRIEVER] Using cached vectorstore for global
+2025-07-20 14:30:09,041 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-20 14:30:09,043 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-20 14:30:09,043 — INFO — retriever — [RETRIEVER] Using cached BM25 with 566 documents
+2025-07-20 14:30:09,431 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-20 14:30:09,438 — INFO — retriever — [RETRIEVER] Enhanced hybrid retriever (FI-04, FI-05, FI-08) — k=12
+2025-07-20 14:30:09,438 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "chunk_index": 0,
+  "preservation_reason": "structured_data_integrity",
+  "created_time": 1752893064.69696,
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "structure_type": "sheet_header",
+  "source_page": 1,
+  "chunk_type": "direct_extraction",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "llm_enrichment": "disabled",
+  "mime_type": "application/octet-stream",
+  "content_type": "unstructured_text",
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "company_id": 3,
+  "file_name": "Lucas Offices.xlsx",
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "llm_enrichment_mode": "disabled",
+  "structural_density": 0.508,
+  "bot_id": 1,
+  "element_types": "sheet_header",
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "total_elements": 1,
+  "event_id": 693,
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "file_size": 9767,
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "processing_strategy": "direct_extraction",
+  "source_type": "xlsx",
+  "modified_time": 1752893064.69696
+}
+2025-07-20 14:30:09,440 — INFO — retriever — [ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing
+2025-07-20 14:30:09,448 — INFO — retriever — [ENHANCED-RETRIEVER] Enhanced retriever built with FI-04, FI-05, FI-08 integration
+2025-07-20 14:30:09,449 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-20 14:30:10,326 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-20 14:30:10,329 — INFO — retriever — [FI-04] Expanded query into 2 variations
+2025-07-20 14:30:10,675 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:11,133 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:11,408 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:11,824 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:11,826 — INFO — retriever — [FI-04] Multi-vector search: 2 queries → 2 results
+2025-07-20 14:30:11,827 — INFO — retriever — [FI-05] Re-ranked 2 docs by term importance
+2025-07-20 14:30:11,827 — INFO — retriever — [FI-08] Applying quality enhancements to 2 documents
+2025-07-20 14:30:11,828 — INFO — retriever — [FI-08] Quality filter: 2 → 0 docs
+2025-07-20 14:30:11,828 — INFO — retriever — [FI-08] Quality enhancements complete: 2 → 0 docs
+2025-07-20 14:30:11,829 — INFO — retriever — [RETRIEVER] Using cached vectorstore for global
+2025-07-20 14:30:11,829 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-20 14:30:11,829 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-20 14:30:11,829 — INFO — retriever — [RETRIEVER] Using cached BM25 with 566 documents
+2025-07-20 14:30:12,216 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-20 14:30:12,224 — INFO — retriever — [RETRIEVER] Enhanced hybrid retriever (FI-04, FI-05, FI-08) — k=12
+2025-07-20 14:30:12,224 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "file_name": "Lucas Offices.xlsx",
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "content_type": "unstructured_text",
+  "file_size": 9767,
+  "company_id": 3,
+  "processing_strategy": "direct_extraction",
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "source_type": "xlsx",
+  "llm_enrichment_mode": "disabled",
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "event_id": 693,
+  "chunk_type": "direct_extraction",
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "preservation_reason": "structured_data_integrity",
+  "element_types": "sheet_header",
+  "source_page": 1,
+  "chunk_index": 0,
+  "structural_density": 0.508,
+  "bot_id": 1,
+  "total_elements": 1,
+  "mime_type": "application/octet-stream",
+  "created_time": 1752893064.69696,
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "structure_type": "sheet_header",
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "modified_time": 1752893064.69696,
+  "llm_enrichment": "disabled"
+}
+2025-07-20 14:30:12,225 — INFO — retriever — [ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing
+2025-07-20 14:30:12,230 — INFO — retriever — [ENHANCED-RETRIEVER] Enhanced retriever built with FI-04, FI-05, FI-08 integration
+2025-07-20 14:30:12,231 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-20 14:30:12,759 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-20 14:30:12,765 — INFO — retriever — [FI-04] Expanded query into 2 variations
+2025-07-20 14:30:12,989 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:13,454 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:13,635 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:14,116 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:14,118 — INFO — retriever — [FI-04] Multi-vector search: 2 queries → 2 results
+2025-07-20 14:30:14,118 — INFO — retriever — [FI-05] Re-ranked 2 docs by term importance
+2025-07-20 14:30:14,118 — INFO — retriever — [FI-08] Applying quality enhancements to 2 documents
+2025-07-20 14:30:14,119 — INFO — retriever — [FI-08] Quality filter: 2 → 0 docs
+2025-07-20 14:30:14,119 — INFO — retriever — [FI-08] Quality enhancements complete: 2 → 0 docs
+2025-07-20 14:30:14,119 — INFO — retriever — [RETRIEVER] Using cached vectorstore for global
+2025-07-20 14:30:14,120 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-20 14:30:14,120 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-20 14:30:14,120 — INFO — retriever — [RETRIEVER] Using cached BM25 with 566 documents
+2025-07-20 14:30:14,443 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-20 14:30:14,448 — INFO — retriever — [RETRIEVER] Enhanced hybrid retriever (FI-04, FI-05, FI-08) — k=12
+2025-07-20 14:30:14,449 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "llm_enrichment_mode": "disabled",
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "structure_type": "sheet_header",
+  "content_type": "unstructured_text",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "element_types": "sheet_header",
+  "file_size": 9767,
+  "mime_type": "application/octet-stream",
+  "chunk_index": 0,
+  "source_type": "xlsx",
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "event_id": 693,
+  "company_id": 3,
+  "preservation_reason": "structured_data_integrity",
+  "structural_density": 0.508,
+  "bot_id": 1,
+  "llm_enrichment": "disabled",
+  "created_time": 1752893064.69696,
+  "modified_time": 1752893064.69696,
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "processing_strategy": "direct_extraction",
+  "total_elements": 1,
+  "source_page": 1,
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "file_name": "Lucas Offices.xlsx",
+  "chunk_type": "direct_extraction"
+}
+2025-07-20 14:30:14,450 — INFO — retriever — [ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing
+2025-07-20 14:30:14,455 — INFO — retriever — [ENHANCED-RETRIEVER] Enhanced retriever built with FI-04, FI-05, FI-08 integration
+2025-07-20 14:30:14,456 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-20 14:30:15,073 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-20 14:30:15,075 — INFO — retriever — [FI-04] Expanded query into 2 variations
+2025-07-20 14:30:15,465 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:16,113 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:16,503 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:17,118 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:17,120 — INFO — retriever — [FI-04] Multi-vector search: 2 queries → 1 results
+2025-07-20 14:30:17,121 — INFO — retriever — [FI-05] Re-ranked 1 docs by term importance
+2025-07-20 14:30:17,121 — INFO — retriever — [FI-08] Applying quality enhancements to 1 documents
+2025-07-20 14:30:17,121 — INFO — retriever — [FI-08] Quality filter: 1 → 0 docs
+2025-07-20 14:30:17,121 — INFO — retriever — [FI-08] Quality enhancements complete: 1 → 0 docs
+2025-07-20 14:30:17,122 — INFO — retriever — [RETRIEVER] Using cached vectorstore for global
+2025-07-20 14:30:17,122 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-20 14:30:17,122 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-20 14:30:17,122 — INFO — retriever — [RETRIEVER] Using cached BM25 with 566 documents
+2025-07-20 14:30:17,543 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-20 14:30:17,548 — INFO — retriever — [RETRIEVER] Enhanced hybrid retriever (FI-04, FI-05, FI-08) — k=12
+2025-07-20 14:30:17,548 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "total_elements": 1,
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "file_name": "Lucas Offices.xlsx",
+  "content_type": "unstructured_text",
+  "llm_enrichment_mode": "disabled",
+  "llm_enrichment": "disabled",
+  "structure_type": "sheet_header",
+  "source_page": 1,
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "processing_strategy": "direct_extraction",
+  "mime_type": "application/octet-stream",
+  "element_types": "sheet_header",
+  "chunk_type": "direct_extraction",
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "event_id": 693,
+  "company_id": 3,
+  "preservation_reason": "structured_data_integrity",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "structural_density": 0.508,
+  "bot_id": 1,
+  "modified_time": 1752893064.69696,
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "chunk_index": 0,
+  "created_time": 1752893064.69696,
+  "file_size": 9767,
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "source_type": "xlsx",
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx"
+}
+2025-07-20 14:30:17,549 — INFO — retriever — [ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing
+2025-07-20 14:30:17,561 — INFO — retriever — [ENHANCED-RETRIEVER] Enhanced retriever built with FI-04, FI-05, FI-08 integration
+2025-07-20 14:30:17,561 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-20 14:30:18,155 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-20 14:30:18,164 — INFO — retriever — [FI-04] Expanded query into 2 variations
+2025-07-20 14:30:18,437 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:18,810 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:19,007 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:19,373 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:19,375 — INFO — retriever — [FI-04] Multi-vector search: 2 queries → 2 results
+2025-07-20 14:30:19,375 — INFO — retriever — [FI-05] Re-ranked 2 docs by term importance
+2025-07-20 14:30:19,375 — INFO — retriever — [FI-08] Applying quality enhancements to 2 documents
+2025-07-20 14:30:19,376 — INFO — retriever — [FI-08] Quality filter: 2 → 1 docs
+2025-07-20 14:30:19,376 — INFO — retriever — [FI-05] Re-ranked 1 docs by term importance
+2025-07-20 14:30:19,376 — INFO — retriever — [FI-08] Quality enhancements complete: 2 → 1 docs
+2025-07-20 14:30:19,376 — INFO — retriever — [RETRIEVER] Using cached vectorstore for global
+2025-07-20 14:30:19,377 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-20 14:30:19,377 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-20 14:30:19,377 — INFO — retriever — [RETRIEVER] Using cached BM25 with 566 documents
+2025-07-20 14:30:19,729 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-20 14:30:19,736 — INFO — retriever — [RETRIEVER] Enhanced hybrid retriever (FI-04, FI-05, FI-08) — k=12
+2025-07-20 14:30:19,736 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "preservation_reason": "structured_data_integrity",
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "modified_time": 1752893064.69696,
+  "company_id": 3,
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "event_id": 693,
+  "processing_strategy": "direct_extraction",
+  "file_name": "Lucas Offices.xlsx",
+  "created_time": 1752893064.69696,
+  "llm_enrichment": "disabled",
+  "source_page": 1,
+  "file_size": 9767,
+  "bot_id": 1,
+  "element_types": "sheet_header",
+  "chunk_index": 0,
+  "source_type": "xlsx",
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "llm_enrichment_mode": "disabled",
+  "structure_type": "sheet_header",
+  "content_type": "unstructured_text",
+  "mime_type": "application/octet-stream",
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "chunk_type": "direct_extraction",
+  "total_elements": 1,
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "structural_density": 0.508
+}
+2025-07-20 14:30:19,737 — INFO — retriever — [ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing
+2025-07-20 14:30:19,743 — INFO — retriever — [ENHANCED-RETRIEVER] Enhanced retriever built with FI-04, FI-05, FI-08 integration
+2025-07-20 14:30:19,745 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-20 14:30:20,798 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-20 14:30:20,804 — INFO — retriever — [FI-04] Expanded query into 2 variations
+2025-07-20 14:30:21,113 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:21,520 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:21,687 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:22,114 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:22,116 — INFO — retriever — [FI-04] Multi-vector search: 2 queries → 2 results
+2025-07-20 14:30:22,118 — INFO — retriever — [FI-05] Re-ranked 2 docs by term importance
+2025-07-20 14:30:22,118 — INFO — retriever — [FI-08] Applying quality enhancements to 2 documents
+2025-07-20 14:30:22,119 — INFO — retriever — [FI-08] Quality filter: 2 → 1 docs
+2025-07-20 14:30:22,120 — INFO — retriever — [FI-05] Re-ranked 1 docs by term importance
+2025-07-20 14:30:22,121 — INFO — retriever — [FI-08] Quality enhancements complete: 2 → 1 docs
+2025-07-20 14:30:22,122 — INFO — retriever — [RETRIEVER] Using cached vectorstore for global
+2025-07-20 14:30:22,122 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-20 14:30:22,123 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-20 14:30:22,123 — INFO — retriever — [RETRIEVER] Using cached BM25 with 566 documents
+2025-07-20 14:30:22,418 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-20 14:30:22,425 — INFO — retriever — [RETRIEVER] Enhanced hybrid retriever (FI-04, FI-05, FI-08) — k=12
+2025-07-20 14:30:22,426 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "processing_strategy": "direct_extraction",
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "modified_time": 1752893064.69696,
+  "event_id": 693,
+  "chunk_index": 0,
+  "llm_enrichment_mode": "disabled",
+  "company_id": 3,
+  "file_size": 9767,
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "mime_type": "application/octet-stream",
+  "preservation_reason": "structured_data_integrity",
+  "bot_id": 1,
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "element_types": "sheet_header",
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "total_elements": 1,
+  "created_time": 1752893064.69696,
+  "source_type": "xlsx",
+  "source_page": 1,
+  "chunk_type": "direct_extraction",
+  "file_name": "Lucas Offices.xlsx",
+  "structural_density": 0.508,
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "llm_enrichment": "disabled",
+  "structure_type": "sheet_header",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "content_type": "unstructured_text"
+}
+2025-07-20 14:30:22,427 — INFO — retriever — [ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing
+2025-07-20 14:30:22,434 — INFO — retriever — [ENHANCED-RETRIEVER] Enhanced retriever built with FI-04, FI-05, FI-08 integration
+2025-07-20 14:30:22,435 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-20 14:30:22,917 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-20 14:30:22,919 — INFO — retriever — [FI-04] Expanded query into 2 variations
+2025-07-20 14:30:23,176 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:23,784 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:23,982 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:24,493 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:24,495 — INFO — retriever — [FI-04] Multi-vector search: 2 queries → 5 results
+2025-07-20 14:30:24,497 — INFO — retriever — [FI-05] Re-ranked 5 docs by term importance
+2025-07-20 14:30:24,498 — INFO — retriever — [FI-08] Applying quality enhancements to 5 documents
+2025-07-20 14:30:24,500 — INFO — retriever — [FI-08] Quality filter: 5 → 4 docs
+2025-07-20 14:30:24,536 — INFO — retriever — [FI-08] Smart deduplication: 4 → 4 docs
+2025-07-20 14:30:24,537 — INFO — retriever — [FI-05] Re-ranked 4 docs by term importance
+2025-07-20 14:30:24,538 — INFO — retriever — [FI-08] Quality enhancements complete: 5 → 4 docs
+2025-07-20 14:30:24,539 — INFO — retriever — [RETRIEVER] Using cached vectorstore for global
+2025-07-20 14:30:24,540 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-20 14:30:24,541 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-20 14:30:24,541 — INFO — retriever — [RETRIEVER] Using cached BM25 with 566 documents
+2025-07-20 14:30:25,024 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-20 14:30:25,034 — INFO — retriever — [RETRIEVER] Enhanced hybrid retriever (FI-04, FI-05, FI-08) — k=12
+2025-07-20 14:30:25,035 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "bot_id": 1,
+  "preservation_reason": "structured_data_integrity",
+  "processing_strategy": "direct_extraction",
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "created_time": 1752893064.69696,
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "mime_type": "application/octet-stream",
+  "file_size": 9767,
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "source_page": 1,
+  "chunk_index": 0,
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "structure_type": "sheet_header",
+  "llm_enrichment": "disabled",
+  "structural_density": 0.508,
+  "llm_enrichment_mode": "disabled",
+  "modified_time": 1752893064.69696,
+  "event_id": 693,
+  "file_name": "Lucas Offices.xlsx",
+  "chunk_type": "direct_extraction",
+  "source_type": "xlsx",
+  "content_type": "unstructured_text",
+  "company_id": 3,
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "total_elements": 1,
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "element_types": "sheet_header"
+}
+2025-07-20 14:30:25,035 — INFO — retriever — [ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing
+2025-07-20 14:30:25,043 — INFO — retriever — [ENHANCED-RETRIEVER] Enhanced retriever built with FI-04, FI-05, FI-08 integration
+2025-07-20 14:30:25,044 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-20 14:30:25,581 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-20 14:30:25,584 — INFO — retriever — [FI-04] Expanded query into 2 variations
+2025-07-20 14:30:25,846 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:26,549 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:26,805 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:27,178 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:27,180 — INFO — retriever — [FI-04] Multi-vector search: 2 queries → 2 results
+2025-07-20 14:30:27,181 — INFO — retriever — [FI-05] Re-ranked 2 docs by term importance
+2025-07-20 14:30:27,181 — INFO — retriever — [FI-08] Applying quality enhancements to 2 documents
+2025-07-20 14:30:27,181 — INFO — retriever — [FI-08] Quality filter: 2 → 0 docs
+2025-07-20 14:30:27,182 — INFO — retriever — [FI-08] Quality enhancements complete: 2 → 0 docs
+2025-07-20 14:30:27,182 — INFO — retriever — [RETRIEVER] Using cached vectorstore for global
+2025-07-20 14:30:27,182 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-20 14:30:27,183 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-20 14:30:27,183 — INFO — retriever — [RETRIEVER] Using cached BM25 with 566 documents
+2025-07-20 14:30:27,504 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-20 14:30:27,514 — INFO — retriever — [RETRIEVER] Enhanced hybrid retriever (FI-04, FI-05, FI-08) — k=12
+2025-07-20 14:30:27,515 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "llm_enrichment": "disabled",
+  "content_type": "unstructured_text",
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "llm_enrichment_mode": "disabled",
+  "file_size": 9767,
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "source_type": "xlsx",
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "source_page": 1,
+  "preservation_reason": "structured_data_integrity",
+  "mime_type": "application/octet-stream",
+  "structure_type": "sheet_header",
+  "total_elements": 1,
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "file_name": "Lucas Offices.xlsx",
+  "company_id": 3,
+  "event_id": 693,
+  "bot_id": 1,
+  "chunk_type": "direct_extraction",
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "chunk_index": 0,
+  "structural_density": 0.508,
+  "modified_time": 1752893064.69696,
+  "element_types": "sheet_header",
+  "processing_strategy": "direct_extraction",
+  "created_time": 1752893064.69696
+}
+2025-07-20 14:30:27,515 — INFO — retriever — [ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing
+2025-07-20 14:30:27,522 — INFO — retriever — [ENHANCED-RETRIEVER] Enhanced retriever built with FI-04, FI-05, FI-08 integration
+2025-07-20 14:30:27,523 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-20 14:30:27,970 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-20 14:30:27,973 — INFO — retriever — [FI-04] Expanded query into 2 variations
+2025-07-20 14:30:28,269 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:28,791 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:29,322 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:29,853 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:29,855 — INFO — retriever — [FI-04] Multi-vector search: 2 queries → 5 results
+2025-07-20 14:30:29,857 — INFO — retriever — [FI-05] Re-ranked 5 docs by term importance
+2025-07-20 14:30:29,857 — INFO — retriever — [FI-08] Applying quality enhancements to 5 documents
+2025-07-20 14:30:29,861 — INFO — retriever — [FI-08] Quality filter: 5 → 5 docs
+2025-07-20 14:30:30,018 — INFO — retriever — [FI-08] Smart deduplication: 5 → 4 docs
+2025-07-20 14:30:30,019 — INFO — retriever — [FI-05] Re-ranked 4 docs by term importance
+2025-07-20 14:30:30,020 — INFO — retriever — [FI-08] Quality enhancements complete: 5 → 4 docs
+2025-07-20 14:30:30,021 — INFO — retriever — [RETRIEVER] Using cached vectorstore for global
+2025-07-20 14:30:30,021 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-20 14:30:30,021 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-20 14:30:30,022 — INFO — retriever — [RETRIEVER] Using cached BM25 with 566 documents
+2025-07-20 14:30:30,431 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-20 14:30:30,489 — INFO — retriever — [RETRIEVER] Enhanced hybrid retriever (FI-04, FI-05, FI-08) — k=12
+2025-07-20 14:30:30,490 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "created_time": 1752893064.69696,
+  "total_elements": 1,
+  "structural_density": 0.508,
+  "mime_type": "application/octet-stream",
+  "structure_type": "sheet_header",
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "preservation_reason": "structured_data_integrity",
+  "bot_id": 1,
+  "source_type": "xlsx",
+  "chunk_index": 0,
+  "content_type": "unstructured_text",
+  "processing_strategy": "direct_extraction",
+  "file_name": "Lucas Offices.xlsx",
+  "company_id": 3,
+  "llm_enrichment": "disabled",
+  "llm_enrichment_mode": "disabled",
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "file_size": 9767,
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "event_id": 693,
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "source_page": 1,
+  "modified_time": 1752893064.69696,
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "element_types": "sheet_header",
+  "chunk_type": "direct_extraction"
+}
+2025-07-20 14:30:30,494 — INFO — retriever — [ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing
+2025-07-20 14:30:30,504 — INFO — retriever — [ENHANCED-RETRIEVER] Enhanced retriever built with FI-04, FI-05, FI-08 integration
+2025-07-20 14:30:30,506 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-20 14:30:31,006 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-20 14:30:31,010 — INFO — retriever — [FI-04] Expanded query into 2 variations
+2025-07-20 14:30:31,217 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:31,607 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:31,928 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:32,319 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:32,321 — INFO — retriever — [FI-04] Multi-vector search: 2 queries → 2 results
+2025-07-20 14:30:32,321 — INFO — retriever — [FI-05] Re-ranked 2 docs by term importance
+2025-07-20 14:30:32,321 — INFO — retriever — [FI-08] Applying quality enhancements to 2 documents
+2025-07-20 14:30:32,322 — INFO — retriever — [FI-08] Quality filter: 2 → 1 docs
+2025-07-20 14:30:32,322 — INFO — retriever — [FI-05] Re-ranked 1 docs by term importance
+2025-07-20 14:30:32,322 — INFO — retriever — [FI-08] Quality enhancements complete: 2 → 1 docs
+2025-07-20 14:30:32,323 — INFO — retriever — [RETRIEVER] Using cached vectorstore for global
+2025-07-20 14:30:32,323 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-20 14:30:32,323 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-20 14:30:32,323 — INFO — retriever — [RETRIEVER] Using cached BM25 with 566 documents
+2025-07-20 14:30:32,681 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-20 14:30:32,687 — INFO — retriever — [RETRIEVER] Enhanced hybrid retriever (FI-04, FI-05, FI-08) — k=12
+2025-07-20 14:30:32,688 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "modified_time": 1752893064.69696,
+  "event_id": 693,
+  "source_type": "xlsx",
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "company_id": 3,
+  "bot_id": 1,
+  "structural_density": 0.508,
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "element_types": "sheet_header",
+  "llm_enrichment_mode": "disabled",
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "file_size": 9767,
+  "chunk_type": "direct_extraction",
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "structure_type": "sheet_header",
+  "total_elements": 1,
+  "file_name": "Lucas Offices.xlsx",
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "content_type": "unstructured_text",
+  "created_time": 1752893064.69696,
+  "chunk_index": 0,
+  "preservation_reason": "structured_data_integrity",
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "llm_enrichment": "disabled",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "processing_strategy": "direct_extraction",
+  "source_page": 1,
+  "mime_type": "application/octet-stream"
+}
+2025-07-20 14:30:32,689 — INFO — retriever — [ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing
+2025-07-20 14:30:32,694 — INFO — retriever — [ENHANCED-RETRIEVER] Enhanced retriever built with FI-04, FI-05, FI-08 integration
+2025-07-20 14:30:32,696 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-20 14:30:33,165 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-20 14:30:33,167 — INFO — retriever — [FI-04] Expanded query into 2 variations
+2025-07-20 14:30:33,344 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:33,819 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:34,010 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-20 14:30:34,510 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/query "HTTP/1.1 200 OK"
+2025-07-20 14:30:34,513 — INFO — retriever — [FI-04] Multi-vector search: 2 queries → 6 results
+2025-07-20 14:30:34,514 — INFO — retriever — [FI-05] Re-ranked 6 docs by term importance
+2025-07-20 14:30:34,514 — INFO — retriever — [FI-08] Applying quality enhancements to 6 documents
+2025-07-20 14:30:34,535 — INFO — retriever — [FI-08] Quality filter: 6 → 6 docs
+2025-07-20 14:30:34,624 — INFO — retriever — [FI-08] Smart deduplication: 6 → 6 docs
+2025-07-20 14:30:34,626 — INFO — retriever — [FI-05] Re-ranked 6 docs by term importance
+2025-07-20 14:30:34,627 — INFO — retriever — [FI-08] Quality enhancements complete: 6 → 6 docs
