@@ -20399,3 +20399,98 @@ These companies represent a diverse range of industries, showcasing varying leve
 I'm not sure.
 2025-07-19 19:31:46,781 — INFO — app — [STREAM] Completed streaming. Clean text for history: 13 chars
 2025-07-19 19:31:46,782 — INFO — app — [RETRIEVAL] Sources: ['sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'sample_mixed.html', 'Lucas Offices.pdf', 'sample_mixed.html'], Scores: ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+2025-07-19 19:45:25,860 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-19 19:45:25,866 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-19 19:45:26,085 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-07-19 19:45:27,153 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-07-19 19:45:27,745 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-07-19 19:45:28,058 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-07-19 19:45:28,836 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-19 19:45:29,485 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-19 19:45:29,487 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-19 19:45:29,488 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-19 19:45:29,929 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-19 19:45:30,376 — INFO — retriever — [RETRIEVER] Initialized BM25 with 430 documents
+2025-07-19 19:45:30,377 — INFO — retriever — [RETRIEVER] Enhanced hybrid retriever (FI-04, FI-05, FI-08) — k=8
+2025-07-19 19:45:30,377 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "chunk_type": "direct_extraction",
+  "file_size": 9767,
+  "element_types": "sheet_header",
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "chunk_index": 0,
+  "modified_time": 1752893064.69696,
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "created_time": 1752893064.69696,
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "llm_enrichment": "disabled",
+  "event_id": 693,
+  "processing_strategy": "direct_extraction",
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "mime_type": "application/octet-stream",
+  "llm_enrichment_mode": "disabled",
+  "content_type": "unstructured_text",
+  "structure_type": "sheet_header",
+  "structural_density": 0.508,
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "preservation_reason": "structured_data_integrity",
+  "source_page": 1,
+  "bot_id": 1,
+  "total_elements": 1,
+  "source_type": "xlsx",
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "company_id": 3,
+  "file_name": "Lucas Offices.xlsx"
+}
+2025-07-19 19:45:30,378 — INFO — retriever — [ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing
+2025-07-19 19:45:30,379 — INFO — retriever — [ENHANCED-RETRIEVER] Enhanced retriever built with FI-04, FI-05, FI-08 integration
+2025-07-19 19:45:30,379 — WARNING — retriever — [FI-04] Query expansion failed for 'Technology companies': asyncio.run() cannot be called from a running event loop
+2025-07-19 19:45:30,384 — WARNING — retriever — [FI-04] Query expansion failed for 'technology companies': asyncio.run() cannot be called from a running event loop
+2025-07-19 19:46:02,388 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-19 19:46:02,396 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-19 19:46:02,591 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-07-19 19:46:03,483 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-07-19 19:46:03,909 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-07-19 19:46:04,320 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-07-19 19:46:04,938 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-19 19:46:05,940 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-19 19:46:05,944 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-19 19:46:05,945 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-19 19:46:06,505 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/b5b1d40a-1830-4b88-bb4b-6e5b1b5baa12/get "HTTP/1.1 200 OK"
+2025-07-19 19:46:06,953 — INFO — retriever — [RETRIEVER] Initialized BM25 with 430 documents
+2025-07-19 19:46:06,953 — INFO — retriever — [RETRIEVER] Enhanced hybrid retriever (FI-04, FI-05, FI-08) — k=8
+2025-07-19 19:46:06,954 — INFO — retriever — [RETRIEVER DEBUG] Sample document metadata: {
+  "total_elements": 1,
+  "company_id": 3,
+  "modified_time": 1752893064.69696,
+  "chunk_type": "direct_extraction",
+  "processing_method": "hybrid_5_stage_created_with_deduplication",
+  "llm_enrichment_mode": "disabled",
+  "llm_processing": "llm_disabled_for_data_integrity",
+  "structural_density": 0.508,
+  "mime_type": "application/octet-stream",
+  "source_type": "xlsx",
+  "preservation_reason": "structured_data_integrity",
+  "bot_id": 1,
+  "source": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "event_id": 693,
+  "processing_strategy": "direct_extraction",
+  "element_types": "sheet_header",
+  "document_id": "nc7jpk6a2k0lwgo588cxrity",
+  "content_type": "unstructured_text",
+  "ingestion_timestamp": "2025-07-19T02:44:24.699542",
+  "llm_enrichment": "disabled",
+  "source_page": 1,
+  "storage_key": "Lucas_Offices_bff8e5d9ef.xlsx",
+  "structure_type": "sheet_header",
+  "file_name": "Lucas Offices.xlsx",
+  "chunk_index": 0,
+  "created_time": 1752893064.69696,
+  "timestamp": "2025-07-19T02:44:25.142030",
+  "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "file_size": 9767
+}
+2025-07-19 19:46:06,956 — INFO — retriever — [ENHANCED-RETRIEVER] Building enhanced retriever with query-adaptive processing
+2025-07-19 19:46:06,957 — INFO — retriever — [ENHANCED-RETRIEVER] Enhanced retriever built with FI-04, FI-05, FI-08 integration
+2025-07-19 19:46:06,957 — WARNING — retriever — [FI-04] Query expansion failed for 'Technology companies': asyncio.run() cannot be called from a running event loop

@@ -604,20 +604,21 @@ Alternative queries:"""
                     """Enhanced document retrieval with FI-04, FI-05, FI-08"""
                     
                     # Step 1: FI-04 - Content-Agnostic Enhanced Retrieval System
-                    expanded_queries = []
-                    if hasattr(self.retriever_service, 'expand_query'):
-                        # Use existing query expansion if available
-                        expanded_queries = self.retriever_service.expand_query(query_text)
-                    else:
-                        # Simple query expansion as fallback
-                        expanded_queries = [query_text]
-                        # Add basic query variations
-                        words = query_text.lower().split()
-                        if len(words) > 1:
-                            # Create entity-focused query
-                            entities = [w for w in words if len(w) > 3 and w.isalpha()]
-                            if entities:
-                                expanded_queries.append(" ".join(entities))
+                    # Simple but effective query expansion without async complications
+                    expanded_queries = [query_text]
+                    
+                    # Add basic query variations for enhanced coverage
+                    words = query_text.lower().split()
+                    if len(words) > 1:
+                        # Create entity-focused query
+                        entities = [w for w in words if len(w) > 3 and w.isalpha()]
+                        if entities and len(entities) != len(words):
+                            expanded_queries.append(" ".join(entities))
+                        
+                        # Create concept-focused query (remove common words)
+                        important_words = [w for w in words if len(w) > 4 and w not in ['what', 'are', 'the', 'how', 'who', 'when', 'where']]
+                        if important_words and len(important_words) != len(words):
+                            expanded_queries.append(" ".join(important_words))
                     
                     # Retrieve documents for each query variant
                     all_documents = []
