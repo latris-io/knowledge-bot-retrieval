@@ -33,7 +33,7 @@ Alternative 2: Which organizations are in the records?"""
             
             # Test query expansion
             original_query = "What companies are in the database?"
-            expanded = asyncio.run(retriever_service.expand_query_semantically(original_query))
+            expanded = retriever_service.expand_query_semantically(original_query)
             
             # Validate expansion results
             assert len(expanded) >= 2, "Should generate at least 2 query variants"
@@ -55,10 +55,10 @@ Alternative 2: Which organizations are in the records?"""
             query = "test caching query"
             
             # First call - should invoke LLM
-            result1 = asyncio.run(retriever_service.expand_query_semantically(query))
+            result1 = retriever_service.expand_query_semantically(query)
             
             # Second call - should use cache
-            result2 = asyncio.run(retriever_service.expand_query_semantically(query))
+            result2 = retriever_service.expand_query_semantically(query)
             
             # Validate caching
             assert result1 == result2, "Cached results should be identical"
@@ -94,7 +94,7 @@ Alternative 2: Which organizations are in the records?"""
             
             # Test multi-vector search
             query = "technology companies"
-            results = asyncio.run(retriever_service.multi_vector_search(query, mock_vectorstore, k=8))
+            results = retriever_service.multi_vector_search(query, mock_vectorstore, k=8)
             
             # Validate multi-vector search
             assert len(results) > 0, "Should return search results"
@@ -131,7 +131,7 @@ Alternative 2: Which organizations are in the records?"""
         with patch.object(retriever_service, 'expand_query_semantically') as mock_expand:
             mock_expand.return_value = ["tech companies", "technology firms"]
             
-            results = asyncio.run(retriever_service.multi_vector_search("tech", mock_vectorstore, k=8))
+            results = retriever_service.multi_vector_search("tech", mock_vectorstore, k=8)
             
             # Validate deduplication
             contents = [doc.page_content for doc in results]
@@ -151,7 +151,7 @@ Alternative 2: Which organizations are in the records?"""
         
         # Test fallback behavior
         query = "test query"  
-        results = asyncio.run(retriever_service.multi_vector_search(query, mock_vectorstore, k=8))
+        results = retriever_service.multi_vector_search(query, mock_vectorstore, k=8)
         
         # Should fallback gracefully
         assert isinstance(results, list), "Should return list even on error"
@@ -160,7 +160,7 @@ Alternative 2: Which organizations are in the records?"""
         with patch('retriever.ChatOpenAI') as mock_llm:
             mock_llm.side_effect = Exception("LLM failed")
             
-            expanded = asyncio.run(retriever_service.expand_query_semantically(query))
+            expanded = retriever_service.expand_query_semantically(query)
             assert query in expanded, "Should fallback to original query on error"
             assert len(expanded) == 1, "Should only return original on error"
     
@@ -181,7 +181,7 @@ Alternative 2: Which organizations are in the records?"""
             
             # Test response time
             start_time = time.time()
-            results = asyncio.run(retriever_service.multi_vector_search("test", mock_vectorstore, k=8))  
+            results = retriever_service.multi_vector_search("test", mock_vectorstore, k=8)  
             end_time = time.time()
             
             response_time = end_time - start_time
@@ -192,7 +192,7 @@ Alternative 2: Which organizations are in the records?"""
             
             # Validate caching improves performance
             start_time2 = time.time()
-            results2 = asyncio.run(retriever_service.multi_vector_search("test", mock_vectorstore, k=8))
+            results2 = retriever_service.multi_vector_search("test", mock_vectorstore, k=8)
             end_time2 = time.time()
             
             cached_time = end_time2 - start_time2  
@@ -219,7 +219,7 @@ Alternative 2: Another approach"""
             ]
             
             for query in test_queries:
-                expanded = asyncio.run(retriever_service.expand_query_semantically(query))
+                expanded = retriever_service.expand_query_semantically(query)
                 
                 # Should work for any domain
                 assert len(expanded) >= 2, f"Should expand query for domain: {query}"

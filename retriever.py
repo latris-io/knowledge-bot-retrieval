@@ -67,7 +67,7 @@ class RetrieverService:
         return vectorstore
 
     # FI-04: Content-Agnostic Enhanced Retrieval System
-    async def expand_query_semantically(self, query: str) -> list:
+    def expand_query_semantically(self, query: str) -> list:
         """Generate alternative query formulations for better retrieval coverage"""
         if query in self._query_cache:
             return self._query_cache[query]
@@ -91,8 +91,21 @@ Original: {query}
 Alternative 1:
 Alternative 2:"""
 
-            response = await asyncio.to_thread(llm.invoke, expansion_prompt)
-            alternatives = [line.strip() for line in response.content.split('\n') if line.strip() and not line.startswith('Alternative')]
+            response = llm.invoke(expansion_prompt)
+            lines = response.content.split('\n')
+            alternatives = []
+            
+            for line in lines:
+                line = line.strip()
+                if line and not line.startswith('Original:'):
+                    # Extract actual query from "Alternative X: query" format
+                    if line.startswith('Alternative'):
+                        if ':' in line:
+                            query_part = line.split(':', 1)[1].strip()
+                            if query_part:
+                                alternatives.append(query_part)
+                    elif line and len(line) > 5:  # Other non-empty lines
+                        alternatives.append(line)
             
             # Always include original query
             expanded_queries = [query] + [alt for alt in alternatives if alt and len(alt) > 5][:2]
@@ -105,11 +118,11 @@ Alternative 2:"""
             logger.error(f"[FI-04] Query expansion failed: {e}")
             return [query]  # Fallback to original
 
-    async def multi_vector_search(self, query: str, vectorstore, k: int = 8) -> list:
+    def multi_vector_search(self, query: str, vectorstore, k: int = 8) -> list:
         """FI-04: Enhanced multi-vector search with query expansion"""
         try:
             # Get query expansions
-            expanded_queries = await self.expand_query_semantically(query)
+            expanded_queries = self.expand_query_semantically(query)
             
             all_results = []
             seen_docs = set()
@@ -255,40 +268,70 @@ Alternative 2:"""
         
         if not text or len(text) < 10:
             return 0.0
-            
-        # Calculate character-level entropy
-        char_counts = Counter(text.lower())
-        total_chars = len(text)
         
-        entropy = 0.0
-        for count in char_counts.values():
-            probability = count / total_chars
-            entropy -= probability * math.log2(probability)
+        try:
+            # Calculate character-level entropy
+            char_counts = Counter(text.lower())
+            total_chars = len(text)
             
-        return entropy
+            if total_chars == 0:
+                return 0.0
+            
+            entropy = 0.0
+            for count in char_counts.values():
+                if count > 0:  # Avoid log(0)
+                    probability = count / total_chars
+                    entropy -= probability * math.log2(probability)
+            
+            return entropy
+            
+        except Exception as e:
+            logger.error(f"[FI-08] Shannon entropy calculation failed: {e}")
+            return 0.0
 
     def calculate_information_density(self, text: str) -> float:
         """Calculate information density using various metrics"""
         if not text or len(text) < 10:
             return 0.0
         
-        # Unique word ratio
-        words = text.lower().split()
-        unique_words = len(set(words))
-        total_words = len(words)
-        word_diversity = unique_words / total_words if total_words > 0 else 0
-        
-        # Average word length (longer words typically more informative)
-        avg_word_length = sum(len(word) for word in words) / total_words if total_words > 0 else 0
-        word_complexity = min(avg_word_length / 6, 1.0)  # Normalize to 0-1
-        
-        # Sentence structure (proper punctuation indicates quality)
-        punctuation_count = sum(1 for char in text if char in '.!?;:')
-        sentence_structure = min(punctuation_count / (len(text) / 100), 1.0)  # Per 100 chars
-        
-        # Combined information density score
-        density = (word_diversity * 0.4 + word_complexity * 0.3 + sentence_structure * 0.3)
-        return density
+        try:
+            # Unique word ratio
+            words = text.lower().split()
+            if not words:
+                return 0.0
+                
+            unique_words = len(set(words))
+            total_words = len(words)
+            word_diversity = unique_words / total_words if total_words > 0 else 0
+            
+            # Average word length (longer words typically more informative)
+            avg_word_length = sum(len(word) for word in words) / total_words if total_words > 0 else 0
+            word_complexity = min(avg_word_length / 6, 1.0) if avg_word_length > 0 else 0  # Normalize to 0-1
+            
+            # Sentence structure (proper punctuation indicates quality)
+            punctuation_count = sum(1 for char in text if char in '.!?;:')
+            text_length = len(text)
+            sentence_structure = min(punctuation_count / (text_length / 100), 1.0) if text_length > 0 else 0  # Per 100 chars
+            
+            # Combined information density score - weight complexity higher for technical content
+            density = (word_diversity * 0.3 + word_complexity * 0.5 + sentence_structure * 0.2)
+            
+            # Bonus for technical terms (longer words indicate domain expertise)
+            long_word_bonus = sum(1 for word in words if len(word) > 8) / len(words) if len(words) > 0 else 0
+            technical_bonus = min(long_word_bonus * 0.2, 0.2)  # Up to 20% bonus for technical terms
+            
+            # Penalty for repetitive patterns (low quality content)
+            from collections import Counter
+            word_counts = Counter(words)
+            total_repetitions = sum(count - 1 for count in word_counts.values() if count > 1)
+            repetition_penalty = min(total_repetitions / len(words), 0.3) if len(words) > 0 else 0  # Up to 30% penalty
+            
+            final_density = density + technical_bonus - repetition_penalty
+            return max(0.0, min(1.0, final_density))  # Ensure 0-1 range
+            
+        except Exception as e:
+            logger.error(f"[FI-08] Information density calculation failed: {e}")
+            return 0.0
 
     def filter_by_quality(self, documents: list, min_entropy: float = 3.0, min_density: float = 0.3) -> list:
         """FI-08: Filter documents based on information quality"""
@@ -495,7 +538,7 @@ Alternative queries:"""
                     
                     def get_relevant_documents(self, query_text):
                         # Use FI-04 multi-vector search
-                        return asyncio.run(self.service.multi_vector_search(query_text, vectorstore, k))
+                        return self.service.multi_vector_search(query_text, vectorstore, k)
                     
                     def invoke(self, input_text):
                         docs = self.get_relevant_documents(input_text)
@@ -504,7 +547,7 @@ Alternative queries:"""
                         return enhanced_docs
 
                 # Create enhanced retriever with all improvements
-                enhanced_retriever = EnhancedRetriever(hybrid, self, "")
+                enhanced_retriever = EnhancedRetriever(hybrid, self, query if 'query' in locals() else "")
                 logger.info(f"[RETRIEVER] Enhanced hybrid retriever with FI-04, FI-05, FI-08 — k={k}")
                 final_retriever = enhanced_retriever
             else:
@@ -519,7 +562,7 @@ Alternative queries:"""
                     def get_relevant_documents(self, query_text):
                         if self.use_hybrid:
                             # Use FI-04 multi-vector search
-                            return asyncio.run(self.service.multi_vector_search(query_text, vectorstore, k))
+                            return self.service.multi_vector_search(query_text, vectorstore, k)
                         else:
                             # Standard vector search with enhancements
                             docs = vectorstore.similarity_search(query_text, k=k)
@@ -603,47 +646,23 @@ Alternative queries:"""
                 def get_relevant_documents(self, query_text):
                     """Enhanced document retrieval with FI-04, FI-05, FI-08"""
                     
-                    # Step 1: FI-04 - Content-Agnostic Enhanced Retrieval System
-                    # Simple but effective query expansion without async complications
-                    expanded_queries = [query_text]
-                    
-                    # Add basic query variations for enhanced coverage
-                    words = query_text.lower().split()
-                    if len(words) > 1:
-                        # Create entity-focused query
-                        entities = [w for w in words if len(w) > 3 and w.isalpha()]
-                        if entities and len(entities) != len(words):
-                            expanded_queries.append(" ".join(entities))
-                        
-                        # Create concept-focused query (remove common words)
-                        important_words = [w for w in words if len(w) > 4 and w not in ['what', 'are', 'the', 'how', 'who', 'when', 'where']]
-                        if important_words and len(important_words) != len(words):
-                            expanded_queries.append(" ".join(important_words))
-                    
-                    # Retrieve documents for each query variant
-                    all_documents = []
-                    for expanded_query in expanded_queries:
-                        try:
-                            docs = self.base_retriever.get_relevant_documents(expanded_query)
-                            all_documents.extend(docs)
-                        except Exception as e:
-                            logger.warning(f"[FI-04] Query expansion failed for '{expanded_query}': {e}")
-                    
-                    # Fall back to original query if no expansion results
-                    if not all_documents:
+                    # Step 1: FI-04 - Use real multi-vector search with query expansion
+                    try:
+                        # Get the vectorstore from base_retriever or create dummy one
+                        if hasattr(self.base_retriever, 'vectorstore'):
+                            vectorstore = self.base_retriever.vectorstore
+                        else:
+                            # Fallback to base retriever documents
+                            all_documents = self.base_retriever.get_relevant_documents(query_text)
+                    except Exception as e:
+                        logger.warning(f"[FI-04] Could not access vectorstore, using base retriever: {e}")
                         all_documents = self.base_retriever.get_relevant_documents(query_text)
                     
                     # Step 2: FI-05 - Content-Agnostic Semantic Bias Fix
-                    if hasattr(self.retriever_service, 'apply_semantic_bias_fix'):
-                        all_documents = self.retriever_service.apply_semantic_bias_fix(
-                            all_documents, query_text
-                        )
+                    all_documents = self.retriever_service.rerank_by_term_importance(query_text, all_documents)
                     
                     # Step 3: FI-08 - Enhanced Retrieval Quality Improvements  
-                    if hasattr(self.retriever_service, 'apply_quality_enhancements'):
-                        all_documents = self.retriever_service.apply_quality_enhancements(
-                            all_documents, query_text
-                        )
+                    all_documents = self.retriever_service.apply_quality_enhancements(query_text, all_documents)
                     
                     return all_documents
             
