@@ -27,6 +27,8 @@ import uuid
 
 load_dotenv()
 
+# FastAPI Knowledge Bot - v2.5 Speed/Accuracy Optimized - Clean Deploy for Render
+
 # FI-02: Semantic Topic Change Detection
 async def detect_topic_change_semantic(current_question: str, chat_history: InMemoryChatMessageHistory, embedding_function) -> bool:
     """
