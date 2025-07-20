@@ -78,6 +78,7 @@ declare -A TEST_CATEGORIES=(
     ["ei_04"]="EI-04: Enhanced Retrieval Debug System"
     ["ei_05"]="EI-05: Person Context Enhancement"
     ["integration_comprehensive"]="Comprehensive Enhanced Integration Tests"
+    ["fi_09"]="FI-09: Comprehensive Hybrid Prompt Template"
 )
 
 # Function to run specific test category
