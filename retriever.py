@@ -333,6 +333,7 @@ Alternative:"""
     def filter_by_quality(self, documents: list, min_entropy: float = 3.5, min_density: float = 0.4) -> list:
         """FI-08: Filter documents based on information quality"""
         if not documents:
+            logger.info("[FI-08] No documents to filter - database may be empty")
             return documents
             
         try:
@@ -387,7 +388,7 @@ Alternative:"""
                 # Apply quality checks
                 if passes_entropy and passes_density and passes_length and passes_uniqueness:
                     quality_docs.append(doc)
-                elif is_structured_data:
+                elif tabular_density > 0.3 or data_repetition > 0.4:
                     # For structured data, be more lenient - just require basic coherence
                     if entropy >= 1.5 and len(content.split()) >= 3:
                         logger.info(f"[FI-08] Allowing structured data with relaxed quality: entropy={entropy:.2f}, density={density:.2f}")
@@ -493,7 +494,7 @@ Alternative:"""
                 # Calculate consistency (how many lines have same separator count)
                 most_common_count = max(set(separator_counts), key=separator_counts.count)
                 consistent_lines = sum(1 for count in separator_counts if count == most_common_count)
-                consistency = consistent_lines / len(separator_counts)
+                consistency = consistent_lines / len(separator_counts) if len(separator_counts) > 0 else 0.0
                 max_consistency = max(max_consistency, consistency)
         
         return max_consistency
@@ -537,8 +538,11 @@ Alternative:"""
             structure_counts[structure] = structure_counts.get(structure, 0) + 1
             
         # Find most common structure
+        if not structure_counts:
+            return 0.0
+            
         max_count = max(structure_counts.values())
-        repetition_ratio = max_count / len(line_structures)
+        repetition_ratio = max_count / len(line_structures) if len(line_structures) > 0 else 0.0
         
         return repetition_ratio
 
@@ -619,14 +623,22 @@ Alternative queries:"""
                 except:
                     pass
             else:
-                docs = vectorstore.get(include=["documents", "metadatas"], where=base_filter)
-                texts = docs["documents"]
-                metadatas = docs["metadatas"]
-                
-                bm25 = BM25Retriever.from_texts(texts, metadatas=metadatas)
-                bm25.k = k
-                self._bm25_cache[cache_key] = bm25
-                logger.info(f"[RETRIEVER] Initialized BM25 with {len(texts)} documents")
+                            docs = vectorstore.get(include=["documents", "metadatas"], where=base_filter)
+            texts = docs["documents"]
+            metadatas = docs["metadatas"]
+            
+            if not texts:
+                logger.warning(f"[RETRIEVER] No documents found for company_id={company_id}, bot_id={bot_id}. Database may be empty.")
+                # Create a dummy retriever that returns empty results
+                class EmptyRetriever(BaseRetriever):
+                    def _get_relevant_documents(self, query: str, *, run_manager=None) -> List[Document]:
+                        return []
+                return EmptyRetriever()
+            
+            bm25 = BM25Retriever.from_texts(texts, metadatas=metadatas)
+            bm25.k = k
+            self._bm25_cache[cache_key] = bm25
+            logger.info(f"[RETRIEVER] Initialized BM25 with {len(texts)} documents")
 
             # For maximum speed in direct mode, skip redundant embedding compression
             if use_multi_query:

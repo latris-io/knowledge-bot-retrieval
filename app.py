@@ -10,6 +10,7 @@ from bot_config import get_openai_api_key
 from prompt_template import get_prompt_template
 from markdown_processor import process_markdown_to_clean_text, process_markdown_to_html, process_streaming_token
 from retriever import RetrieverService
+from empty_database_handler import EmptyDatabaseHandler
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableSequence
@@ -399,15 +400,22 @@ async def ask_question(
         retriever_service = RetrieverService()
         
         # Use enhanced retriever with query-adaptive processing and all Foundation Improvements
-        retriever = await retriever_service.build_enhanced_retriever(
-            company_id=company_id,
-            bot_id=bot_id,
-            query=question,  # Pass query for adaptive processing
-            k=k,
-            similarity_threshold=similarity_threshold,
-            use_multi_query=use_multi_query,
-            use_enhanced_search=True  # Enable enhanced search by default
-        )
+        try:
+            retriever = await retriever_service.build_enhanced_retriever(
+                company_id=company_id,
+                bot_id=bot_id,
+                query=question,  # Pass query for adaptive processing
+                k=k,
+                similarity_threshold=similarity_threshold,
+                use_multi_query=use_multi_query,
+                use_enhanced_search=True  # Enable enhanced search by default
+            )
+        except (ZeroDivisionError, Exception) as e:
+            if "division by zero" in str(e).lower() or isinstance(e, ZeroDivisionError):
+                logger.warning(f"[EMPTY-DB] Database appears empty for company_id={company_id}, bot_id={bot_id}")
+                retriever = EmptyDatabaseHandler.create_empty_retriever(company_id, bot_id)
+            else:
+                raise e
         
         # Enhanced Retrieval Debug System - Test retrieval quality and coverage
         if verbose:
@@ -416,23 +424,26 @@ async def ask_question(
                 test_docs = retriever.get_relevant_documents(question)
                 logger.info(f"[RETRIEVAL DEBUG] Retrieved {len(test_docs)} documents")
                 
-                # Show top 3 documents with metadata
-                for i, doc in enumerate(test_docs[:3]):
-                    content_preview = doc.page_content[:150].replace('\n', ' ')
-                    logger.info(f"[RETRIEVAL DEBUG] Doc {i+1}: {content_preview}...")
+                if not test_docs:
+                    logger.warning(f"[RETRIEVAL DEBUG] No documents retrieved - database may be empty for company_id={company_id}, bot_id={bot_id}")
+                else:
+                    # Show top 3 documents with metadata
+                    for i, doc in enumerate(test_docs[:3]):
+                        content_preview = doc.page_content[:150].replace('\n', ' ')
+                        logger.info(f"[RETRIEVAL DEBUG] Doc {i+1}: {content_preview}...")
+                        
+                        metadata = doc.metadata
+                        file_info = {
+                            'file_name': metadata.get('file_name', 'Unknown'),
+                            'chunk_index': metadata.get('chunk_index', 'N/A'),
+                            'source_type': metadata.get('source_type', 'Unknown')
+                        }
+                        logger.info(f"[RETRIEVAL DEBUG] Metadata: {file_info}")
                     
-                    metadata = doc.metadata
-                    file_info = {
-                        'file_name': metadata.get('file_name', 'Unknown'),
-                        'chunk_index': metadata.get('chunk_index', 'N/A'),
-                        'source_type': metadata.get('source_type', 'Unknown')
-                    }
-                    logger.info(f"[RETRIEVAL DEBUG] Metadata: {file_info}")
-                
-                # Log document source diversity
-                sources = [doc.metadata.get('file_name', 'Unknown') for doc in test_docs]
-                unique_sources = list(set(sources))
-                logger.info(f"[RETRIEVAL DEBUG] Source diversity: {len(unique_sources)} unique sources from {len(test_docs)} documents")
+                    # Log document source diversity
+                    sources = [doc.metadata.get('file_name', 'Unknown') for doc in test_docs]
+                    unique_sources = list(set(sources))
+                    logger.info(f"[RETRIEVAL DEBUG] Source diversity: {len(unique_sources)} unique sources from {len(test_docs)} documents")
                 
             except Exception as e:
                 logger.error(f"[RETRIEVAL DEBUG] Error testing retrieval: {e}")
@@ -523,7 +534,7 @@ async def ask_question(
         # Create a simple, reliable chain with conversational context
         from langchain.chains import RetrievalQA
         
-        chain = RetrievalQA.from_chain_type(
+        base_chain = RetrievalQA.from_chain_type(
             llm=llm,
             chain_type="stuff",
             retriever=retriever,
@@ -533,6 +544,11 @@ async def ask_question(
                 "prompt": enhanced_prompt,
                 "document_prompt": document_prompt
             }
+        )
+        
+        # Wrap chain to handle empty database gracefully
+        chain = EmptyDatabaseHandler.wrap_chain_for_empty_database(
+            base_chain, question, company_id, bot_id
         )
 
         if streaming:
