@@ -95,11 +95,28 @@ logger = logging.getLogger(__name__)
 
 session_histories = {}
 
-def get_session_history(session_id: str) -> InMemoryChatMessageHistory:
-    if session_id not in session_histories:
-        session_histories[session_id] = InMemoryChatMessageHistory()
-        logger.info(f"[MEMORY] Created new history for session {session_id}")
-    return session_histories[session_id]
+def get_session_history(company_id: int, bot_id: int, session_id: str) -> InMemoryChatMessageHistory:
+    """
+    SECURITY FIX: Session history isolated by company_id/bot_id/session_id
+    Prevents cross-tenant data leaks through conversation history
+    """
+    tenant_session_key = f"{company_id}_{bot_id}_{session_id}"
+    
+    if tenant_session_key not in session_histories:
+        session_histories[tenant_session_key] = InMemoryChatMessageHistory()
+        logger.info(f"[MEMORY] Created new isolated history for company_id={company_id}, bot_id={bot_id}, session_id={session_id}")
+    return session_histories[tenant_session_key]
+
+def validate_tenant_access(company_id: int, bot_id: int, documents_found: int) -> bool:
+    """
+    SECURITY: Strict multi-tenant validation
+    Returns False if no documents found for company_id/bot_id combination
+    Prevents any fallbacks that could leak cross-tenant data
+    """
+    if documents_found == 0:
+        logger.warning(f"[SECURITY] No documents found for company_id={company_id}, bot_id={bot_id}. Blocking all fallbacks.")
+        return False
+    return True
 
 async def format_chat_history_smart(
     chat_history: InMemoryChatMessageHistory, 
@@ -448,6 +465,43 @@ async def ask_question(
             except Exception as e:
                 logger.error(f"[RETRIEVAL DEBUG] Error testing retrieval: {e}")
 
+        # SECURITY: Check document availability for strict multi-tenant validation
+        documents_found = 0
+        try:
+            if verbose:
+                # Already checked in debug section above
+                test_docs = retriever.get_relevant_documents(question)
+                documents_found = len(test_docs)
+            else:
+                # Check document availability for security even in non-verbose mode
+                test_docs = retriever.get_relevant_documents(question)
+                documents_found = len(test_docs)
+        except Exception as e:
+            logger.error(f"[SECURITY] Error checking document availability: {e}")
+            documents_found = 0
+
+        # SECURITY: Strict multi-tenant validation - block all responses if no authorized documents
+        if not validate_tenant_access(company_id, bot_id, documents_found):
+            security_response = f"""I don't have access to any documents for this query.
+
+### 🔒 **Access Restricted**
+- Company ID: {company_id}
+- Bot ID: {bot_id}
+- Authorized documents: 0
+
+### 📋 **Next Steps**
+- Verify the correct bot configuration is being used
+- Ensure documents have been uploaded for this specific bot
+- Contact your administrator if you believe this is an error
+
+For security reasons, I cannot provide information from other sources or previous conversations."""
+
+            # Return security response immediately without any conversation history or fallbacks
+            return {
+                "result": security_response,
+                "source_documents": []
+            }
+
         # Use comprehensive prompt template for Smart Complex mode
         prompt = get_prompt_template(mode)
 
@@ -512,7 +566,7 @@ async def ask_question(
         )
 
         # Get conversation history for this session - Smart Complex mode with enhanced context
-        chat_history = get_session_history(session_id)
+        chat_history = get_session_history(company_id, bot_id, session_id)
         
         # Smart conversation context with semantic topic change detection
         embedding_function = retriever_service.embedding_function
