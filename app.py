@@ -482,19 +482,8 @@ async def ask_question(
 
         # SECURITY: Strict multi-tenant validation - block all responses if no authorized documents
         if not validate_tenant_access(company_id, bot_id, documents_found):
-            security_response = f"""I don't have access to any documents for this query.
-
-### 🔒 **Access Restricted**
-- Company ID: {company_id}
-- Bot ID: {bot_id}
-- Authorized documents: 0
-
-### 📋 **Next Steps**
-- Verify the correct bot configuration is being used
-- Ensure documents have been uploaded for this specific bot
-- Contact your administrator if you believe this is an error
-
-For security reasons, I cannot provide information from other sources or previous conversations."""
+            # Standard user-friendly response (same as any other "don't know" scenario)
+            security_response = "I don't have access to that information in my knowledge base. Please ensure the relevant documents have been uploaded and indexed."
 
             # Handle security response for both streaming and non-streaming
             if streaming:
