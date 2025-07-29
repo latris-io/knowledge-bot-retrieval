@@ -496,11 +496,30 @@ async def ask_question(
 
 For security reasons, I cannot provide information from other sources or previous conversations."""
 
-            # Return security response immediately without any conversation history or fallbacks
-            return {
-                "result": security_response,
-                "source_documents": []
-            }
+            # Handle security response for both streaming and non-streaming
+            if streaming:
+                # For streaming, send security response through stream handler
+                async def send_security_response():
+                    try:
+                        # Send security response as streaming chunks
+                        lines = security_response.split('\n')
+                        for line in lines:
+                            if line.strip():  # Skip empty lines
+                                await stream_handler.queue.put(line + '\n')
+                        logger.info(f"[SECURITY] Streamed security response for company_id={company_id}, bot_id={bot_id}")
+                    except Exception as e:
+                        logger.error(f"[SECURITY] Error streaming security response: {e}")
+                        await stream_handler.queue.put(f"[ERROR] Access denied for security reasons.")
+                    finally:
+                        await stream_handler.queue.put(None)  # End stream
+                
+                return send_security_response()
+            else:
+                # Return security response immediately for non-streaming
+                return {
+                    "result": security_response,
+                    "source_documents": []
+                }
 
         # Use comprehensive prompt template for Smart Complex mode
         prompt = get_prompt_template(mode)
