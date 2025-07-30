@@ -34,7 +34,6 @@
     let markdownLoaded = false;
     loadMarkdownLibrary().then(() => {
         markdownLoaded = true;
-        console.log('[MARKDOWN-IT] Ready for use');
     });
   
     // Load markdown-it library for robust markdown parsing
@@ -48,7 +47,6 @@
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/markdown-it@14.0.0/dist/markdown-it.min.js';
             script.onload = () => {
-                console.log('[MARKDOWN-IT] Library loaded successfully');
                 // Initialize markdown-it with robust LLM-friendly settings
                 window.md = window.markdownit({
                     html: false,         // Disable HTML tags in source
@@ -58,12 +56,10 @@
                     linkify: false,      // Don't auto-convert URLs
                     typographer: false   // Don't use smart quotes
                 });
-                console.log('[MARKDOWN-IT] Configuration set');
                 resolve();
             };
             
             script.onerror = () => {
-                console.error('[MARKDOWN-IT] Failed to load markdown-it from CDN');
                 resolve(); // Still resolve to continue with fallback
             };
             document.head.appendChild(script);
@@ -77,8 +73,6 @@
         // Use markdown-it if available (robust, industry-standard)
         if (window.md && markdownLoaded) {
             try {
-                console.log('[MARKDOWN-IT] Input text:', text);
-                
                 // Preprocessing: Fix markdown structure issues
                 let processedText = text;
                 
@@ -133,15 +127,11 @@
                     '$1\n\n$2'
                 );
                 
-                console.log('[MARKDOWN-IT] Processed text:', processedText);
                 const result = window.md.render(processedText);
-                console.log('[MARKDOWN-IT] Output HTML:', result);
                 return result;
             } catch (error) {
-                console.warn('[MARKDOWN-IT] Parsing failed, using fallback:', error);
+                // Fallback to basic formatting on error
             }
-        } else {
-            console.warn('[MARKDOWN-IT] markdown-it not available (loaded:', markdownLoaded, ', window.md:', !!window.md, '), using fallback');
         }
         
         // Fallback: basic inline formatting only
@@ -413,10 +403,6 @@
       let accumulatedText = "";
   
       try {
-        console.log(`[Widget] Making request to ${API_URL}/ask`);
-        console.log(`[Widget] Question: "${question}"`);
-        console.log(`[Widget] Session: ${sessionManager.getSessionId()}`);
-        
         const res = await fetch(`${API_URL}/ask`, {
           method: "POST",
           headers: {
@@ -431,19 +417,14 @@
           })
         });
 
-        console.log(`[Widget] Response status: ${res.status}`);
-        console.log(`[Widget] Response headers:`, Array.from(res.headers.entries()));
-
         if (!res.ok) {
           throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         }
 
         // Check content type to determine response format
         const contentType = res.headers.get('content-type');
-        console.log(`[Widget] Content-Type: "${contentType}"`);
         
         if (contentType && contentType.includes('application/json')) {
-          console.log(`[Widget] Handling as JSON response`);
           // Handle JSON response (fallback for production)
           const data = await res.json();
           let raw = data.answer || data.error || "No response.";
@@ -468,7 +449,6 @@
             
         } else {
           // Handle streaming response (Server-Sent Events)
-          console.log(`[Widget] Handling as streaming response`);
           const reader = res.body.getReader();
           const decoder = new TextDecoder();
           let chunkCount = 0;
@@ -477,22 +457,15 @@
           while (true) {
             const { done, value } = await reader.read();
             if (done) {
-              console.log(`[Widget] Stream completed after ${chunkCount} chunks`);
-              console.log(`[Widget] Final accumulated text length: ${accumulatedText.length}`);
-              console.log(`[Widget] Final accumulated text:`, accumulatedText);
-              
-                              // Stream complete - now parse final markdown
-                if (accumulatedText) {
-                  console.log('[Widget] Stream complete, parsing final markdown');
-                  const sourceMatches = [...accumulatedText.matchAll(/\[source: (.+?)\]/g)];
-                  const allSources = sourceMatches.map(match => match[1]);
-                  const uniqueSources = [...new Set(allSources)];
-                  // Remove sources but preserve line breaks - don't trim!
-                  const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "");
-                  // Remove loading message but preserve line breaks - don't trim!
-                  const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "");
-                
-                console.log('[Widget] Content for markdown parsing:', contentText);
+              // Stream complete - now parse final markdown
+              if (accumulatedText) {
+                const sourceMatches = [...accumulatedText.matchAll(/\[source: (.+?)\]/g)];
+                const allSources = sourceMatches.map(match => match[1]);
+                const uniqueSources = [...new Set(allSources)];
+                // Remove sources but preserve line breaks - don't trim!
+                const cleanText = accumulatedText.replace(/\[source: .+?\]/g, "");
+                // Remove loading message but preserve line breaks - don't trim!
+                const contentText = cleanText.replace(/^Getting your response\.\.\.?\s*/, "");
                 
                 // Now parse the complete markdown
                 const mainHtml = parseMarkdown(contentText);
@@ -500,21 +473,15 @@
                   ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(src => `<li>${src}</li>`).join("")}</ul></details>`
                   : "";
                 
-                console.log('[Widget] Final HTML after parsing:', mainHtml);
-                
                 answerBox.innerHTML = window.DOMPurify
                   ? DOMPurify.sanitize(mainHtml + sourcesHtml)
                   : (mainHtml + sourcesHtml);
-              } else {
-                console.log('[Widget] No accumulated text to parse');
               }
-              
               break;
             }
 
             chunkCount++;
             const chunk = decoder.decode(value, { stream: true });
-            console.log(`[Widget] Chunk ${chunkCount}: "${chunk}"`);
             const lines = chunk.split('\n');
 
             for (const line of lines) {
@@ -537,26 +504,21 @@
               // Now try to parse as JSON chunk
               try {
                 const jsonChunk = JSON.parse(dataContent);
-                console.log(`[Widget] Parsed JSON chunk:`, jsonChunk);
                 
                 // Handle different chunk types
                 if (jsonChunk.type === 'start') {
-                  console.log(`[Widget] Stream starting`);
                   continue;
                 } else if (jsonChunk.type === 'end') {
-                  console.log(`[Widget] Stream ending`);
                   continue;
                 } else if (jsonChunk.type === 'content') {
                   // Extract content from JSON chunk
                   const content = jsonChunk.content || '';
-                  console.log(`[Widget] Content chunk: "${content}"`);
                   accumulatedText += content;
                 } else if (jsonChunk.type === 'error') {
                   throw new Error(jsonChunk.content || 'Stream error');
                 }
               } catch (parseError) {
                 // Fallback: treat as plain text if JSON parsing fails
-                console.log(`[Widget] Non-JSON data, treating as text: "${dataContent}"`);
                 // Handle legacy plain text format or malformed JSON
                 accumulatedText += dataContent === '' ? '\n' : dataContent;
               }
@@ -567,7 +529,6 @@
               
               if (!responseStarted && hasActualContent) {
                 responseStarted = true;
-                console.log(`[Widget] Response content detected, hiding Thinking spinner`);
               }
               
               // Extract and deduplicate sources
@@ -604,12 +565,9 @@
           }
         }
       } catch (err) {
-        console.error('[Widget] Streaming error:', err);
         answerBox.innerHTML = `<strong>Error:</strong> ${err.message}`;
       } finally {
         askBtn.disabled = false;
-        console.log('[Widget] Request completed');
       }
     };
   })();
-  
