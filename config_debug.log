@@ -33642,3 +33642,57 @@ I'm not sure.
 2025-07-20 14:30:34,624 — INFO — retriever — [FI-08] Smart deduplication: 6 → 6 docs
 2025-07-20 14:30:34,626 — INFO — retriever — [FI-05] Re-ranked 6 docs by term importance
 2025-07-20 14:30:34,627 — INFO — retriever — [FI-08] Quality enhancements complete: 6 → 6 docs
+2025-07-23 08:12:33,949 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-23 08:12:33,976 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-23 08:12:34,465 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-07-23 08:12:35,899 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-07-23 08:12:36,359 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-07-23 08:12:36,697 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-07-23 08:12:37,434 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-23 08:12:38,009 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-23 08:12:38,419 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/0be82a5e-aac7-4b91-905a-2deeab5cb393/get "HTTP/1.1 200 OK"
+2025-07-23 08:12:38,839 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/0be82a5e-aac7-4b91-905a-2deeab5cb393/get "HTTP/1.1 200 OK"
+2025-07-23 08:12:39,418 — INFO — retriever — [RETRIEVER] Using cached vectorstore for global
+2025-07-23 08:12:39,419 — INFO — retriever — [RETRIEVER] Connected to Chroma collection: global
+2025-07-23 08:12:39,420 — INFO — retriever — [RETRIEVER] Using direct vector retriever for maximum speed
+2025-07-23 08:12:39,761 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/0be82a5e-aac7-4b91-905a-2deeab5cb393/get "HTTP/1.1 200 OK"
+2025-07-23 08:12:39,765 — WARNING — retriever — [RETRIEVER] No documents found for company_id=3, bot_id=1. Database may be empty.
+2025-07-23 08:13:46,494 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-23 08:13:46,523 — INFO — bot_config — [CONFIG] Successfully loaded OPENAI_API_KEY
+2025-07-23 08:13:46,925 — INFO — retriever — [RETRIEVER] Initialized RetrieverService
+2025-07-23 08:13:47,950 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/auth/identity "HTTP/1.1 200 OK"
+2025-07-23 08:13:48,421 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2025-07-23 08:13:48,791 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2025-07-23 08:13:49,401 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-23 08:13:50,031 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2025-07-23 08:13:54,381 — INFO — httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-07-23 08:13:54,839 — INFO — httpx — HTTP Request: GET https://chroma-load-balancer.onrender.com/api/v2/pre-flight-checks "HTTP/1.1 200 OK"
+2025-07-23 08:13:56,497 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/0be82a5e-aac7-4b91-905a-2deeab5cb393/upsert "HTTP/1.1 200 OK"
+2025-07-23 08:13:57,223 — INFO — httpx — HTTP Request: POST https://chroma-load-balancer.onrender.com/api/v2/tenants/default_tenant/databases/default_database/collections/0be82a5e-aac7-4b91-905a-2deeab5cb393/get "HTTP/1.1 200 OK"
+2025-07-29 09:40:10,408 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-29 09:40:17,951 — INFO — app — [MEMORY] Created new isolated history for company_id=1, bot_id=1, session_id=test
+2025-07-29 09:40:17,951 — INFO — app — [MEMORY] Created new isolated history for company_id=1, bot_id=2, session_id=test
+2025-07-29 09:40:17,951 — WARNING — app — [SECURITY] No documents found for company_id=7, bot_id=6. Blocking all fallbacks.
+2025-07-29 09:50:47,661 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-29 09:50:53,287 — INFO — app — [BOT] Using mode: qa
+2025-07-29 09:50:53,288 — INFO — app — [BOT] Smart Complex Mode enabled for ALL queries
+2025-07-29 09:50:53,288 — INFO — app — [BOT] Smart Complex → Fast Comprehensive (comprehensive coverage)
+2025-07-29 09:50:53,289 — ERROR — app — [BOT] Error processing question: object Mock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/app.py", line 435, in ask_question
+    raise e
+  File "/Users/martybremer/Library/CloudStorage/OneDrive-Latris/Projects/Knowledge Bot/Code Repository/knowledge-bot/knowledge-bot-retrieval/app.py", line 421, in ask_question
+    retriever = await retriever_service.build_enhanced_retriever(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+TypeError: object Mock can't be used in 'await' expression
+2025-07-29 09:53:42,633 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-29 09:53:48,009 — INFO — app — [MEMORY] Created new isolated history for company_id=1, bot_id=1, session_id=test_1753800828
+2025-07-29 09:53:48,010 — INFO — app — [MEMORY] Created new isolated history for company_id=1, bot_id=2, session_id=test_1753800828
+2025-07-29 09:53:48,010 — INFO — app — [MEMORY] Created new isolated history for company_id=2, bot_id=1, session_id=test_1753800828
+2025-07-29 09:53:48,010 — WARNING — app — [SECURITY] No documents found for company_id=7, bot_id=6. Blocking all fallbacks.
+2025-07-29 10:05:07,141 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store
+2025-07-29 10:05:13,460 — WARNING — app — [SECURITY] No documents found for company_id=7, bot_id=6. Blocking all fallbacks.
+2025-08-07 18:07:31,261 — INFO — bot_config — [CONFIG] CHROMA_DIR set to ./chroma_store

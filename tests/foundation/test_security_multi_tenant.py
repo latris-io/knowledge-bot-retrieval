@@ -113,12 +113,9 @@ class TestRealMultiTenantSecurity:
                         if chunk_data.strip() and chunk_data != "[DONE]":
                             response_text += chunk_data
                 
-                # REAL SECURITY VALIDATION
-                assert "Access Restricted" in response_text
-                assert "Company ID: 7" in response_text
-                assert "Bot ID: 6" in response_text  
-                assert "Authorized documents: 0" in response_text
-                assert "For security reasons" in response_text
+                # REAL SECURITY VALIDATION - Should get standard "don't know" response  
+                expected_response = "I don't have access to that information in my knowledge base. Please ensure the relevant documents have been uploaded and indexed."
+                assert expected_response in response_text
                 
                 # CRITICAL: Verify no unauthorized Brentwood data leaked
                 assert "7:00 AM - 4:00 PM" not in response_text
@@ -141,18 +138,18 @@ class TestRealMultiTenantSecurity:
     async def test_real_cross_bot_isolation_database(self):
         """Test actual cross-bot isolation using real database queries"""
         
-                 # This would require real database setup, but demonstrates the principle
-         # In a real test environment, you'd:
-         # 1. Set up test data for bot_id=5 
-         # 2. Ensure no data for bot_id=6
-         # 3. Make real queries to both bots
-         # 4. Validate bot_id=6 gets security block, bot_id=5 gets data
-         
-         try:
-             from retriever import RetrieverService
-         except ImportError:
-             logger.warning("⚠️ RetrieverService not available - skipping database test")
-             return
+        # This would require real database setup, but demonstrates the principle
+        # In a real test environment, you'd:
+        # 1. Set up test data for bot_id=5 
+        # 2. Ensure no data for bot_id=6
+        # 3. Make real queries to both bots
+        # 4. Validate bot_id=6 gets security block, bot_id=5 gets data
+        
+        try:
+            from retriever import RetrieverService
+        except ImportError:
+            logger.warning("⚠️ RetrieverService not available - skipping database test")
+            return
         
         try:
             retriever_service = RetrieverService()

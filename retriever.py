@@ -108,7 +108,7 @@ Alternative:"""
                         alternatives.append(line)
             
             # Always include original query - optimized for 2 total queries
-            expanded_queries = [query] + [alt for alt in alternatives if alt and len(alt) > 5][:1]
+            expanded_queries = [query] + [alt for alt in alternatives if alt and len(alt) > 5][:2]
             
             self._query_cache[query] = expanded_queries
             logger.info(f"[FI-04] Expanded query into {len(expanded_queries)} variations")
@@ -118,7 +118,7 @@ Alternative:"""
             logger.error(f"[FI-04] Query expansion failed: {e}")
             return [query]  # Fallback to original
 
-    def multi_vector_search(self, query: str, vectorstore, k: int = 8) -> list:
+    def multi_vector_search(self, query: str, vectorstore, k: int = 8, base_filter: Optional[Dict] = None) -> list:
         """FI-04: Enhanced multi-vector search with query expansion"""
         try:
             # Get query expansions
@@ -133,10 +133,10 @@ Alternative:"""
                     # Optimized search distribution for 2 variants
                     if i == 0:
                         # Original query - gets majority of k
-                        results = vectorstore.similarity_search(variant_query, k=int(k*0.7))
+                        results = vectorstore.similarity_search(variant_query, k=int(k*0.7), filter=base_filter)
                     else:
                         # Alternative query - gets remaining k
-                        results = vectorstore.similarity_search(variant_query, k=int(k*0.3))
+                        results = vectorstore.similarity_search(variant_query, k=int(k*0.3), filter=base_filter)
                     
                     # Deduplicate while preserving order
                     for doc in results:
@@ -159,7 +159,7 @@ Alternative:"""
         except Exception as e:
             logger.error(f"[FI-04] Multi-vector search failed: {e}")
             # Fallback to standard search
-            return vectorstore.similarity_search(query, k=k)
+            return vectorstore.similarity_search(query, k=k, filter=base_filter)
 
     # FI-05: Content-Agnostic Semantic Bias Fix
     def analyze_query_term_importance(self, query: str) -> dict:
@@ -665,7 +665,7 @@ Alternative queries:"""
                     
                     def _get_relevant_documents(self, query_text: str, *, run_manager=None) -> List[Document]:
                         # Use FI-04 multi-vector search
-                        docs = self.service.multi_vector_search(query_text, vectorstore, k)
+                        docs = self.service.multi_vector_search(query_text, vectorstore, k, base_filter)
                         # Apply FI-08 quality enhancements
                         enhanced_docs = self.service.apply_quality_enhancements(query_text, docs)
                         return enhanced_docs
@@ -694,10 +694,10 @@ Alternative queries:"""
                     def _get_relevant_documents(self, query_text: str, *, run_manager=None) -> List[Document]:
                         if self.use_hybrid:
                             # Use FI-04 multi-vector search
-                            return self.service.multi_vector_search(query_text, vectorstore, k)
+                            return self.service.multi_vector_search(query_text, vectorstore, k, base_filter)
                         else:
                             # Standard vector search with enhancements
-                            docs = vectorstore.similarity_search(query_text, k=k)
+                            docs = vectorstore.similarity_search(query_text, k=k, filter=base_filter)
                             return self.service.apply_quality_enhancements(query_text, docs)
 
                 if k >= 8:

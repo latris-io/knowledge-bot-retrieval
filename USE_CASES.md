@@ -677,3 +677,41 @@ All improvements maintain **universal applicability**:
 - **Enhanced Features**: Quantifiable improvements over baseline (33-50% better coverage)
 - **Safety & Performance**: Proper safety responses + <30s comprehensive query performance
 - **Regression Ready**: Tests designed for **years of continuous improvement** 
+
+---
+
+## 🔒 CRITICAL SECURITY FIX (v2.7)
+
+**Status**: Multi-tenant vector search isolation enforced ✅  
+**Validation**: FI-04 path now strictly applies tenant filters across all retrieval calls
+
+### Vulnerability
+- In the FI-04 enhanced retrieval path (`multi_vector_search`), `similarity_search` calls did not receive the tenant filter.
+- Result: Cross-tenant documents could be retrieved when enhanced search was active (e.g., `k >= 8`), causing data isolation breaches.
+
+### Fix
+- Threaded the authoritative tenant filter (`base_filter`) everywhere:
+  - `multi_vector_search(query, vectorstore, k, base_filter)` now accepts and applies `base_filter` on all `similarity_search` calls, including fallback.
+  - `StandardEnhancedRetriever` vector-only path calls `similarity_search(..., filter=base_filter)`.
+  - All internal callers in `build_retriever` pass the same `base_filter`.
+
+### Security Impact
+- Enforces strict segmentation by `company_id` and `bot_id` for all retrieval modes (vector-only, hybrid FI-04, and fallbacks).
+- Eliminates the discovered cross-tenant leak in the enhanced search path.
+
+### Validation
+- Unit tests for the enhanced retrieval system pass with the fix (FI-04 logic validated).
+- Integration tests require a running API server and real services; when the server is running with valid env (e.g., `CHROMA_URL`, OpenAI key), end-to-end tests validate without mocking.
+
+### Technical Reference
+- Authoritative filter:
+  - `base_filter = {"$and": [{"company_id": {"$eq": company_id}}, {"bot_id": {"$eq": bot_id}}]}`
+- Applied to:
+  - `vectorstore.as_retriever(search_kwargs={"k": k, "filter": base_filter})`
+  - FI-04 `similarity_search(..., filter=base_filter)` for original, alternative, and fallback paths
+
+---
+
+**Document Version**: v2.7 - CRITICAL SECURITY FIX - FI-04 Multi-Vector Tenant Filter Enforced  
+**Last Updated**: January 2025  
+**Status**: ALL 9 FOUNDATION IMPROVEMENTS + 5 ENHANCED INTEGRATION FEATURES + SECURITY FIXES IMPLEMENTED ✅ 
