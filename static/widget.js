@@ -105,7 +105,7 @@
       position:fixed; right:20px; bottom:20px; z-index:9999;
       display:inline-flex; align-items:center; justify-content:center;
       height:56px; width:56px; border-radius:22px; cursor:pointer; border:none;
-      color:#fff; font:600 14px/1 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:#fff; font:600 14px/1 -apple-system,BlinkMacSystemFont,sans-serif;
       background: radial-gradient(120% 120% at 20% 20%, var(--neon), transparent 60%),
                   linear-gradient(135deg, var(--accent), #a98bff);
       box-shadow: 0 10px 32px rgba(0,0,0,.35), 0 0 24px rgba(122,247,255,.25) inset;
@@ -144,7 +144,7 @@
     .kb-head{ position:sticky; top:0; z-index:2; display:flex; align-items:center; gap:12px; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.08); background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.02)) }
     .kb-logo{ inline-size:22px; block-size:22px; border-radius:8px; background: linear-gradient(135deg, var(--accent), var(--neon)); box-shadow: 0 0 10px rgba(122,247,255,.35) }
     .kb-title{ font-weight:700; letter-spacing:.2px; color: var(--txt); font-size:14px }
-    .kb-title{ margin-left:4px; font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial; }
+    .kb-title{ margin-left:4px; font-family: -apple-system,BlinkMacSystemFont,sans-serif; }
     .kb-badges{ display:none }
     .kb-pill{ display:none }
     .kb-close:hover{ background:rgba(255,255,255,.14) }
@@ -166,7 +166,7 @@
     /* Dock */
     .kb-dock{ display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:center; padding:12px; border-top:1px solid rgba(255,255,255,.06); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)) }
     .kb-input{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:14px; background:var(--glass-strong); border:1px solid var(--border) }
-    .kb-input input{ all:unset; flex:1; color: var(--txt); font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial; font-size:13px !important; line-height:1.5; font-weight:400 }
+    .kb-input input{ all:unset; flex:1; color: var(--txt); font-family: -apple-system,BlinkMacSystemFont,sans-serif; font-size:13px !important; line-height:1.5; font-weight:400 }
     .kb-input input::placeholder{ color: var(--muted); opacity:.9 }
     .kb-send{ all:unset; cursor:pointer; padding:10px 18px; border-radius:16px; font-weight:700; color:#fff;
       background:
