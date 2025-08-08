@@ -3,6 +3,7 @@
   const token = scriptEl.getAttribute("data-token");
   const bubbleTitle = scriptEl.getAttribute("data-bubble-title");
   const searchTitle = scriptEl.getAttribute("data-search-title") || "";
+  const showLogo = (scriptEl.getAttribute("data-show-logo") === "true");
     const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
     const API_URL = isLocalhost ? "http://localhost:8000" : "https://knowledge-bot-retrieval.onrender.com";
   
@@ -121,15 +122,16 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,.25), inset 0 0 0 1px rgba(255,255,255,.06); }
 
     .kb-modal *, .kb-modal *::before, .kb-modal *::after { box-sizing: border-box; }
-    .kb-close { margin-left:6px; inline-size:28px; block-size:28px; display:grid; place-items:center; border-radius:8px; color: var(--muted); cursor: pointer; z-index:2 }
-
+    .kb-close { position:absolute; top:8px; right:10px; inline-size:32px; block-size:32px; display:grid; place-items:center; border-radius:10px; color: var(--muted); cursor: pointer; z-index:3; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); }
+    .kb-close svg { width:16px; height:16px; }
+     
     /* Header */
-    .kb-head{ position:relative; z-index:2; display:flex; align-items:center; gap:12px; padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)) }
-    .kb-logo{ inline-size:28px; block-size:28px; border-radius:10px; background: linear-gradient(135deg, var(--accent), var(--neon)); box-shadow: 0 0 16px rgba(122,247,255,.35) }
-    .kb-title{ font-weight:700; letter-spacing:.2px; color: var(--txt) }
+    .kb-head{ position:relative; z-index:2; display:flex; align-items:center; gap:12px; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.08); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)) }
+    .kb-logo{ inline-size:22px; block-size:22px; border-radius:8px; background: linear-gradient(135deg, var(--accent), var(--neon)); box-shadow: 0 0 10px rgba(122,247,255,.35) }
+    .kb-title{ font-weight:700; letter-spacing:.2px; color: var(--txt); font-size:14px }
     .kb-badges{ display:none }
     .kb-pill{ display:none }
-    .kb-close:hover{ background:rgba(255,255,255,.10) }
+    .kb-close:hover{ background:rgba(255,255,255,.14) }
 
     /* Messages */
     .kb-msgs{ max-height:min(68vh, 560px); overflow:auto; padding:14px; display:flex; flex-direction:column; gap:10px }
@@ -137,7 +139,8 @@
     .kb-msg.user{ align-self:flex-end; flex-direction:row-reverse }
     .kb-ava{ width:28px; height:28px; border-radius:10px; flex:0 0 auto; background:#fff }
     .kb-msg.ai .kb-ava{ background: linear-gradient(135deg, var(--accent), var(--neon)) }
-    .kb-bubble{ padding:12px 14px; border-radius:18px; background: var(--glass-strong); border:1px solid var(--border); box-shadow:0 10px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.15); color: var(--txt) }
+    .kb-bubble{ padding:12px 14px; border-radius:18px; background: var(--glass-strong); border:1px solid var(--border); box-shadow:0 10px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.15); color: var(--txt); font-size:13px; line-height:1.5 }
+    .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
     .kb-msg.user .kb-bubble{ background: linear-gradient(135deg, rgba(155,140,255,.35), rgba(135,245,255,.30)); border-color: rgba(255,255,255,.55) }
     .kb-meta{ font-size:11px; color:var(--muted); margin-top:6px }
 
@@ -145,7 +148,7 @@
     .kb-dock{ display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:center; padding:12px; border-top:1px solid rgba(255,255,255,.06); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)) }
     .kb-input{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:14px; background:var(--glass-strong); border:1px solid var(--border) }
     .kb-input input{ all:unset; flex:1; color: var(--txt) }
-    .kb-send{ all:unset; cursor:pointer; padding:10px 16px; border-radius:14px; font-weight:700; background:linear-gradient(135deg,var(--accent),var(--neon)); box-shadow:0 8px 24px rgba(23,162,255,.35), inset 0 1px 0 rgba(255,255,255,.25); color:#0a0c10 }
+    .kb-send{ all:unset; cursor:pointer; padding:10px 16px; border-radius:16px; font-weight:700; background:linear-gradient(135deg,var(--accent),var(--neon)); box-shadow:0 10px 28px rgba(23,162,255,.35), inset 0 1px 0 rgba(255,255,255,.25); color:#0a0c10 }
 
     .kb-spinner { border: 3px solid rgba(255,255,255,.25); border-top: 3px solid var(--neon); border-radius: 50%; width: 18px; height: 18px; animation: kb-spin .8s linear infinite; display: inline-block; vertical-align: middle; }
     @keyframes kb-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -186,7 +189,7 @@
     <div class="kb-head" role="banner">
       <div class="kb-logo" aria-hidden="true"></div>
       <div class="kb-title">${searchTitle}</div>
-      <button class="kb-close" title="Close" aria-label="Close">✕</button>
+      <button class="kb-close" title="Close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
     </div>
 
     <div class="kb-msgs" id="kbMsgs"></div>
@@ -199,6 +202,7 @@
     </div>
   `;
   wrap.appendChild(modal);
+  if(!showLogo){ const logo = modal.querySelector('.kb-logo'); if(logo) logo.style.display = 'none'; }
   
   const msgsEl = modal.querySelector('#kbMsgs');
   const inputEl = modal.querySelector('#kbInput');
@@ -278,9 +282,18 @@
         for (const line of chunk.split('\n')) {
           if (!line.trim()) continue;
           let dataContent = line.startsWith('data: ')? line.slice(6) : line;
+          // Hard filter control frames before any parsing
+          if (/"type"\s*:\s*"(start|end)"/.test(dataContent)) { continue; }
           if (dataContent === '[DONE]') continue;
           if (dataContent.startsWith('[ERROR]')) throw new Error(dataContent.replace('[ERROR] ', ''));
-          try { const json = JSON.parse(dataContent); if (json.type === 'content') acc += (json.content || ''); else acc += dataContent; }
+          try {
+            const json = JSON.parse(dataContent);
+            if (json.type === 'content') {
+              acc += (json.content || '');
+            } else {
+              // ignore other frame types
+            }
+          }
           catch { acc += dataContent; }
           const clean = acc.replace(/\[source: .+?\]/g, '').replace(/^Getting your response\.\.\.?\s*/, '');
           aiBubble.innerHTML = `<div style="white-space:pre-wrap">${clean}</div>`;
