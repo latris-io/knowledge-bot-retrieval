@@ -174,7 +174,7 @@
     .kb-bubble table{ display:block; width:100%; overflow:auto }
     .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
     /* User bubble (pastel gradient, white text) */
-    .kb-msg.user .kb-bubble{ background: var(--user-bubble-gradient); color:#fff; border-color: var(--user-bubble-border); box-shadow:0 12px 36px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.55); backdrop-filter:none; -webkit-backdrop-filter:none }
+    .kb-msg.user .kb-bubble{ background: var(--user-bubble-gradient), #0b0f1a; background-blend-mode: normal; color:#fff; border-color: var(--user-bubble-border); box-shadow:0 12px 36px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.55); backdrop-filter:none !important; -webkit-backdrop-filter:none !important; opacity:1 !important; background-clip: padding-box; }
     .kb-meta{ font-size:11px; color:var(--muted); margin-top:6px }
 
     /* Dock */
