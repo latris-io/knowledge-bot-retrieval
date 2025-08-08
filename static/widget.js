@@ -96,6 +96,9 @@
       --user-bubble-gradient: linear-gradient(135deg, #aee6ff 0%, #c9b8ff 35%, #ffd6e7 70%, #fff3b8 100%);
       --user-bubble-overlay: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.10));
       --user-bubble-border: rgba(255,255,255,.65);
+      /* Ask bubble (user) visual reused for buttons/launcher */
+      --ask-gradient: linear-gradient(135deg, rgba(155,140,255,.80), rgba(135,245,255,.70));
+      --ask-overlay: linear-gradient(180deg, rgba(0,0,0,.16), rgba(0,0,0,.10));
     }
     @media (prefers-color-scheme: light){
       :root{
@@ -119,7 +122,7 @@
       display:inline-flex; align-items:center; justify-content:center;
       height:56px; width:56px; border-radius:22px; cursor:pointer; border:none;
       color:#fff; font:600 14px/1 -apple-system,BlinkMacSystemFont,sans-serif;
-      background: var(--brand-gradient);
+      background: var(--ask-overlay), var(--ask-gradient);
       box-shadow: 0 10px 32px rgba(0,0,0,.35), 0 0 24px rgba(122,247,255,.25) inset;
       padding:0 0; white-space:nowrap;
       }
@@ -177,7 +180,7 @@
     .kb-bubble table{ display:block; width:100%; overflow:auto }
     .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
     /* User bubble (pastel gradient over opaque solid, white text) */
-    .kb-msg.user .kb-bubble{ background: linear-gradient(180deg, rgba(0,0,0,.16), rgba(0,0,0,.10)), linear-gradient(135deg, rgba(155,140,255,.80), rgba(135,245,255,.70)); color:#fff; border-color: rgba(255,255,255,.85); box-shadow:0 16px 42px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.62); backdrop-filter:none; -webkit-backdrop-filter:none; opacity:1; background-clip: padding-box; }
+    .kb-msg.user .kb-bubble{ background: var(--ask-overlay), var(--ask-gradient); color:#fff; border-color: rgba(255,255,255,.85); box-shadow:0 16px 42px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.62); backdrop-filter:none; -webkit-backdrop-filter:none; opacity:1; background-clip: padding-box; }
     .kb-meta{ font-size:11px; color:var(--muted); margin-top:6px }
 
     /* Dock */
@@ -186,7 +189,7 @@
     .kb-input input{ all:unset; flex:1; color: var(--txt); font-family: -apple-system,BlinkMacSystemFont,sans-serif; font-size:13px !important; line-height:1.5; font-weight:400 }
     .kb-input input::placeholder{ color: var(--muted); opacity:.9 }
     .kb-send{ all:unset; cursor:pointer; padding:10px 18px; border-radius:16px; font-weight:700; color:#fff;
-      background: var(--brand-gradient);
+      background: var(--ask-overlay), var(--ask-gradient);
       border:1px solid rgba(255,255,255,.40);
       box-shadow: 0 10px 30px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.85), 0 0 28px rgba(122,247,255,.22);
       backdrop-filter: blur(12px) saturate(170%);
