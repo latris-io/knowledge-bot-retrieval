@@ -179,6 +179,8 @@
     .kb-bubble pre, .kb-bubble code{ white-space: pre-wrap; word-break: break-word; overflow-wrap:anywhere }
     .kb-bubble table{ display:block; width:100%; overflow:auto }
     .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
+    /* Answer bubble (AI) uses same ask gradient */
+    .kb-msg.ai .kb-bubble{ background: var(--ask-overlay), var(--ask-gradient); color:#fff; border-color: rgba(255,255,255,.85); box-shadow:0 16px 42px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.62); backdrop-filter:none; -webkit-backdrop-filter:none; opacity:1; background-clip: padding-box; }
     /* User bubble (pastel gradient over opaque solid, white text) */
     .kb-msg.user .kb-bubble{ background: var(--ask-overlay), var(--ask-gradient); color:#fff; border-color: rgba(255,255,255,.85); box-shadow:0 16px 42px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.62); backdrop-filter:none; -webkit-backdrop-filter:none; opacity:1; background-clip: padding-box; }
     .kb-meta{ font-size:11px; color:var(--muted); margin-top:6px }
