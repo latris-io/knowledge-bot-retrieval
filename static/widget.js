@@ -112,6 +112,8 @@
       position:relative; border-radius:24px; background: var(--glass); border:1px solid var(--border);
       backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%);
       overflow:hidden; transform: translateY(20px) scale(.98); opacity:0; pointer-events:none;
+      max-height: calc(100vh - 32px);
+      display:flex; flex-direction:column;
       transition: transform .25s cubic-bezier(.2,.7,.2,1), opacity .2s ease; box-shadow: 0 20px 50px rgba(0,0,0,.45);
     }
     .kb-modal.kb-open{ transform: translateY(0) scale(1); opacity:1; pointer-events:auto; }
@@ -126,7 +128,7 @@
     .kb-close svg { width:16px; height:16px; }
      
     /* Header */
-    .kb-head{ position:relative; z-index:2; display:flex; align-items:center; gap:12px; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.08); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)) }
+    .kb-head{ position:sticky; top:0; z-index:2; display:flex; align-items:center; gap:12px; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.08); background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.02)) }
     .kb-logo{ inline-size:22px; block-size:22px; border-radius:8px; background: linear-gradient(135deg, var(--accent), var(--neon)); box-shadow: 0 0 10px rgba(122,247,255,.35) }
     .kb-title{ font-weight:700; letter-spacing:.2px; color: var(--txt); font-size:14px }
     .kb-title{ margin-left:4px; font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial; }
@@ -135,7 +137,7 @@
     .kb-close:hover{ background:rgba(255,255,255,.14) }
 
     /* Messages */
-    .kb-msgs{ max-height:min(68vh, 560px); overflow:auto; padding:14px; display:flex; flex-direction:column; gap:10px }
+    .kb-msgs{ flex:1 1 auto; overflow:auto; padding:14px; display:flex; flex-direction:column; gap:10px }
     .kb-msg{ display:flex; gap:10px; max-width:78% }
     .kb-msg.user{ align-self:flex-end; flex-direction:row-reverse }
     .kb-ava{ width:28px; height:28px; border-radius:10px; flex:0 0 auto; background:#fff }
@@ -148,15 +150,18 @@
     /* Dock */
     .kb-dock{ display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:center; padding:12px; border-top:1px solid rgba(255,255,255,.06); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)) }
     .kb-input{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:14px; background:var(--glass-strong); border:1px solid var(--border) }
-    .kb-input input{ all:unset; flex:1; color: var(--txt) }
+    .kb-input input{ all:unset; flex:1; color: var(--txt); font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial; font-size:13px !important; line-height:1.5; font-weight:400 }
+    .kb-input input::placeholder{ color: var(--muted); opacity:.9 }
     .kb-send{ all:unset; cursor:pointer; padding:10px 18px; border-radius:16px; font-weight:700;
-      background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.35));
+      color:#ffffff;
+      background: linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,.16));
       border:1px solid rgba(255,255,255,.35);
-      color:#0a0c10;
-      box-shadow: 0 6px 20px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.75);
-      backdrop-filter: blur(8px) saturate(140%);
+      box-shadow: 0 8px 28px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.85), 0 0 24px rgba(122,247,255,.18);
+      backdrop-filter: blur(10px) saturate(160%);
+      -webkit-backdrop-filter: blur(10px) saturate(160%);
+      text-shadow: 0 1px 2px rgba(0,0,0,.25);
     }
-    .kb-send:hover{ background: linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,.45)); }
+    .kb-send:hover{ background: linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.22)); }
     .kb-send:active{ transform: translateY(1px); }
 
     .kb-spinner { border: 3px solid rgba(255,255,255,.25); border-top: 3px solid var(--neon); border-radius: 50%; width: 18px; height: 18px; animation: kb-spin .8s linear infinite; display: inline-block; vertical-align: middle; }
