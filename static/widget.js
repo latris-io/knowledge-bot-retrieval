@@ -79,8 +79,8 @@
   
     const STYLE = `
     :root{
-      --glass: rgba(255,255,255,.12);
-      --glass-strong: rgba(255,255,255,.18);
+      --glass: rgba(255,255,255,.18);
+      --glass-strong: rgba(255,255,255,.34);
       --border: rgba(255,255,255,.35);
       --txt: #eaf0ff;
       --muted:#b7c0d6;
@@ -131,7 +131,7 @@
       .kb-modal{ max-height: min(90dvh, calc(100dvh - 24px)); }
     }
     .kb-modal::before{ content:""; position:absolute; inset:-30% -10% auto -10%; height:60%;
-      background: radial-gradient(400px 260px at 20% 40%, rgba(122,247,255,.35), transparent 60%), radial-gradient(420px 280px at 80% 0%, rgba(158,139,255,.35), transparent 65%);
+      background: radial-gradient(400px 260px at 20% 40%, rgba(122,247,255,.18), transparent 60%), radial-gradient(420px 280px at 80% 0%, rgba(158,139,255,.18), transparent 65%);
       filter: blur(40px); pointer-events:none; }
     .kb-modal::after{ content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.25), inset 0 0 0 1px rgba(255,255,255,.06); }
@@ -155,12 +155,12 @@
     .kb-msg.user{ align-self:flex-end; flex-direction:row-reverse }
     .kb-ava{ display:none }
     .kb-msg.ai .kb-ava{ display:none }
-    .kb-bubble{ padding:12px 14px; border-radius:18px; background: var(--glass-strong); border:1px solid var(--border); box-shadow:0 10px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.15); color: var(--txt); font-size:13px; line-height:1.5; word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap; max-width: 100%; }
+    .kb-bubble{ padding:12px 14px; border-radius:18px; background: linear-gradient(180deg, rgba(20,24,32,.78), rgba(20,24,32,.78)), var(--glass-strong); border:1px solid var(--border); box-shadow:0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12); color: var(--txt); font-size:13px; line-height:1.5; word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap; max-width: 100%; }
     .kb-bubble *{ max-width:100%; box-sizing:border-box }
     .kb-bubble pre, .kb-bubble code{ white-space: pre-wrap; word-break: break-word; overflow-wrap:anywhere }
     .kb-bubble table{ display:block; width:100%; overflow:auto }
     .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
-    .kb-msg.user .kb-bubble{ background: linear-gradient(135deg, rgba(155,140,255,.35), rgba(135,245,255,.30)); border-color: rgba(255,255,255,.55) }
+    .kb-msg.user .kb-bubble{ background: linear-gradient(180deg, rgba(24,28,38,.78), rgba(24,28,38,.78)), linear-gradient(135deg, rgba(155,140,255,.35), rgba(135,245,255,.30)); border-color: rgba(255,255,255,.55) }
     .kb-meta{ font-size:11px; color:var(--muted); margin-top:6px }
 
     /* Dock */
