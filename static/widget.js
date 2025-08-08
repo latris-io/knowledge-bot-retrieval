@@ -90,6 +90,12 @@
       /* Shared brand gradients */
       --brand-gradient: linear-gradient(135deg, rgba(155,140,255,.35), rgba(135,245,255,.30));
       --brand-overlay: linear-gradient(180deg, rgba(24,28,38,.78), rgba(24,28,38,.78));
+      /* Bubble themes */
+      --assistant-bubble-bg: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.70));
+      --assistant-text: #0b0f1a;
+      --user-bubble-gradient: linear-gradient(135deg, #aee6ff, #c9b8ff 40%, #ffd6e7);
+      --user-bubble-overlay: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.10));
+      --user-bubble-border: rgba(255,255,255,.65);
     }
     @media (prefers-color-scheme: light){
       :root{
@@ -101,6 +107,7 @@
         --bg:#f5f7fb;
         --accent:#6a5cff;
         --neon:#17a2ff;
+        --assistant-text:#0b0f1a;
       }
     }
 
@@ -160,12 +167,14 @@
     .kb-msg.user{ align-self:flex-end; flex-direction:row-reverse }
     .kb-ava{ display:none }
     .kb-msg.ai .kb-ava{ display:none }
-    .kb-bubble{ padding:12px 14px; border-radius:18px; background: linear-gradient(180deg, rgba(20,24,32,.78), rgba(20,24,32,.78)), var(--glass-strong); border:1px solid var(--border); box-shadow:0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12); color: var(--txt); font-size:13px; line-height:1.5; word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap; max-width: 100%; }
+    /* Assistant bubble (lighter glass, dark text) */
+    .kb-bubble{ padding:12px 14px; border-radius:18px; background: var(--assistant-bubble-bg); border:1px solid rgba(0,0,0,.10); box-shadow:0 10px 30px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.35); color: var(--assistant-text); font-size:13px; line-height:1.5; word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap; max-width: 100%; backdrop-filter: blur(10px) saturate(140%); -webkit-backdrop-filter: blur(10px) saturate(140%); }
     .kb-bubble *{ max-width:100%; box-sizing:border-box }
     .kb-bubble pre, .kb-bubble code{ white-space: pre-wrap; word-break: break-word; overflow-wrap:anywhere }
     .kb-bubble table{ display:block; width:100%; overflow:auto }
     .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
-    .kb-msg.user .kb-bubble{ background: var(--brand-overlay), var(--brand-gradient); border-color: rgba(255,255,255,.55) }
+    /* User bubble (pastel gradient, white text) */
+    .kb-msg.user .kb-bubble{ background: var(--user-bubble-overlay), var(--user-bubble-gradient); color:#fff; border-color: var(--user-bubble-border); box-shadow:0 10px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.45) }
     .kb-meta{ font-size:11px; color:var(--muted); margin-top:6px }
 
     /* Dock */
