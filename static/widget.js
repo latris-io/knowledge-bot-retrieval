@@ -109,10 +109,10 @@
 
     .kb-wrap{ position:fixed; right:20px; bottom:88px; z-index:9999; width: min(420px, 92vw); max-height:100vh; pointer-events:none; }
     .kb-modal{
-      position:relative; border-radius:24px; background: var(--glass); border:1px solid var(--border);
+      position:fixed; right:20px; bottom:88px; width:min(420px, 92vw); border-radius:24px; background: var(--glass); border:1px solid var(--border);
       backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%);
       overflow:hidden; transform: translateY(20px) scale(.98); opacity:0; pointer-events:none;
-      max-height: min(90vh, calc(100% - 24px));
+      max-height: min(90vh, calc(100vh - 24px));
       display:flex; flex-direction:column;
       transition: transform .25s cubic-bezier(.2,.7,.2,1), opacity .2s ease; box-shadow: 0 20px 50px rgba(0,0,0,.45);
     }
@@ -174,6 +174,7 @@
   
     @media (max-width:480px){
       .kb-wrap{ right:12px; width: calc(100vw - 24px); max-height:100vh }
+      .kb-modal{ right:12px; bottom:72px; width: calc(100vw - 24px) }
       .kb-btn{ right:12px; bottom:12px }
       /* Prevent iOS zoom-on-focus by ensuring input font-size >= 16px */
       .kb-input input{ font-size:16px !important }
