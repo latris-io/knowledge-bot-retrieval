@@ -91,7 +91,7 @@
       --brand-gradient: linear-gradient(135deg, rgba(155,140,255,.35), rgba(135,245,255,.30));
       --brand-overlay: linear-gradient(180deg, rgba(24,28,38,.78), rgba(24,28,38,.78));
       /* Bubble themes */
-      --assistant-bubble-bg: linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.92));
+      --assistant-bubble-bg: linear-gradient(180deg, rgba(255,255,255,1.0), rgba(245,248,255,.98));
       --assistant-text: #0b0f1a;
       --user-bubble-gradient: linear-gradient(135deg, #aee6ff 0%, #c9b8ff 35%, #ffd6e7 70%, #fff3b8 100%);
       --user-bubble-overlay: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.10));
@@ -171,13 +171,13 @@
     .kb-ava{ display:none }
     .kb-msg.ai .kb-ava{ display:none }
              /* Assistant bubble (light glass, darker contrast, no blur on bubble) */
-      .kb-bubble{ padding:12px 14px; border-radius:18px; background: var(--assistant-bubble-bg); border:1px solid rgba(0,0,0,.14); box-shadow:0 14px 36px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.55); color: var(--assistant-text); font-size:13px; line-height:1.5; word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap; max-width: 100%; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+      .kb-bubble{ padding:12px 14px; border-radius:18px; background: var(--assistant-bubble-bg); border:1px solid rgba(0,0,0,.20); box-shadow:0 16px 40px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.65); color: var(--assistant-text); font-size:13px; line-height:1.5; word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap; max-width: 100%; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
     .kb-bubble *{ max-width:100%; box-sizing:border-box }
     .kb-bubble pre, .kb-bubble code{ white-space: pre-wrap; word-break: break-word; overflow-wrap:anywhere }
     .kb-bubble table{ display:block; width:100%; overflow:auto }
     .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
     /* User bubble (pastel gradient over opaque solid, white text) */
-    .kb-msg.user .kb-bubble{ background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.06)), linear-gradient(135deg, rgba(155,140,255,.72), rgba(135,245,255,.62)); color:#fff; border-color: rgba(255,255,255,.75); box-shadow:0 14px 38px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.60); backdrop-filter:none; -webkit-backdrop-filter:none; opacity:1; background-clip: padding-box; }
+    .kb-msg.user .kb-bubble{ background: linear-gradient(180deg, rgba(0,0,0,.16), rgba(0,0,0,.10)), linear-gradient(135deg, rgba(155,140,255,.80), rgba(135,245,255,.70)); color:#fff; border-color: rgba(255,255,255,.85); box-shadow:0 16px 42px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.62); backdrop-filter:none; -webkit-backdrop-filter:none; opacity:1; background-clip: padding-box; }
     .kb-meta{ font-size:11px; color:var(--muted); margin-top:6px }
 
     /* Dock */
