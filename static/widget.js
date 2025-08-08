@@ -78,7 +78,7 @@
     }
   
     const STYLE = `
-    :root{
+    :host{
       --glass: rgba(255,255,255,.18);
       --glass-strong: rgba(255,255,255,.34);
       --border: rgba(255,255,255,.35);
@@ -101,7 +101,7 @@
       --ask-overlay: linear-gradient(180deg, rgba(0,0,0,.16), rgba(0,0,0,.10));
     }
     @media (prefers-color-scheme: light){
-      :root{
+      :host{
         --glass: rgba(255,255,255,.55);
         --glass-strong: rgba(255,255,255,.75);
         --border: rgba(0,0,0,.10);
