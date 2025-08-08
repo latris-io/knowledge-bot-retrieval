@@ -131,7 +131,10 @@
 
     .kb-wrap{ position:fixed; right:20px; bottom:88px; z-index:9999; width: min(420px, 92vw); max-height:100vh; pointer-events:none; }
     .kb-modal{
-      position:fixed; right:20px; bottom:88px; width:min(420px, 92vw); border-radius:24px; background: var(--glass); border:1px solid var(--border);
+      position:fixed; right:20px; bottom:88px; width:min(420px, 92vw); border-radius:24px;
+      /* internal fog tint over glass to avoid page punch-through */
+      background: linear-gradient(180deg, rgba(10,12,16,.42), rgba(10,12,16,.28)), var(--glass);
+      border:1px solid var(--border);
       backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%);
       overflow:hidden; transform: translateY(20px) scale(.98); opacity:0; pointer-events:none;
       max-height: min(90vh, calc(100vh - 24px));
@@ -162,19 +165,19 @@
     .kb-close:hover{ background:rgba(255,255,255,.14) }
 
     /* Messages */
-    .kb-msgs{ flex:1 1 auto; overflow-y:auto; overflow-x:hidden; padding:14px; display:flex; flex-direction:column; gap:10px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch }
+    .kb-msgs{ flex:1 1 auto; overflow-y:auto; overflow-x:hidden; padding:14px; display:flex; flex-direction:column; gap:10px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)) }
     .kb-msg{ display:flex; gap:0; max-width:86% }
     .kb-msg.user{ align-self:flex-end; flex-direction:row-reverse }
     .kb-ava{ display:none }
     .kb-msg.ai .kb-ava{ display:none }
-              /* Assistant bubble (light glass, darker contrast) */
-      .kb-bubble{ padding:12px 14px; border-radius:18px; background: var(--assistant-bubble-bg); border:1px solid rgba(0,0,0,.14); box-shadow:0 14px 36px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.55); color: var(--assistant-text); font-size:13px; line-height:1.5; word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap; max-width: 100%; backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); }
+             /* Assistant bubble (light glass, darker contrast, no blur on bubble) */
+      .kb-bubble{ padding:12px 14px; border-radius:18px; background: var(--assistant-bubble-bg); border:1px solid rgba(0,0,0,.14); box-shadow:0 14px 36px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.55); color: var(--assistant-text); font-size:13px; line-height:1.5; word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap; max-width: 100%; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
     .kb-bubble *{ max-width:100%; box-sizing:border-box }
     .kb-bubble pre, .kb-bubble code{ white-space: pre-wrap; word-break: break-word; overflow-wrap:anywhere }
     .kb-bubble table{ display:block; width:100%; overflow:auto }
     .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
-    /* User bubble (pastel gradient, white text) */
-    .kb-msg.user .kb-bubble{ background: var(--user-bubble-gradient), #0b0f1a; background-blend-mode: normal; color:#fff; border-color: var(--user-bubble-border); box-shadow:0 12px 36px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.55); backdrop-filter:none !important; -webkit-backdrop-filter:none !important; opacity:1 !important; background-clip: padding-box; }
+    /* User bubble (pastel gradient over opaque solid, white text) */
+    .kb-msg.user .kb-bubble{ background: var(--user-bubble-gradient), #ffffff; background-blend-mode: normal; color:#fff; border-color: var(--user-bubble-border); box-shadow:0 12px 36px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.55); backdrop-filter:none !important; -webkit-backdrop-filter:none !important; opacity:1 !important; background-clip: padding-box; }
     .kb-meta{ font-size:11px; color:var(--muted); margin-top:6px }
 
     /* Dock */
