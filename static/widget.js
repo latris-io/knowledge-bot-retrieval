@@ -266,7 +266,7 @@
     const node = document.createElement('div');
     node.className = 'kb-msg ' + role;
     node.innerHTML = `
-      <div><div class="kb-bubble">${html}</div><div class="kb-meta">${role==='user'?'You':'Assistant'} • now</div></div>`;
+      <div><div class="kb-bubble">${html}</div><div class="kb-meta">${role==='user'?'You':'Assistant'}</div></div>`;
     msgsEl.appendChild(node);
     msgsEl.scrollTop = msgsEl.scrollHeight;
     return node.querySelector('.kb-bubble');
