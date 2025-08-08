@@ -107,12 +107,12 @@
     .kb-btn::after{ content:""; position:absolute; inset:0; border-radius:inherit; animation: kb-ping 2.6s infinite; pointer-events:none; box-shadow:0 0 0 0 rgba(122,247,255,.35); }
     @keyframes kb-ping { 0%{ box-shadow:0 0 0 0 rgba(122,247,255,.35) } 70%{ box-shadow:0 0 0 22px rgba(122,247,255,0) } 100%{ box-shadow:0 0 0 0 rgba(122,247,255,0) } }
 
-    .kb-wrap{ position:fixed; right:20px; bottom:88px; z-index:9999; width: min(420px, 92vw); pointer-events:none; }
+    .kb-wrap{ position:fixed; right:20px; bottom:88px; z-index:9999; width: min(420px, 92vw); max-height:100vh; pointer-events:none; }
     .kb-modal{
       position:relative; border-radius:24px; background: var(--glass); border:1px solid var(--border);
       backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%);
       overflow:hidden; transform: translateY(20px) scale(.98); opacity:0; pointer-events:none;
-      max-height: min(90vh, calc(100vh - 24px));
+      max-height: min(90vh, calc(100% - 24px));
       display:flex; flex-direction:column;
       transition: transform .25s cubic-bezier(.2,.7,.2,1), opacity .2s ease; box-shadow: 0 20px 50px rgba(0,0,0,.45);
     }
@@ -173,7 +173,7 @@
     details.kb-sources ul{ margin:8px 0 0 18px; }
   
     @media (max-width:480px){
-      .kb-wrap{ right:12px; width: calc(100vw - 24px) }
+      .kb-wrap{ right:12px; width: calc(100vw - 24px); max-height:100vh }
       .kb-btn{ right:12px; bottom:12px }
       /* Prevent iOS zoom-on-focus by ensuring input font-size >= 16px */
       .kb-input input{ font-size:16px !important }
