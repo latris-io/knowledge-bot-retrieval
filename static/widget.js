@@ -217,7 +217,7 @@
 
     <div class="kb-dock">
       <label class="kb-input" aria-label="chat input">
-        <input id="kbInput" placeholder="Ask anything… 'Plan a 2‑day coastal escape with oysters + live jazz'" />
+        <input id="kbInput" placeholder="Ask anything..." />
       </label>
       <button class="kb-send" id="kbSend">Send</button>
     </div>
