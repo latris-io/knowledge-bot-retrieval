@@ -138,10 +138,10 @@
 
     /* Messages */
     .kb-msgs{ flex:1 1 auto; overflow:auto; padding:14px; display:flex; flex-direction:column; gap:10px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch }
-    .kb-msg{ display:flex; gap:10px; max-width:78% }
+    .kb-msg{ display:flex; gap:0; max-width:86% }
     .kb-msg.user{ align-self:flex-end; flex-direction:row-reverse }
-    .kb-ava{ width:28px; height:28px; border-radius:10px; flex:0 0 auto; background:#fff }
-    .kb-msg.ai .kb-ava{ background: linear-gradient(135deg, var(--accent), var(--neon)) }
+    .kb-ava{ display:none }
+    .kb-msg.ai .kb-ava{ display:none }
     .kb-bubble{ padding:12px 14px; border-radius:18px; background: var(--glass-strong); border:1px solid var(--border); box-shadow:0 10px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.15); color: var(--txt); font-size:13px; line-height:1.5 }
     .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
     .kb-msg.user .kb-bubble{ background: linear-gradient(135deg, rgba(155,140,255,.35), rgba(135,245,255,.30)); border-color: rgba(255,255,255,.55) }
@@ -197,11 +197,11 @@
   wrap.className = 'kb-wrap';
   document.body.appendChild(wrap);
   
-  const modal = document.createElement("div");
-  modal.className = "kb-modal";
+    const modal = document.createElement("div");
+    modal.className = "kb-modal";
   modal.setAttribute('role','dialog');
   modal.setAttribute('aria-modal','false');
-  modal.innerHTML = `
+    modal.innerHTML = `
     <div class="kb-head" role="banner">
       <div class="kb-logo" aria-hidden="true"></div>
       <div class="kb-title">${searchTitle}</div>
@@ -254,7 +254,6 @@
     const node = document.createElement('div');
     node.className = 'kb-msg ' + role;
     node.innerHTML = `
-      <div class="kb-ava" ${role==='user'? 'style="background:#fff"' : ''}></div>
       <div><div class="kb-bubble">${html}</div><div class="kb-meta">${role==='user'?'You':'Assistant'} • now</div></div>`;
     msgsEl.appendChild(node);
     msgsEl.scrollTop = msgsEl.scrollHeight;
@@ -265,48 +264,48 @@
     if(!q) return;
     const userBubble = addMsg('user', (window.DOMPurify?DOMPurify.sanitize(q):q));
     const aiBubble = addMsg('ai', `<div style="display:flex;align-items:center;gap:8px"><span class="kb-spinner"></span><span>Thinking…</span></div>`);
-
-    try {
-      const res = await fetch(`${API_URL}/ask`, {
+  
+      try {
+        const res = await fetch(`${API_URL}/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ question: q, session_id: sessionManager.getSessionId(), k: 12, similarity_threshold: 0.1 })
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
 
-      const contentType = res.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        const data = await res.json();
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await res.json();
         let raw = (data.answer || data.error || 'No response.').trim();
-        const sourceMatches = [...raw.matchAll(/\[source: (.+?)\]/g)];
+          const sourceMatches = [...raw.matchAll(/\[source: (.+?)\]/g)];
         const uniqueSources = [...new Set(sourceMatches.map(m => m[1]))];
         raw = raw.replace(/\[source: .+?\]/g, '');
-        const mainHtml = parseMarkdown(raw);
+          const mainHtml = parseMarkdown(raw);
         const sourcesHtml = uniqueSources.length ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(s=>`<li>${s}</li>`).join('')}</ul></details>` : '';
         aiBubble.innerHTML = (window.DOMPurify ? DOMPurify.sanitize(mainHtml + sourcesHtml) : (mainHtml + sourcesHtml));
         msgsEl.scrollTop = msgsEl.scrollHeight;
         return;
       }
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
       let acc = '';
-      while (true) {
-        const { done, value } = await reader.read();
+          while (true) {
+            const { done, value } = await reader.read();
         if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
+            const chunk = decoder.decode(value, { stream: true });
         for (const line of chunk.split('\n')) {
           if (!line.trim()) continue;
           let dataContent = line.startsWith('data: ')? line.slice(6) : line;
           // Hard filter control frames before any parsing
           if (/"type"\s*:\s*"(start|end)"/.test(dataContent)) { continue; }
-          if (dataContent === '[DONE]') continue;
+                if (dataContent === '[DONE]') continue;
           if (dataContent.startsWith('[ERROR]')) throw new Error(dataContent.replace('[ERROR] ', ''));
           try {
             const json = JSON.parse(dataContent);
             if (json.type === 'content') {
               acc += (json.content || '');
-            } else {
+              } else {
               // ignore other frame types
             }
           }
