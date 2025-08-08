@@ -246,7 +246,8 @@
     modal.className = "kb-modal";
   modal.setAttribute('role','dialog');
   modal.setAttribute('aria-modal','false');
-    modal.innerHTML = `
+  const ASK_BG = 'linear-gradient(180deg, rgba(0,0,0,.16), rgba(0,0,0,.10)), linear-gradient(135deg, rgba(155,140,255,.80), rgba(135,245,255,.70))';
+  modal.innerHTML = `
     <div class="kb-head" role="banner">
       <div class="kb-logo" aria-hidden="true"></div>
       <div class="kb-title">${searchTitle}</div>
@@ -269,6 +270,10 @@
   const inputEl = modal.querySelector('#kbInput');
   const sendEl  = modal.querySelector('#kbSend');
   const closeBtn = modal.querySelector('.kb-close');
+
+  // Enforce gradient via inline styles to avoid external overrides
+  try { btn.style.background = ASK_BG; } catch {}
+  try { sendEl.style.background = ASK_BG; } catch {}
   
   function openPanel(){
     modal.classList.add('kb-open');
@@ -304,8 +309,10 @@
     node.innerHTML = `
       <div><div class="kb-bubble">${html}</div><div class="kb-meta">${role==='user'?'You':'Assistant'}</div></div>`;
     msgsEl.appendChild(node);
+    const bubble = node.querySelector('.kb-bubble');
+    if (bubble) { bubble.style.background = ASK_BG; bubble.style.color = '#fff'; }
     msgsEl.scrollTop = msgsEl.scrollHeight;
-    return node.querySelector('.kb-bubble');
+    return bubble;
   }
 
   async function askQuestion(q){
@@ -370,6 +377,7 @@
       const mainHtml = parseMarkdown(cleanFinal);
       const sourcesHtml = unique.length ? `<details class="kb-sources"><summary>Show Sources (${unique.length})</summary><ul>${unique.map(s=>`<li>${s}</li>`).join('')}</ul></details>` : '';
       aiBubble.innerHTML = (window.DOMPurify ? DOMPurify.sanitize(mainHtml + sourcesHtml) : (mainHtml + sourcesHtml));
+      try { aiBubble.style.background = ASK_BG; aiBubble.style.color = '#fff'; } catch {}
     } catch (e) {
       aiBubble.innerHTML = `<strong>Error:</strong> ${e.message}`;
     }
