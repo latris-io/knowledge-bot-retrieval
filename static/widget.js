@@ -167,14 +167,14 @@
     .kb-msg.user{ align-self:flex-end; flex-direction:row-reverse }
     .kb-ava{ display:none }
     .kb-msg.ai .kb-ava{ display:none }
-         /* Assistant bubble (lighter glass, dark text) */
-     .kb-bubble{ padding:12px 14px; border-radius:18px; background: var(--assistant-bubble-bg); border:1px solid rgba(0,0,0,.12); box-shadow:0 12px 36px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.45); color: var(--assistant-text); font-size:13px; line-height:1.5; word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap; max-width: 100%; backdrop-filter: blur(12px) saturate(170%); -webkit-backdrop-filter: blur(12px) saturate(170%); }
+              /* Assistant bubble (light glass, darker contrast) */
+      .kb-bubble{ padding:12px 14px; border-radius:18px; background: var(--assistant-bubble-bg); border:1px solid rgba(0,0,0,.14); box-shadow:0 14px 36px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.55); color: var(--assistant-text); font-size:13px; line-height:1.5; word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap; max-width: 100%; backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); }
     .kb-bubble *{ max-width:100%; box-sizing:border-box }
     .kb-bubble pre, .kb-bubble code{ white-space: pre-wrap; word-break: break-word; overflow-wrap:anywhere }
     .kb-bubble table{ display:block; width:100%; overflow:auto }
     .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
     /* User bubble (pastel gradient, white text) */
-    .kb-msg.user .kb-bubble{ background: var(--user-bubble-gradient); color:#fff; border-color: var(--user-bubble-border); box-shadow:0 12px 36px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.55) }
+    .kb-msg.user .kb-bubble{ background: var(--user-bubble-gradient); color:#fff; border-color: var(--user-bubble-border); box-shadow:0 12px 36px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.55); backdrop-filter:none; -webkit-backdrop-filter:none }
     .kb-meta{ font-size:11px; color:var(--muted); margin-top:6px }
 
     /* Dock */
