@@ -172,7 +172,12 @@
     details.kb-sources summary { cursor: pointer; font-weight:700; color: var(--neon); text-decoration: underline; }
     details.kb-sources ul{ margin:8px 0 0 18px; }
   
-    @media (max-width:480px){ .kb-wrap{ right:12px; width: calc(100vw - 24px) } .kb-btn{ right:12px; bottom:12px } }
+    @media (max-width:480px){
+      .kb-wrap{ right:12px; width: calc(100vw - 24px) }
+      .kb-btn{ right:12px; bottom:12px }
+      /* Prevent iOS zoom-on-focus by ensuring input font-size >= 16px */
+      .kb-input input{ font-size:16px !important }
+    }
     @media (prefers-reduced-motion: reduce){ .kb-modal{ transition:none } .kb-btn::after{ animation:none } }
     `;
   
