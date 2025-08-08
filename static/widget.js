@@ -140,12 +140,15 @@
     .kb-close:hover{ background:rgba(255,255,255,.14) }
 
     /* Messages */
-    .kb-msgs{ flex:1 1 auto; overflow:auto; padding:14px; display:flex; flex-direction:column; gap:10px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch }
+    .kb-msgs{ flex:1 1 auto; overflow-y:auto; overflow-x:hidden; padding:14px; display:flex; flex-direction:column; gap:10px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch }
     .kb-msg{ display:flex; gap:0; max-width:86% }
     .kb-msg.user{ align-self:flex-end; flex-direction:row-reverse }
     .kb-ava{ display:none }
     .kb-msg.ai .kb-ava{ display:none }
-    .kb-bubble{ padding:12px 14px; border-radius:18px; background: var(--glass-strong); border:1px solid var(--border); box-shadow:0 10px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.15); color: var(--txt); font-size:13px; line-height:1.5 }
+    .kb-bubble{ padding:12px 14px; border-radius:18px; background: var(--glass-strong); border:1px solid var(--border); box-shadow:0 10px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.15); color: var(--txt); font-size:13px; line-height:1.5; word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap; max-width: 100%; }
+    .kb-bubble *{ max-width:100%; box-sizing:border-box }
+    .kb-bubble pre, .kb-bubble code{ white-space: pre-wrap; word-break: break-word; overflow-wrap:anywhere }
+    .kb-bubble table{ display:block; width:100%; overflow:auto }
     .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
     .kb-msg.user .kb-bubble{ background: linear-gradient(135deg, rgba(155,140,255,.35), rgba(135,245,255,.30)); border-color: rgba(255,255,255,.55) }
     .kb-meta{ font-size:11px; color:var(--muted); margin-top:6px }
@@ -323,7 +326,7 @@
           }
           catch { acc += dataContent; }
           const clean = acc.replace(/\[source: .+?\]/g, '').replace(/^Getting your response\.\.\.?\s*/, '');
-          aiBubble.innerHTML = `<div style="white-space:pre-wrap">${clean}</div>`;
+          aiBubble.innerHTML = `<div style="white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere">${clean}</div>`;
           msgsEl.scrollTop = msgsEl.scrollHeight;
         }
       }
