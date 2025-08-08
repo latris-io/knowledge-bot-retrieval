@@ -112,7 +112,7 @@
       position:relative; border-radius:24px; background: var(--glass); border:1px solid var(--border);
       backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%);
       overflow:hidden; transform: translateY(20px) scale(.98); opacity:0; pointer-events:none;
-      max-height: calc(100vh - 32px);
+      max-height: min(90vh, calc(100vh - 24px));
       display:flex; flex-direction:column;
       transition: transform .25s cubic-bezier(.2,.7,.2,1), opacity .2s ease; box-shadow: 0 20px 50px rgba(0,0,0,.45);
     }
@@ -137,7 +137,7 @@
     .kb-close:hover{ background:rgba(255,255,255,.14) }
 
     /* Messages */
-    .kb-msgs{ flex:1 1 auto; overflow:auto; padding:14px; display:flex; flex-direction:column; gap:10px }
+    .kb-msgs{ flex:1 1 auto; overflow:auto; padding:14px; display:flex; flex-direction:column; gap:10px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch }
     .kb-msg{ display:flex; gap:10px; max-width:78% }
     .kb-msg.user{ align-self:flex-end; flex-direction:row-reverse }
     .kb-ava{ width:28px; height:28px; border-radius:10px; flex:0 0 auto; background:#fff }
@@ -152,16 +152,17 @@
     .kb-input{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:14px; background:var(--glass-strong); border:1px solid var(--border) }
     .kb-input input{ all:unset; flex:1; color: var(--txt); font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial; font-size:13px !important; line-height:1.5; font-weight:400 }
     .kb-input input::placeholder{ color: var(--muted); opacity:.9 }
-    .kb-send{ all:unset; cursor:pointer; padding:10px 18px; border-radius:16px; font-weight:700;
-      color:#ffffff;
-      background: linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,.16));
-      border:1px solid rgba(255,255,255,.35);
-      box-shadow: 0 8px 28px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.85), 0 0 24px rgba(122,247,255,.18);
-      backdrop-filter: blur(10px) saturate(160%);
-      -webkit-backdrop-filter: blur(10px) saturate(160%);
-      text-shadow: 0 1px 2px rgba(0,0,0,.25);
+    .kb-send{ all:unset; cursor:pointer; padding:10px 18px; border-radius:16px; font-weight:700; color:#fff;
+      background:
+        radial-gradient(120% 150% at 20% 20%, rgba(122,247,255,.55), rgba(122,247,255,0) 60%),
+        linear-gradient(135deg, rgba(142,162,255,.65), rgba(122,247,255,.55));
+      border:1px solid rgba(255,255,255,.40);
+      box-shadow: 0 10px 30px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.85), 0 0 28px rgba(122,247,255,.22);
+      backdrop-filter: blur(12px) saturate(170%);
+      -webkit-backdrop-filter: blur(12px) saturate(170%);
+      text-shadow: 0 1px 2px rgba(0,0,0,.30);
     }
-    .kb-send:hover{ background: linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.22)); }
+    .kb-send:hover{ filter: brightness(1.05); }
     .kb-send:active{ transform: translateY(1px); }
 
     .kb-spinner { border: 3px solid rgba(255,255,255,.25); border-top: 3px solid var(--neon); border-radius: 50%; width: 18px; height: 18px; animation: kb-spin .8s linear infinite; display: inline-block; vertical-align: middle; }
