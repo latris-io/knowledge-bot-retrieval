@@ -99,6 +99,8 @@
       /* Ask bubble (user) visual reused for buttons/launcher */
       --ask-gradient: linear-gradient(135deg, rgba(155,140,255,.80), rgba(135,245,255,.70));
       --ask-overlay: linear-gradient(180deg, rgba(0,0,0,.16), rgba(0,0,0,.10));
+      /* Answer bubble (AI) white with same transparency as ask */
+      --answer-gradient: linear-gradient(180deg, rgba(255,255,255,.80), rgba(255,255,255,.70));
     }
     @media (prefers-color-scheme: light){
       :host{
@@ -180,7 +182,7 @@
     .kb-bubble table{ display:block; width:100%; overflow:auto }
     .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
     /* Answer bubble (AI) uses same ask gradient */
-    :host .kb-msg.ai .kb-bubble, .kb-msg.ai .kb-bubble{ background: var(--ask-overlay), var(--ask-gradient) !important; color:#fff; border-color: rgba(255,255,255,.85); box-shadow:0 16px 42px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.62); backdrop-filter:none; -webkit-backdrop-filter:none; opacity:1; background-clip: padding-box; }
+    :host .kb-msg.ai .kb-bubble, .kb-msg.ai .kb-bubble{ background: var(--ask-overlay), var(--answer-gradient) !important; color:#0b0f1a; border-color: rgba(0,0,0,.12); box-shadow:0 14px 36px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.55); backdrop-filter:none; -webkit-backdrop-filter:none; opacity:1; background-clip: padding-box; }
     /* User bubble (pastel gradient over opaque solid, white text) */
     :host .kb-msg.user .kb-bubble, .kb-msg.user .kb-bubble{ background: var(--ask-overlay), var(--ask-gradient) !important; color:#fff; border-color: rgba(255,255,255,.85); box-shadow:0 16px 42px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.62); backdrop-filter:none; -webkit-backdrop-filter:none; opacity:1; background-clip: padding-box; }
     .kb-meta{ font-size:11px; color:var(--muted); margin-top:6px }
@@ -247,6 +249,7 @@
   modal.setAttribute('role','dialog');
   modal.setAttribute('aria-modal','false');
   const ASK_BG = 'linear-gradient(180deg, rgba(0,0,0,.16), rgba(0,0,0,.10)), linear-gradient(135deg, rgba(155,140,255,.80), rgba(135,245,255,.70))';
+  const ANSWER_BG = 'linear-gradient(180deg, rgba(0,0,0,.16), rgba(0,0,0,.10)), linear-gradient(180deg, rgba(255,255,255,.80), rgba(255,255,255,.70))';
   modal.innerHTML = `
     <div class="kb-head" role="banner">
       <div class="kb-logo" aria-hidden="true"></div>
@@ -310,7 +313,10 @@
       <div><div class="kb-bubble">${html}</div><div class="kb-meta">${role==='user'?'You':'Assistant'}</div></div>`;
     msgsEl.appendChild(node);
     const bubble = node.querySelector('.kb-bubble');
-    if (bubble) { bubble.style.background = ASK_BG; bubble.style.color = '#fff'; }
+    if (bubble) {
+      if (role === 'user') { bubble.style.background = ASK_BG; bubble.style.color = '#fff'; }
+      else { bubble.style.background = ANSWER_BG; bubble.style.color = '#0b0f1a'; }
+    }
     msgsEl.scrollTop = msgsEl.scrollHeight;
     return bubble;
   }
@@ -377,7 +383,7 @@
       const mainHtml = parseMarkdown(cleanFinal);
       const sourcesHtml = unique.length ? `<details class="kb-sources"><summary>Show Sources (${unique.length})</summary><ul>${unique.map(s=>`<li>${s}</li>`).join('')}</ul></details>` : '';
       aiBubble.innerHTML = (window.DOMPurify ? DOMPurify.sanitize(mainHtml + sourcesHtml) : (mainHtml + sourcesHtml));
-      try { aiBubble.style.background = ASK_BG; aiBubble.style.color = '#fff'; } catch {}
+      try { aiBubble.style.background = ANSWER_BG; aiBubble.style.color = '#0b0f1a'; } catch {}
     } catch (e) {
       aiBubble.innerHTML = `<strong>Error:</strong> ${e.message}`;
     }
