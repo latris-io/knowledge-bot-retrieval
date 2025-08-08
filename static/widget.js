@@ -87,6 +87,9 @@
       --bg: #0a0c10;
       --accent:#8ea2ff;
       --neon:#7af7ff;
+      /* Shared brand gradients */
+      --brand-gradient: linear-gradient(135deg, rgba(155,140,255,.35), rgba(135,245,255,.30));
+      --brand-overlay: linear-gradient(180deg, rgba(24,28,38,.78), rgba(24,28,38,.78));
     }
     @media (prefers-color-scheme: light){
       :root{
@@ -109,8 +112,7 @@
       display:inline-flex; align-items:center; justify-content:center;
       height:56px; width:56px; border-radius:22px; cursor:pointer; border:none;
       color:#fff; font:600 14px/1 -apple-system,BlinkMacSystemFont,sans-serif;
-      background: radial-gradient(120% 120% at 20% 20%, var(--neon), transparent 60%),
-                  linear-gradient(135deg, var(--accent), #a98bff);
+      background: var(--brand-gradient);
       box-shadow: 0 10px 32px rgba(0,0,0,.35), 0 0 24px rgba(122,247,255,.25) inset;
       padding:0 0; white-space:nowrap;
       }
@@ -163,7 +165,7 @@
     .kb-bubble pre, .kb-bubble code{ white-space: pre-wrap; word-break: break-word; overflow-wrap:anywhere }
     .kb-bubble table{ display:block; width:100%; overflow:auto }
     .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
-    .kb-msg.user .kb-bubble{ background: linear-gradient(180deg, rgba(24,28,38,.78), rgba(24,28,38,.78)), linear-gradient(135deg, rgba(155,140,255,.35), rgba(135,245,255,.30)); border-color: rgba(255,255,255,.55) }
+    .kb-msg.user .kb-bubble{ background: var(--brand-overlay), var(--brand-gradient); border-color: rgba(255,255,255,.55) }
     .kb-meta{ font-size:11px; color:var(--muted); margin-top:6px }
 
     /* Dock */
@@ -172,9 +174,7 @@
     .kb-input input{ all:unset; flex:1; color: var(--txt); font-family: -apple-system,BlinkMacSystemFont,sans-serif; font-size:13px !important; line-height:1.5; font-weight:400 }
     .kb-input input::placeholder{ color: var(--muted); opacity:.9 }
     .kb-send{ all:unset; cursor:pointer; padding:10px 18px; border-radius:16px; font-weight:700; color:#fff;
-      background:
-        radial-gradient(120% 150% at 20% 20%, rgba(122,247,255,.55), rgba(122,247,255,0) 60%),
-        linear-gradient(135deg, rgba(142,162,255,.65), rgba(122,247,255,.55));
+      background: var(--brand-gradient);
       border:1px solid rgba(255,255,255,.40);
       box-shadow: 0 10px 30px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.85), 0 0 28px rgba(122,247,255,.22);
       backdrop-filter: blur(12px) saturate(170%);
