@@ -129,6 +129,7 @@
     .kb-head{ position:relative; z-index:2; display:flex; align-items:center; gap:12px; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.08); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)) }
     .kb-logo{ inline-size:22px; block-size:22px; border-radius:8px; background: linear-gradient(135deg, var(--accent), var(--neon)); box-shadow: 0 0 10px rgba(122,247,255,.35) }
     .kb-title{ font-weight:700; letter-spacing:.2px; color: var(--txt); font-size:14px }
+    .kb-title{ margin-left:4px; font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial; }
     .kb-badges{ display:none }
     .kb-pill{ display:none }
     .kb-close:hover{ background:rgba(255,255,255,.14) }
@@ -148,13 +149,22 @@
     .kb-dock{ display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:center; padding:12px; border-top:1px solid rgba(255,255,255,.06); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)) }
     .kb-input{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:14px; background:var(--glass-strong); border:1px solid var(--border) }
     .kb-input input{ all:unset; flex:1; color: var(--txt) }
-    .kb-send{ all:unset; cursor:pointer; padding:10px 16px; border-radius:16px; font-weight:700; background:linear-gradient(135deg,var(--accent),var(--neon)); box-shadow:0 10px 28px rgba(23,162,255,.35), inset 0 1px 0 rgba(255,255,255,.25); color:#0a0c10 }
+    .kb-send{ all:unset; cursor:pointer; padding:10px 18px; border-radius:16px; font-weight:700;
+      background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.35));
+      border:1px solid rgba(255,255,255,.35);
+      color:#0a0c10;
+      box-shadow: 0 6px 20px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.75);
+      backdrop-filter: blur(8px) saturate(140%);
+    }
+    .kb-send:hover{ background: linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,.45)); }
+    .kb-send:active{ transform: translateY(1px); }
 
     .kb-spinner { border: 3px solid rgba(255,255,255,.25); border-top: 3px solid var(--neon); border-radius: 50%; width: 18px; height: 18px; animation: kb-spin .8s linear infinite; display: inline-block; vertical-align: middle; }
     @keyframes kb-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    details.kb-sources { margin-top: 12px; background: rgba(142,162,255,.15); padding: 8px; border-radius: 8px; font-size: 13px; color: var(--txt) }
-    summary { cursor: pointer; font-weight: 700; }
+    details.kb-sources { margin-top: 12px; background: rgba(142,162,255,.12); padding: 10px; border-radius: 10px; font-size: 13px; color: var(--txt); border:1px solid rgba(255,255,255,.18) }
+    details.kb-sources summary { cursor: pointer; font-weight:700; color: var(--neon); text-decoration: underline; }
+    details.kb-sources ul{ margin:8px 0 0 18px; }
   
     @media (max-width:480px){ .kb-wrap{ right:12px; width: calc(100vw - 24px) } .kb-btn{ right:12px; bottom:12px } }
     @media (prefers-reduced-motion: reduce){ .kb-modal{ transition:none } .kb-btn::after{ animation:none } }
@@ -239,7 +249,7 @@
     node.className = 'kb-msg ' + role;
     node.innerHTML = `
       <div class="kb-ava" ${role==='user'? 'style="background:#fff"' : ''}></div>
-      <div><div class="kb-bubble">${html}</div><div class="kb-meta">${role==='user'?'You':'Nova'} • now</div></div>`;
+      <div><div class="kb-bubble">${html}</div><div class="kb-meta">${role==='user'?'You':'Assistant'} • now</div></div>`;
     msgsEl.appendChild(node);
     msgsEl.scrollTop = msgsEl.scrollHeight;
     return node.querySelector('.kb-bubble');
