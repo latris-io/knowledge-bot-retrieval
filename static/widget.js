@@ -7,6 +7,16 @@
     const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
     const API_URL = isLocalhost ? "http://localhost:8000" : "https://knowledge-bot-retrieval.onrender.com";
   
+    // Host element + Shadow DOM to isolate styles from the host site
+    const host = document.createElement('div');
+    host.id = 'kb-widget-host';
+    // Keep host out of layout flow; children use position:fixed
+    host.style.all = 'initial';
+    host.style.position = 'relative';
+    host.style.zIndex = '2147483646';
+    document.body.appendChild(host);
+    const shadowRoot = host.attachShadow ? host.attachShadow({ mode: 'open' }) : null;
+
     class SessionManager {
         constructor() {
             this.sessionKey = 'kb-chat-session';
@@ -192,8 +202,8 @@
     `;
   
     const style = document.createElement("style");
-    style.innerText = STYLE;
-    document.head.appendChild(style);
+    style.textContent = STYLE;
+    if (shadowRoot) { shadowRoot.appendChild(style); } else { document.head.appendChild(style); }
   
   const btn = document.createElement("button");
   btn.type = "button";
@@ -206,11 +216,11 @@
   } else {
     btn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3c5 0 9 3.6 9 8.1 0 2.4-1.3 4.5-3.3 6l.7 3.8-3.9-2c-.8.2-1.7.3-2.5.3-5 0-9-3.6-9-8.1S7 3 12 3z" fill="white" opacity=".9"/></svg>`;
   }
-    document.body.appendChild(btn);
+    if (shadowRoot) { shadowRoot.appendChild(btn); } else { document.body.appendChild(btn); }
 
   const wrap = document.createElement('div');
   wrap.className = 'kb-wrap';
-  document.body.appendChild(wrap);
+  if (shadowRoot) { shadowRoot.appendChild(wrap); } else { document.body.appendChild(wrap); }
   
     const modal = document.createElement("div");
     modal.className = "kb-modal";
@@ -257,12 +267,15 @@
 
   closeBtn.addEventListener('click', ()=>{ closePanel(); inputEl.value = ''; });
 
-  document.addEventListener('click', (e)=>{
+  const clickHandler = (e)=>{
     const isOpen = modal.classList.contains('kb-open');
     if (!isOpen) return;
-    const clickedInside = modal.contains(e.target) || btn.contains(e.target);
+    const path = e.composedPath ? e.composedPath() : [];
+    const clickedInside = path.includes(modal) || path.includes(btn) || path.includes(host);
     if (!clickedInside) closePanel();
-  });
+  };
+  document.addEventListener('click', clickHandler);
+  if (shadowRoot) shadowRoot.addEventListener('click', clickHandler);
   document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closePanel(); });
 
   function addMsg(role, html){
