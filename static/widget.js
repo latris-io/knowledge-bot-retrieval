@@ -117,6 +117,9 @@
       transition: transform .25s cubic-bezier(.2,.7,.2,1), opacity .2s ease; box-shadow: 0 20px 50px rgba(0,0,0,.45);
     }
     .kb-modal.kb-open{ transform: translateY(0) scale(1); opacity:1; pointer-events:auto; }
+    @supports (height: 100dvh) {
+      .kb-modal{ max-height: min(90dvh, calc(100dvh - 24px)); }
+    }
     .kb-modal::before{ content:""; position:absolute; inset:-30% -10% auto -10%; height:60%;
       background: radial-gradient(400px 260px at 20% 40%, rgba(122,247,255,.35), transparent 60%), radial-gradient(420px 280px at 80% 0%, rgba(158,139,255,.35), transparent 65%);
       filter: blur(40px); pointer-events:none; }
@@ -174,7 +177,10 @@
   
     @media (max-width:480px){
       .kb-wrap{ right:12px; width: calc(100vw - 24px); max-height:100vh }
-      .kb-modal{ right:12px; bottom:72px; width: calc(100vw - 24px) }
+      .kb-modal{ right:12px; bottom:72px; width: calc(100vw - 24px); max-height: calc(100vh - 96px); }
+      @supports (height: 100dvh) {
+        .kb-modal{ max-height: calc(100dvh - 96px); }
+      }
       .kb-btn{ right:12px; bottom:12px }
       /* Prevent iOS zoom-on-focus by ensuring input font-size >= 16px */
       .kb-input input{ font-size:16px !important }
