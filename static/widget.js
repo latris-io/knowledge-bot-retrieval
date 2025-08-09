@@ -87,17 +87,6 @@
         .replace(/\s*<br\s*\/?>\s*(<li>)/g, '$1')
         .replace(/<p>\s*<\/p>/g, '');
     }
-
-    function stripSources(text){
-      // Remove [source: ...] blocks and tidy trailing punctuation/commas
-      let t = String(text).replace(/\[source:[^\]]*\]/gi, '');
-      // Collapse duplicate commas and stray commas before conjunctions/periods
-      t = t.replace(/\s*,\s*,+/g, ', ')
-           .replace(/,\s*(and|or)\s*,/gi, ' $1 ')
-           .replace(/,\s*\./g, '.')
-           .replace(/\s{2,}/g, ' ');
-      return t;
-    }
   
     const STYLE = `
     :host{
@@ -204,11 +193,11 @@
     .kb-bubble table{ display:block; width:100%; overflow:auto }
     .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
     /* Markdown formatting tweaks */
-    .kb-bubble p{ margin:4px 0 }
-    .kb-bubble ul, .kb-bubble ol{ margin:4px 0 6px 16px; padding-left:16px }
-    .kb-bubble li{ margin:2px 0 }
+    .kb-bubble p{ margin:6px 0 }
+    .kb-bubble ul, .kb-bubble ol{ margin:6px 0 8px 18px; padding-left:18px }
+    .kb-bubble li{ margin:4px 0 }
     .kb-bubble li > p{ margin:0; display:inline }
-    .kb-bubble h3{ margin:6px 0 4px }
+    .kb-bubble h3{ margin:8px 0 6px }
     .kb-bubble > *:first-child{ margin-top:0 }
     .kb-bubble > *:last-child{ margin-bottom:0 }
     /* Answer bubble (AI) uses same ask gradient */
@@ -370,7 +359,7 @@
         let raw = (data.answer || data.error || 'No response.').trim();
           const sourceMatches = [...raw.matchAll(/\[source: (.+?)\]/g)];
         const uniqueSources = [...new Set(sourceMatches.map(m => m[1]))];
-          raw = stripSources(raw);
+        raw = raw.replace(/\[source: .+?\]/g, '');
           const mainHtml = normalizeHtml(parseMarkdown(raw));
         const sourcesHtml = uniqueSources.length ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(s=>`<li>${s}</li>`).join('')}</ul></details>` : '';
         aiBubble.innerHTML = (window.DOMPurify ? DOMPurify.sanitize(mainHtml + sourcesHtml) : (mainHtml + sourcesHtml));
@@ -409,7 +398,7 @@
 
       const srcs = [...acc.matchAll(/\[source: (.+?)\]/g)].map(m=>m[1]);
       const unique = [...new Set(srcs)];
-      const cleanFinal = stripSources(acc).replace(/^Getting your response\.\.\.?\s*/, '');
+      const cleanFinal = acc.replace(/\[source: .+?\]/g, '').replace(/^Getting your response\.\.\.?\s*/, '');
       const mainHtml = normalizeHtml(parseMarkdown(cleanFinal));
       const sourcesHtml = unique.length ? `<details class="kb-sources"><summary>Show Sources (${unique.length})</summary><ul>${unique.map(s=>`<li>${s}</li>`).join('')}</ul></details>` : '';
       aiBubble.innerHTML = (window.DOMPurify ? DOMPurify.sanitize(mainHtml + sourcesHtml) : (mainHtml + sourcesHtml));
