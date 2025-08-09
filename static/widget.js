@@ -187,7 +187,7 @@
     .kb-ava{ display:none }
     .kb-msg.ai .kb-ava{ display:none }
              /* Assistant bubble (light glass, darker contrast, no blur on bubble) */
-      .kb-bubble{ padding:12px 14px; border-radius:18px; background: var(--assistant-bubble-bg); border:1px solid rgba(0,0,0,.20); box-shadow:0 16px 40px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.65); color: var(--assistant-text); font-size:13px; line-height:1.5; word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap; max-width: 100%; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+      .kb-bubble{ padding:12px 14px; border-radius:18px; background: var(--assistant-bubble-bg); border:1px solid rgba(0,0,0,.20); box-shadow:0 16px 40px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.65); color: var(--assistant-text); font-size:13px; line-height:1.5; word-break: break-word; overflow-wrap: anywhere; white-space: normal; max-width: 100%; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
     .kb-bubble *{ max-width:100%; box-sizing:border-box }
     .kb-bubble pre, .kb-bubble code{ white-space: pre-wrap; word-break: break-word; overflow-wrap:anywhere }
     .kb-bubble table{ display:block; width:100%; overflow:auto }
@@ -197,7 +197,8 @@
     .kb-bubble ul, .kb-bubble ol{ margin:2px 0 4px 16px; padding-left:16px }
     .kb-bubble li{ margin:2px 0 }
     .kb-bubble li > p{ margin:0; display:inline }
-    .kb-bubble h3{ margin:4px 0 2px }
+    .kb-bubble h3{ margin:2px 0 2px }
+    .kb-bubble h3 + ul, .kb-bubble h3 + p{ margin-top:0 }
     .kb-bubble > *:first-child{ margin-top:0 }
     .kb-bubble > *:last-child{ margin-bottom:0 }
     /* Answer bubble (AI) uses same ask gradient */
