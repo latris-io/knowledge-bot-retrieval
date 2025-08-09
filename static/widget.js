@@ -84,7 +84,8 @@
       return String(html)
         .replace(/<li>\s*<p>/g, '<li>')
         .replace(/<\/p>\s*<\/li>/g, '</li>')
-        .replace(/\s*<br\s*\/?>\s*(<li>)/g, '$1');
+        .replace(/\s*<br\s*\/?>\s*(<li>)/g, '$1')
+        .replace(/<p>\s*<\/p>/g, '');
     }
   
     const STYLE = `
@@ -192,10 +193,13 @@
     .kb-bubble table{ display:block; width:100%; overflow:auto }
     .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
     /* Markdown formatting tweaks */
-    .kb-bubble ul, .kb-bubble ol{ margin:8px 0 12px 18px; padding-left:18px }
-    .kb-bubble li{ margin:6px 0 }
+    .kb-bubble p{ margin:6px 0 }
+    .kb-bubble ul, .kb-bubble ol{ margin:6px 0 8px 18px; padding-left:18px }
+    .kb-bubble li{ margin:4px 0 }
     .kb-bubble li > p{ margin:0; display:inline }
-    .kb-bubble h3{ margin:10px 0 8px }
+    .kb-bubble h3{ margin:8px 0 6px }
+    .kb-bubble > *:first-child{ margin-top:0 }
+    .kb-bubble > *:last-child{ margin-bottom:0 }
     /* Answer bubble (AI) uses same ask gradient */
     :host .kb-msg.ai .kb-bubble, .kb-msg.ai .kb-bubble{ background: var(--ask-overlay), var(--answer-gradient) !important; color:#0b0f1a; border-color: rgba(0,0,0,.12); box-shadow:0 14px 36px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.55); backdrop-filter:none; -webkit-backdrop-filter:none; opacity:1; background-clip: padding-box; }
     /* User bubble (pastel gradient over opaque solid, white text) */
