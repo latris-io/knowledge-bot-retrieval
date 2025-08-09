@@ -193,11 +193,11 @@
     .kb-bubble table{ display:block; width:100%; overflow:auto }
     .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
     /* Markdown formatting tweaks */
-    .kb-bubble p{ margin:6px 0 }
-    .kb-bubble ul, .kb-bubble ol{ margin:6px 0 8px 18px; padding-left:18px }
-    .kb-bubble li{ margin:4px 0 }
+    .kb-bubble p{ margin:4px 0 }
+    .kb-bubble ul, .kb-bubble ol{ margin:2px 0 4px 16px; padding-left:16px }
+    .kb-bubble li{ margin:2px 0 }
     .kb-bubble li > p{ margin:0; display:inline }
-    .kb-bubble h3{ margin:8px 0 6px }
+    .kb-bubble h3{ margin:4px 0 2px }
     .kb-bubble > *:first-child{ margin-top:0 }
     .kb-bubble > *:last-child{ margin-bottom:0 }
     /* Answer bubble (AI) uses same ask gradient */
