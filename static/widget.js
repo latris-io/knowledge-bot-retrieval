@@ -79,6 +79,13 @@
             .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
             .replace(/\n/g, '<br>');
     }
+
+    function normalizeHtml(html){
+      return String(html)
+        .replace(/<li>\s*<p>/g, '<li>')
+        .replace(/<\/p>\s*<\/li>/g, '</li>')
+        .replace(/\s*<br\s*\/?>\s*(<li>)/g, '$1');
+    }
   
     const STYLE = `
     :host{
@@ -349,7 +356,7 @@
           const sourceMatches = [...raw.matchAll(/\[source: (.+?)\]/g)];
         const uniqueSources = [...new Set(sourceMatches.map(m => m[1]))];
         raw = raw.replace(/\[source: .+?\]/g, '');
-          const mainHtml = parseMarkdown(raw);
+          const mainHtml = normalizeHtml(parseMarkdown(raw));
         const sourcesHtml = uniqueSources.length ? `<details class="kb-sources"><summary>Show Sources (${uniqueSources.length})</summary><ul>${uniqueSources.map(s=>`<li>${s}</li>`).join('')}</ul></details>` : '';
         aiBubble.innerHTML = (window.DOMPurify ? DOMPurify.sanitize(mainHtml + sourcesHtml) : (mainHtml + sourcesHtml));
         msgsEl.scrollTop = msgsEl.scrollHeight;
@@ -388,7 +395,7 @@
       const srcs = [...acc.matchAll(/\[source: (.+?)\]/g)].map(m=>m[1]);
       const unique = [...new Set(srcs)];
       const cleanFinal = acc.replace(/\[source: .+?\]/g, '').replace(/^Getting your response\.\.\.?\s*/, '');
-      const mainHtml = parseMarkdown(cleanFinal);
+      const mainHtml = normalizeHtml(parseMarkdown(cleanFinal));
       const sourcesHtml = unique.length ? `<details class="kb-sources"><summary>Show Sources (${unique.length})</summary><ul>${unique.map(s=>`<li>${s}</li>`).join('')}</ul></details>` : '';
       aiBubble.innerHTML = (window.DOMPurify ? DOMPurify.sanitize(mainHtml + sourcesHtml) : (mainHtml + sourcesHtml));
       try { aiBubble.style.background = ANSWER_BG; aiBubble.style.color = '#0b0f1a'; } catch {}
