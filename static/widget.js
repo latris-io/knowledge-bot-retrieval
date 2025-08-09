@@ -63,12 +63,15 @@
         processedText = processedText.replace(/(\n- [^-\n]*[.!?])\s*- \*\*/g, '$1\n- **');
         processedText = processedText.replace(/([.!?])-\s*\*\*/g, '$1\n- **');
         processedText = processedText.replace(/([.!?])\s*([A-Z][^.!?]*[.!?])\s*-\s*\*\*/g, '$1\n\n$2\n- **');
-        processedText = processedText.replace(/(\n- [^\n]+\n+)(\*\*[^*]+\*\*:)/g, '$1\n$2');
-        processedText = processedText.replace(/(\*\*[^*]+\*\*:[^\n]*\n+)(\*\*[^*]+\*\*:)/g, '$1\n$2');
+        processedText = processedText.replace(/(\n- [^\n]+\n+)(\*\*[^*]+\*\*:\s)/g, '$1\n$2');
+        processedText = processedText.replace(/(\*\*[^*]+\*\*:[^\n]*\n+)(\*\*[^*]+\*\*:\s)/g, '$1\n$2');
         processedText = processedText.replace(/([.!?])\s*(###)/g, '$1\n\n$2');
+        // Normalize extra blank lines before list items
+        processedText = processedText.replace(/\n{3,}- /g, '\n\n- ');
         return window.md.render(processedText);
       } catch {}
         }
+        // Fallback: basic inline formatting only
         return text
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
@@ -181,6 +184,11 @@
     .kb-bubble pre, .kb-bubble code{ white-space: pre-wrap; word-break: break-word; overflow-wrap:anywhere }
     .kb-bubble table{ display:block; width:100%; overflow:auto }
     .kb-bubble h1, .kb-bubble h2, .kb-bubble h3 { font-size:15px; }
+    /* Markdown formatting tweaks */
+    .kb-bubble ul, .kb-bubble ol{ margin:8px 0 12px 18px; padding-left:18px }
+    .kb-bubble li{ margin:6px 0 }
+    .kb-bubble li > p{ margin:0; display:inline }
+    .kb-bubble h3{ margin:10px 0 8px }
     /* Answer bubble (AI) uses same ask gradient */
     :host .kb-msg.ai .kb-bubble, .kb-msg.ai .kb-bubble{ background: var(--ask-overlay), var(--answer-gradient) !important; color:#0b0f1a; border-color: rgba(0,0,0,.12); box-shadow:0 14px 36px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.55); backdrop-filter:none; -webkit-backdrop-filter:none; opacity:1; background-clip: padding-box; }
     /* User bubble (pastel gradient over opaque solid, white text) */
