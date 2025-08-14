@@ -22,22 +22,6 @@ Embed a glassmorphism chat widget on any website. It preserves token handling, s
 ></script>
 ```
 
-## Core snippet (local dev)
-Run your backend on port 8000, then:
-```html
-<script
-  src="http://localhost:8000/static/widget.js"
-  data-token="YOUR_LOCAL_TEST_TOKEN"
-  data-bubble-title="Chat"
-  data-search-title="Assistant"
-  data-show-logo="false"
-  defer
-></script>
-```
-Notes:
-- The widget auto-detects `localhost/127.0.0.1` for API calls; otherwise uses production.
-- If you use a different local port, adjust the script URL.
-
 ## Attributes
 - `data-token` (required): your bot’s widget token
 - `data-bubble-title` (optional): text in floating bubble; if omitted, an icon is shown
