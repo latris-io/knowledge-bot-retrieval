@@ -81,6 +81,8 @@ app = FastAPI()
 
 # Mount static files for widget.js
 app.mount("/static", StaticFiles(directory="static"), name="static")
+# Mount public assets (serves index.html at /public)
+app.mount("/public", StaticFiles(directory="public", html=True), name="public")
 
 # Configure logging
 logging.basicConfig(
